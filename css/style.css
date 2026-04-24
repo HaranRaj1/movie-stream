@@ -1,12 +1,12 @@
 :root {
-    /* Dynamic Theme Variables - Controlled by CMS */
     --bg-main: #020205;
     --accent: #6366f1;
     --accent-secondary: #a855f7;
     --text-primary: #ffffff;
     --text-muted: #94a3b8;
-    --card-radius: 12px;
-    --glass: rgba(10, 10, 20, 0.85);
+    --card-radius: 16px;
+    --glass: rgba(10, 10, 25, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --font-main: 'Outfit', sans-serif;
 }
 
@@ -18,30 +18,54 @@ body {
     font-family: var(--font-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
 }
 
-.container { max-width: 1600px; margin: 0 auto; padding: 0 4rem; }
-
-/* Sticky Premium Navbar */
-.sticky-nav {
-    position: fixed;
-    top: 0; width: 100%; z-index: 1000;
-    padding: 1.5rem 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-    transition: all 0.4s ease;
+/* Responsive Containers */
+.container { 
+    max-width: 1600px; 
+    margin: 0 auto; 
+    padding: 0 5%; 
 }
 
-.sticky-nav.scrolled {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+@media (max-width: 768px) {
+    .container { padding: 0 1.5rem; }
 }
 
-.fade-in { animation: fadeIn 0.8s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Premium Button */
+.cms-btn {
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+}
 
-/* CMS Sidebar Layout */
+.cms-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.6);
+}
+
+/* Admin Sidebar - Responsive */
 .admin-layout { display: flex; min-height: 100vh; padding-top: 70px; }
-.admin-sidebar { width: 280px; background: #08080a; border-right: 1px solid #1a1a1a; padding: 2rem; position: fixed; height: 100%; }
+.admin-sidebar { 
+    width: 280px; background: #08080a; 
+    border-right: 1px solid var(--glass-border); 
+    padding: 2rem; position: fixed; height: 100%; 
+    z-index: 1001;
+}
+
+@media (max-width: 1024px) {
+    .admin-sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--glass-border); }
+    .admin-layout { flex-direction: column; }
+    .admin-content { margin-left: 0 !important; padding: 2rem 1.5rem !important; }
+}
+
 .admin-content { margin-left: 280px; flex: 1; padding: 4rem; }
