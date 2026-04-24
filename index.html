@@ -6,21 +6,44 @@
     <title>StreamFlix — Premium Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'sf-red':'#E50914','sf-dark':'#0a0a0f','sf-surface':'#12121a','sf-card':'#16161f','sf-border':'#1e1e2a','sf-muted':'#6b6b80' }, fontFamily:{'inter':['Inter','sans-serif']} } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sf-red': '#E50914',
+                        'sf-dark': '#0a0a0f',
+                        'sf-surface': '#12121a',
+                        'sf-card': '#16161f',
+                        'sf-border': '#1e1e2a',
+                        'sf-muted': '#6b6b80',
+                    },
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
     </script>
     <style>
-        :root{--c-primary:#E50914;--c-bg:#0a0a0f;--c-surface:#12121a;--c-card:#16161f;--c-border:#1e1e2a;--c-muted:#6b6b80;--c-text:#ffffff;--c-text2:#94a3b8;--f-heading:'Inter',sans-serif;--f-body:'Inter',sans-serif;--f-hw:700;--f-bw:300;--btn-radius:12px;--card-radius:12px}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:var(--f-body);background:var(--c-bg);color:var(--c-text);overflow-x:hidden;font-weight:var(--f-bw)}
-        ::-webkit-scrollbar{height:3px;width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:10px}
-        .row-scroll{scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none}.row-scroll::-webkit-scrollbar{display:none}
-        .card-hover{transition:transform 500ms cubic-bezier(0.16,1,0.3,1),box-shadow 500ms ease}.card-hover:hover{transform:scale(1.12) translateY(-8px);z-index:30;box-shadow:0 30px 80px -20px rgba(0,0,0,0.9),0 0 60px -10px rgba(229,9,20,0.12)}
-        .card-hover:hover .card-info{opacity:1;transform:translateY(0)}.card-hover:hover .card-overlay{opacity:1}.card-hover:hover .card-img{transform:scale(1.05)}
-        .card-info{opacity:0;transform:translateY(12px);transition:all 400ms cubic-bezier(0.16,1,0.3,1) 80ms}.card-overlay{opacity:0;transition:opacity 400ms ease}.card-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
-        .hero-gradient{background:linear-gradient(135deg,rgba(10,10,15,0.97) 0%,rgba(10,10,15,0.8) 30%,rgba(10,10,15,0.3) 55%,transparent 80%),linear-gradient(to top,var(--c-bg) 0%,rgba(10,10,15,0.85) 25%,rgba(10,10,15,0.2) 55%,transparent 75%)}
-        .nav-blur{backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%)}.modal-backdrop{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#fff;overflow-x:hidden}
+        ::-webkit-scrollbar{height:3px;width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:10px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
+        .row-scroll{scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none}
+        .row-scroll::-webkit-scrollbar{display:none}
+        .card-hover{transition:transform 500ms cubic-bezier(0.16,1,0.3,1),box-shadow 500ms ease}
+        .card-hover:hover{transform:scale(1.12) translateY(-8px);z-index:30;box-shadow:0 30px 80px -20px rgba(0,0,0,0.9),0 0 60px -10px rgba(229,9,20,0.12)}
+        .card-hover:hover .card-info{opacity:1;transform:translateY(0)}
+        .card-hover:hover .card-overlay{opacity:1}
+        .card-hover:hover .card-img{transform:scale(1.05)}
+        .card-info{opacity:0;transform:translateY(12px);transition:all 400ms cubic-bezier(0.16,1,0.3,1) 80ms}
+        .card-overlay{opacity:0;transition:opacity 400ms ease}
+        .card-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
+        .hero-gradient{background:linear-gradient(135deg,rgba(10,10,15,0.97) 0%,rgba(10,10,15,0.8) 30%,rgba(10,10,15,0.3) 55%,transparent 80%),linear-gradient(to top,#0a0a0f 0%,rgba(10,10,15,0.85) 25%,rgba(10,10,15,0.2) 55%,transparent 75%)}
+        .nav-blur{backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%)}
+        .modal-backdrop{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
         @keyframes slideUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes scaleIn{from{opacity:0;transform:scale(0.92) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -29,154 +52,323 @@
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
         @keyframes glow-pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
         @keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-2%)}30%{transform:translate(1%,2%)}50%{transform:translate(-1%,1%)}70%{transform:translate(2%,-1%)}90%{transform:translate(-2%,1%)}}
-        .animate-slide-up{animation:slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards}.animate-slide-down{animation:slideDown 0.4s cubic-bezier(0.16,1,0.3,1) forwards}.animate-scale-in{animation:scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}.animate-toast-in{animation:toastIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}.animate-toast-out{animation:toastOut 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+        .animate-slide-up{animation:slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards}
+        .animate-slide-down{animation:slideDown 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+        .animate-scale-in{animation:scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
+        .animate-toast-in{animation:toastIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
+        .animate-toast-out{animation:toastOut 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
         .film-grain::after{content:'';position:fixed;inset:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");animation:grain 6s steps(8) infinite;pointer-events:none;z-index:9999}
-        .genre-chip{transition:all 300ms cubic-bezier(0.16,1,0.3,1)}.genre-chip:hover{background:var(--c-primary);color:white;border-color:var(--c-primary);transform:translateY(-2px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}.genre-chip.active{background:var(--c-primary);color:white;border-color:var(--c-primary)}
-        .scroll-arrow{transition:all 300ms cubic-bezier(0.16,1,0.3,1);opacity:0;transform:scale(0.8)}.row-container:hover .scroll-arrow{opacity:1;transform:scale(1)}.scroll-arrow:hover{background:rgba(229,9,20,0.95);transform:scale(1.1)!important}
+        .genre-chip{transition:all 300ms cubic-bezier(0.16,1,0.3,1)}
+        .genre-chip:hover{background:#E50914;color:white;border-color:#E50914;transform:translateY(-2px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}
+        .genre-chip.active{background:#E50914;color:white;border-color:#E50914;box-shadow:0 2px 16px rgba(229,9,20,0.25)}
+        .scroll-arrow{transition:all 300ms cubic-bezier(0.16,1,0.3,1);opacity:0;transform:scale(0.8)}
+        .row-container:hover .scroll-arrow{opacity:1;transform:scale(1)}
+        .scroll-arrow:hover{background:rgba(229,9,20,0.95);transform:scale(1.1)!important;box-shadow:0 4px 24px rgba(229,9,20,0.4)}
         .top10-number{font-size:9rem;font-weight:900;-webkit-text-stroke:3px rgba(229,9,20,0.25);color:transparent;line-height:0.85;font-style:italic;filter:drop-shadow(0 0 30px rgba(229,9,20,0.1))}
-        .search-input:focus{outline:none}.maturity-badge{border:1px solid rgba(255,255,255,0.3);padding:0 5px;font-size:10px;font-weight:600;letter-spacing:0.5px}
-        .genre-tile{transition:all 400ms cubic-bezier(0.16,1,0.3,1)}.genre-tile:hover{transform:translateY(-4px) scale(1.02)}.genre-tile:hover .genre-tile-img{transform:scale(1.1)}.genre-tile-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
-        .row-title{position:relative;display:inline-block}.row-title::after{content:'';position:absolute;bottom:-4px;left:0;width:32px;height:3px;background:var(--c-primary);border-radius:2px;transition:width 300ms ease}.row-container:hover .row-title::after{width:100%}
-        .avatar-ring{background:conic-gradient(from 0deg,var(--c-primary),#ff6b6b,var(--c-primary));padding:2px;border-radius:10px;cursor:pointer;transition:all 300ms}.avatar-ring:hover{box-shadow:0 0 20px rgba(229,9,20,0.3);transform:scale(1.05)}
-        .ai{background:#0a0a0f;border:1px solid #1e1e2a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;width:100%;transition:border-color 300ms;font-family:var(--f-body)}.ai:focus{outline:none;border-color:var(--c-primary)}.ai::placeholder{color:#4a4a5a}
-        .ab{background:var(--c-primary);color:white;font-weight:600;font-size:13px;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;transition:all 300ms;font-family:var(--f-body)}.ab:hover{filter:brightness(1.15);transform:translateY(-1px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}
-        .ab2{background:#1e1e2a;color:#ccc;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #2a2a3a;cursor:pointer;transition:all 300ms;font-family:var(--f-body)}.ab2:hover{background:#2a2a3a;color:#fff}
-        .abd{background:transparent;color:#f87171;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #7f1d1d;cursor:pointer;transition:all 300ms;font-family:var(--f-body)}.abd:hover{background:#7f1d1d;color:#fff}
-        .ac{background:#12121a;border:1px solid #1e1e2a;border-radius:16px;padding:20px;transition:border-color 300ms}.ac:hover{border-color:#2a2a3a}
-        .at{width:100%;border-collapse:separate;border-spacing:0}.at th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#6b6b80;border-bottom:1px solid #1e1e2a}.at td{padding:12px 14px;font-size:13px;border-bottom:1px solid #14141c;vertical-align:middle}.at tr:hover td{background:rgba(255,255,255,0.02)}
-        .st{padding:6px 14px;font-size:11px;font-weight:500;border-radius:8px;cursor:pointer;transition:all 200ms;color:#6b6b80;background:transparent;border:1px solid transparent}
-        .st:hover{color:#fff;background:rgba(255,255,255,0.03)}.st.active{color:#fff;background:#1e1e2a;border-color:#2a2a3a}
-        .tgl{position:relative;width:40px;height:22px;border-radius:11px;background:#1e1e2a;cursor:pointer;transition:background 300ms;border:none;flex-shrink:0}
-        .tgl::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#6b6b80;transition:all 300ms}
-        .tgl.on{background:var(--c-primary)}.tgl.on::after{left:21px;background:#fff}
-        .clr-swatch{width:36px;height:36px;border-radius:10px;border:2px solid #2a2a3a;cursor:pointer;transition:all 200ms;position:relative;overflow:hidden}.clr-swatch:hover{border-color:#fff;transform:scale(1.1)}.clr-swatch input{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);opacity:0;cursor:pointer}
-        .section-toggle{transition:all 400ms ease}.section-toggle.off{opacity:0.15;pointer-events:none}
-        #announcement-bar{transition:all 400ms ease}#promo-popup{transition:all 400ms ease}
-        .ad-slot{transition:all 300ms ease}
-        @media(max-width:768px){.top10-number{font-size:5.5rem;-webkit-text-stroke:2px rgba(229,9,20,0.2)}.card-hover:hover{transform:scale(1.04) translateY(-4px)}.card-info{opacity:1;transform:translateY(0)}.card-overlay{opacity:1}}
+        .search-input:focus{outline:none}
+        .maturity-badge{border:1px solid rgba(255,255,255,0.3);padding:0 5px;font-size:10px;font-weight:600;letter-spacing:0.5px}
+        .genre-tile{transition:all 400ms cubic-bezier(0.16,1,0.3,1)}
+        .genre-tile:hover{transform:translateY(-4px) scale(1.02)}
+        .genre-tile:hover .genre-tile-img{transform:scale(1.1)}
+        .genre-tile-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
+        .row-title{position:relative;display:inline-block}
+        .row-title::after{content:'';position:absolute;bottom:-4px;left:0;width:32px;height:3px;background:#E50914;border-radius:2px;transition:width 300ms ease}
+        .row-container:hover .row-title::after{width:100%}
+        .avatar-ring{background:conic-gradient(from 0deg,#E50914,#ff6b6b,#E50914);padding:2px;border-radius:10px}
+        .admin-input{background:#0a0a0f;border:1px solid #1e1e2a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;width:100%;transition:border-color 300ms}
+        .admin-input:focus{outline:none;border-color:#E50914}
+        .admin-input::placeholder{color:#4a4a5a}
+        .admin-btn{background:#E50914;color:white;font-weight:600;font-size:13px;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;transition:all 300ms}
+        .admin-btn:hover{background:#F40612;transform:translateY(-1px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}
+        .admin-btn-secondary{background:#1e1e2a;color:#ccc;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #2a2a3a;cursor:pointer;transition:all 300ms}
+        .admin-btn-secondary:hover{background:#2a2a3a;color:#fff}
+        .admin-btn-danger{background:transparent;color:#f87171;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #7f1d1d;cursor:pointer;transition:all 300ms}
+        .admin-btn-danger:hover{background:#7f1d1d;color:#fff}
+        .admin-card{background:#12121a;border:1px solid #1e1e2a;border-radius:16px;padding:20px;transition:all 300ms}
+        .admin-card:hover{border-color:#2a2a3a}
+        .admin-table{width:100%;border-collapse:separate;border-spacing:0}
+        .admin-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#6b6b80;border-bottom:1px solid #1e1e2a}
+        .admin-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid #14141c;vertical-align:middle}
+        .admin-table tr:hover td{background:rgba(255,255,255,0.02)}
+        @media(max-width:768px){
+            .top10-number{font-size:5.5rem;-webkit-text-stroke:2px rgba(229,9,20,0.2)}
+            .card-hover:hover{transform:scale(1.04) translateY(-4px)}
+            .card-info{opacity:1;transform:translateY(0)}
+            .card-overlay{opacity:1}
+        }
     </style>
 </head>
-<body class="film-grain">
+<body class="font-inter film-grain">
+
 <div id="toast-container" class="fixed top-24 right-6 z-[200] flex flex-col gap-3"></div>
 
-<!-- Admin Login -->
+<!-- Admin Login Modal -->
 <div id="admin-login" class="fixed inset-0 z-[300] hidden">
     <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeAdminLogin()"></div>
-    <div class="relative z-10 max-w-md mx-auto mt-[15vh] animate-scale-in"><div class="ac p-8">
-        <div class="flex items-center justify-between mb-6"><div><div class="flex items-center gap-2 mb-1"><div class="w-6 h-6 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-3 h-3 text-white"></i></div><span class="text-sm font-bold">Admin Access</span></div><p class="text-xs text-sf-muted">Enter password to continue</p></div><button onclick="closeAdminLogin()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-        <div id="login-error" class="hidden mb-4 p-3 rounded-xl bg-red-950/50 border border-red-900/50 text-red-400 text-xs"></div>
-        <input id="admin-pass" type="password" placeholder="Password" class="ai mb-4" onkeydown="if(event.key==='Enter')attemptAdminLogin()">
-        <button onclick="attemptAdminLogin()" class="ab w-full">Authenticate</button>
-    </div></div>
-</div>
-
-<!-- Admin Panel -->
-<div id="admin-panel" class="fixed inset-0 z-[250] hidden">
-    <div class="absolute inset-0 bg-[#0a0a0f]/98 backdrop-blur-xl"></div>
-    <div class="relative z-10 h-full flex flex-col">
-        <header class="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0">
-            <div class="flex items-center gap-3"><div class="w-8 h-8 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-white"></i></div><div><h1 class="text-base font-bold">Admin Panel</h1><p class="text-[11px] text-sf-muted">Full site editor</p></div></div>
-            <div class="flex items-center gap-2"><button onclick="saveAll()" class="ab text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save</button><button onclick="closeAdmin()" class="ab2 text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button><button onclick="resetAllData()" class="abd text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset</button><button onclick="closeAdmin()" class="abd text-xs py-2 px-4"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>
-        </header>
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar -->
-            <div class="w-56 border-r border-white/5 flex-shrink-0 overflow-y-auto p-3 space-y-1 hidden lg:block">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-sf-muted px-3 pt-2 pb-1">Content</div>
-                <button onclick="switchAdminTab('movies')" class="st active w-full text-left flex items-center gap-2" data-tab="movies"><i data-lucide="film" class="w-3.5 h-3.5"></i> Movies</button>
-                <button onclick="switchAdminTab('rows')" class="st w-full text-left flex items-center gap-2" data-tab="rows"><i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Content Rows</button>
-                <button onclick="switchAdminTab('hero')" class="st w-full text-left flex items-center gap-2" data-tab="hero"><i data-lucide="image" class="w-3.5 h-3.5"></i> Hero Slider</button>
-                <button onclick="switchAdminTab('top10')" class="st w-full text-left flex items-center gap-2" data-tab="top10"><i data-lucide="trophy" class="w-3.5 h-3.5"></i> Top 10</button>
-                <button onclick="switchAdminTab('genres')" class="st w-full text-left flex items-center gap-2" data-tab="genres"><i data-lucide="grid-3x3" class="w-3.5 h-3.5"></i> Genre Tiles</button>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-sf-muted px-3 pt-4 pb-1">Appearance</div>
-                <button onclick="switchAdminTab('branding')" class="st w-full text-left flex items-center gap-2" data-tab="branding"><i data-lucide="palette" class="w-3.5 h-3.5"></i> Branding</button>
-                <button onclick="switchAdminTab('colors')" class="st w-full text-left flex items-center gap-2" data-tab="colors"><i data-lucide="pipette" class="w-3.5 h-3.5"></i> Colors & Theme</button>
-                <button onclick="switchAdminTab('typography')" class="st w-full text-left flex items-center gap-2" data-tab="typography"><i data-lucide="type" class="w-3.5 h-3.5"></i> Typography</button>
-                <button onclick="switchAdminTab('components')" class="st w-full text-left flex items-center gap-2" data-tab="components"><i data-lucide="component" class="w-3.5 h-3.5"></i> Components</button>
-                <button onclick="switchAdminTab('header')" class="st w-full text-left flex items-center gap-2" data-tab="header"><i data-lucide="panel-top" class="w-3.5 h-3.5"></i> Header Builder</button>
-                <button onclick="switchAdminTab('footer')" class="st w-full text-left flex items-center gap-2" data-tab="footer"><i data-lucide="panel-bottom" class="w-3.5 h-3.5"></i> Footer Builder</button>
-                <button onclick="switchAdminTab('banners')" class="st w-full text-left flex items-center gap-2" data-tab="banners"><i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Banners & Popups</button>
-                <button onclick="switchAdminTab('sections')" class="st w-full text-left flex items-center gap-2" data-tab="sections"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Sections</button>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-sf-muted px-3 pt-4 pb-1">Monetization</div>
-                <button onclick="switchAdminTab('adplacements')" class="st w-full text-left flex items-center gap-2" data-tab="adplacements"><i data-lucide="layout-list" class="w-3.5 h-3.5"></i> Ad Placements</button>
-                <button onclick="switchAdminTab('campaigns')" class="st w-full text-left flex items-center gap-2" data-tab="campaigns"><i data-lucide="target" class="w-3.5 h-3.5"></i> Campaigns</button>
-                <button onclick="switchAdminTab('sponsored')" class="st w-full text-left flex items-center gap-2" data-tab="sponsored"><i data-lucide="badge-dollar-sign" class="w-3.5 h-3.5"></i> Sponsored & Affiliate</button>
+    <div class="relative z-10 max-w-md mx-auto mt-[15vh] animate-scale-in">
+        <div class="admin-card p-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-6 h-6 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-3 h-3 text-white"></i></div>
+                        <span class="text-sm font-bold">Admin Access</span>
+                    </div>
+                    <p class="text-xs text-sf-muted">Enter password to continue</p>
+                </div>
+                <button onclick="closeAdminLogin()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <!-- Mobile tabs -->
-            <div class="lg:hidden flex-shrink-0 border-b border-white/5 overflow-x-auto row-scroll p-2 gap-1" id="mobile-admin-tabs"></div>
-            <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-6" id="admin-content"></div>
+            <div id="login-error" class="hidden mb-4 p-3 rounded-xl bg-red-950/50 border border-red-900/50 text-red-400 text-xs"></div>
+            <input id="admin-pass" type="password" placeholder="Password" class="admin-input mb-4" onkeydown="if(event.key==='Enter')attemptAdminLogin()">
+            <button onclick="attemptAdminLogin()" class="admin-btn w-full">Authenticate</button>
         </div>
     </div>
 </div>
 
-<!-- Movie Editor -->
-<div id="movie-editor" class="fixed inset-0 z-[260] hidden"><div class="absolute inset-0 bg-black/80" onclick="closeMovieEditor()"></div><div class="relative z-10 max-w-2xl mx-auto mt-[8vh] max-h-[84vh] overflow-y-auto animate-scale-in"><div class="ac p-6 sm:p-8"><div class="flex items-center justify-between mb-6"><h2 id="editor-title" class="text-lg font-bold">Add Movie</h2><button onclick="closeMovieEditor()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="space-y-4"><div><label class="text-xs text-sf-muted block mb-1.5">Title</label><input id="ed-title" class="ai" placeholder="Movie title"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-xs text-sf-muted block mb-1.5">Genre</label><select id="ed-genre" class="ai"><option value="action">Action</option><option value="thriller">Thriller</option><option value="scifi">Sci-Fi</option><option value="drama">Drama</option><option value="comedy">Comedy</option><option value="horror">Horror</option><option value="romance">Romance</option><option value="documentary">Documentary</option></select></div><div><label class="text-xs text-sf-muted block mb-1.5">Year</label><input id="ed-year" type="number" class="ai" placeholder="2024"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="text-xs text-sf-muted block mb-1.5">Duration</label><input id="ed-duration" class="ai" placeholder="2h 15m"></div><div><label class="text-xs text-sf-muted block mb-1.5">Maturity</label><select id="ed-maturity" class="ai"><option value="TV-G">TV-G</option><option value="PG">PG</option><option value="PG-13">PG-13</option><option value="TV-14">TV-14</option><option value="TV-MA">TV-MA</option><option value="R">R</option></select></div></div><div><label class="text-xs text-sf-muted block mb-1.5">Description</label><textarea id="ed-desc" rows="3" class="ai resize-none" placeholder="Movie description..."></textarea></div><div><label class="text-xs text-sf-muted block mb-1.5">Cast</label><input id="ed-cast" class="ai" placeholder="Actor 1, Actor 2"></div><div class="grid grid-cols-2 gap-4"><div><label class="text-xs text-sf-muted block mb-1.5">Image Seed</label><input id="ed-img" class="ai" placeholder="my-poster"><p class="text-[10px] text-sf-muted mt-1">Poster & card image</p></div><div><label class="text-xs text-sf-muted block mb-1.5">Banner Seed</label><input id="ed-banner" class="ai" placeholder="my-banner"><p class="text-[10px] text-sf-muted mt-1">Hero & modal background</p></div></div><div class="flex items-center gap-3 pt-2"><button onclick="saveMovieEdits()" class="ab flex-1">Save Movie</button><button onclick="closeMovieEditor()" class="ab2">Cancel</button></div></div></div></div></div>
+<!-- Admin Panel -->
+<div id="admin-panel" class="fixed inset-0 z-[250] hidden">
+    <div class="absolute inset-0 bg-sf-dark/98 backdrop-blur-xl"></div>
+    <div class="relative z-10 h-full flex flex-col max-w-[1400px] mx-auto">
+        <header class="flex items-center justify-between px-6 py-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-white"></i></div>
+                <div>
+                    <h1 class="text-base font-bold">Admin Panel</h1>
+                    <p class="text-[11px] text-sf-muted">Full site editor</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="saveAll()" class="admin-btn text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save & Apply</button>
+                <button onclick="closeAdmin()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button>
+                <button onclick="closeAdmin()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="x" class="w-3.5 h-3.5"></i> Close</button>
+            </div>
+        </header>
 
-<!-- Announcement Bar -->
-<div id="announcement-bar" class="hidden"></div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- Admin Tabs -->
+            <div class="flex items-center gap-1 mb-6 border-b border-white/5 pb-3">
+                <button onclick="switchAdminTab('movies')" class="admin-tab active px-4 py-2 text-xs font-medium rounded-lg transition-all" data-tab="movies">Movies</button>
+                <button onclick="switchAdminTab('rows')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white" data-tab="rows">Content Rows</button>
+                <button onclick="switchAdminTab('hero')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white" data-tab="hero">Hero Slider</button>
+                <button onclick="switchAdminTab('top10')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white" data-tab="top10">Top 10</button>
+                <button onclick="switchAdminTab('genres')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white" data-tab="genres">Genre Tiles</button>
+            </div>
 
-<!-- Promo Popup -->
-<div id="promo-popup" class="fixed inset-0 z-[180] hidden">
-    <div class="absolute inset-0 bg-black/70" onclick="closePromoPopup()"></div>
-    <div class="relative z-10 max-w-lg mx-auto mt-[20vh] animate-scale-in" id="promo-popup-content"></div>
+            <!-- Movies Tab -->
+            <div id="tab-movies" class="admin-tab-content">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-sf-muted">Manage all movies in the database</p>
+                    <button onclick="openMovieEditor(-1)" class="admin-btn text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Movie</button>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-white/5">
+                    <table class="admin-table" id="movies-table"></table>
+                </div>
+            </div>
+
+            <!-- Rows Tab -->
+            <div id="tab-rows" class="admin-tab-content hidden">
+                <p class="text-sm text-sf-muted mb-4">Edit row titles and which movies appear in each</p>
+                <div id="rows-editor" class="space-y-4"></div>
+            </div>
+
+            <!-- Hero Tab -->
+            <div id="tab-hero" class="admin-tab-content hidden">
+                <p class="text-sm text-sf-muted mb-4">Choose which movies rotate in the hero banner</p>
+                <div class="admin-card">
+                    <label class="text-xs text-sf-muted block mb-2">Hero Movies (select up to 6)</label>
+                    <div id="hero-selector" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Top 10 Tab -->
+            <div id="tab-top10" class="admin-tab-content hidden">
+                <p class="text-sm text-sf-muted mb-4">Drag to reorder or click to remove. Click the + button to add.</p>
+                <div class="admin-card">
+                    <div id="top10-editor" class="space-y-2"></div>
+                    <div class="mt-4 pt-4 border-t border-white/5">
+                        <label class="text-xs text-sf-muted block mb-2">Add movie to Top 10</label>
+                        <div class="flex gap-2">
+                            <select id="top10-add-select" class="admin-input flex-1"></select>
+                            <button onclick="addToTop10()" class="admin-btn text-xs py-2 px-4">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genres Tab -->
+            <div id="tab-genres" class="admin-tab-content hidden">
+                <p class="text-sm text-sf-muted mb-4">Edit genre display names</p>
+                <div id="genres-editor" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Nav -->
+<!-- Movie Editor Modal -->
+<div id="movie-editor" class="fixed inset-0 z-[260] hidden">
+    <div class="absolute inset-0 bg-black/80" onclick="closeMovieEditor()"></div>
+    <div class="relative z-10 max-w-2xl mx-auto mt-[8vh] max-h-[84vh] overflow-y-auto animate-scale-in">
+        <div class="admin-card p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="editor-title" class="text-lg font-bold">Add Movie</h2>
+                <button onclick="closeMovieEditor()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="text-xs text-sf-muted block mb-1.5">Title</label><input id="ed-title" class="admin-input" placeholder="Movie title"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre</label>
+                        <select id="ed-genre" class="admin-input"><option value="action">Action</option><option value="thriller">Thriller</option><option value="scifi">Sci-Fi</option><option value="drama">Drama</option><option value="comedy">Comedy</option><option value="horror">Horror</option><option value="romance">Romance</option><option value="documentary">Documentary</option></select>
+                    </div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Year</label><input id="ed-year" type="number" class="admin-input" placeholder="2024"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Duration</label><input id="ed-duration" class="admin-input" placeholder="2h 15m"></div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Maturity</label>
+                        <select id="ed-maturity" class="admin-input"><option value="TV-G">TV-G</option><option value="TV-PG">TV-PG</option><option value="PG">PG</option><option value="PG-13">PG-13</option><option value="TV-14">TV-14</option><option value="TV-MA">TV-MA</option><option value="R">R</option></select>
+                    </div>
+                </div>
+                <div><label class="text-xs text-sf-muted block mb-1.5">Description</label><textarea id="ed-desc" rows="3" class="admin-input resize-none" placeholder="Movie description..."></textarea></div>
+                <div><label class="text-xs text-sf-muted block mb-1.5">Cast</label><input id="ed-cast" class="admin-input" placeholder="Actor 1, Actor 2, Actor 3"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Image Seed</label><input id="ed-img" class="admin-input" placeholder="my-movie-poster"><p class="text-[10px] text-sf-muted mt-1">Used for poster & card images</p></div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Banner Seed</label><input id="ed-banner" class="admin-input" placeholder="my-movie-banner"><p class="text-[10px] text-sf-muted mt-1">Used for hero & modal background</p></div>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <button onclick="saveMovieEdits()" class="admin-btn flex-1">Save Movie</button>
+                    <button onclick="closeMovieEditor()" class="admin-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Site Nav -->
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-700">
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
         <div class="flex items-center justify-between h-16 lg:h-20">
             <div class="flex items-center gap-6 lg:gap-10">
-                <a href="#" id="logo-link" class="flex items-center gap-2.5 group"><div id="logo-icon" class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500"><i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i></div><span id="logo-text" class="text-xl font-bold tracking-tight">Stream<span style="color:var(--c-primary)">Flix</span></span></a>
-                <div id="nav-menu" class="hidden lg:flex items-center gap-0.5"></div>
+                <a href="#" class="flex items-center gap-2.5 group" onclick="logoClick(event)">
+                    <div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500">
+                        <i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
+                </a>
+                <div class="hidden lg:flex items-center gap-0.5">
+                    <a href="#" class="px-3.5 py-2 text-[13px] font-medium text-white relative">Home<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span></a>
+                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">TV Shows</a>
+                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">Movies</a>
+                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">New & Popular</a>
+                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">My List</a>
+                </div>
                 <button id="mobile-menu-btn" class="lg:hidden p-2 text-sf-muted hover:text-white transition-colors"><i data-lucide="menu" class="w-5 h-5"></i></button>
             </div>
             <div class="flex items-center gap-3">
                 <div id="search-wrapper" class="relative flex items-center">
                     <div id="search-closed" class="cursor-pointer p-2 text-sf-muted hover:text-white transition-colors duration-300" onclick="openSearch()"><i data-lucide="search" class="w-[18px] h-[18px]"></i></div>
-                    <div id="search-open" class="hidden items-center animate-slide-down"><i data-lucide="search" class="w-4 h-4 text-sf-muted absolute left-3"></i><input id="search-input" type="text" placeholder="Titles, people, genres..." class="search-input bg-sf-surface/95 border border-white/10 text-sm text-white pl-10 pr-10 py-2.5 w-60 lg:w-96 rounded-xl placeholder:text-sf-muted focus:border-sf-red/40 transition-all duration-300 shadow-xl" oninput="handleSearch(this.value)"><button onclick="closeSearch()" class="absolute right-3 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+                    <div id="search-open" class="hidden items-center animate-slide-down">
+                        <i data-lucide="search" class="w-4 h-4 text-sf-muted absolute left-3"></i>
+                        <input id="search-input" type="text" placeholder="Titles, people, genres..." class="search-input bg-sf-surface/95 border border-white/10 text-sm text-white pl-10 pr-10 py-2.5 w-60 lg:w-96 rounded-xl placeholder:text-sf-muted focus:border-sf-red/40 transition-all duration-300 shadow-xl" oninput="handleSearch(this.value)">
+                        <button onclick="closeSearch()" class="absolute right-3 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
                 </div>
-                <div id="nav-profile" class="avatar-ring" onclick="openAdminLogin()"><div class="w-8 h-8 rounded-[8px] overflow-hidden bg-sf-surface"><img src="https://picsum.photos/seed/avatar-user/80/80.jpg" alt="Profile" class="w-full h-full object-cover"></div></div>
+                <div class="avatar-ring cursor-pointer hover:shadow-lg hover:shadow-sf-red/20 transition-shadow duration-500">
+                    <div class="w-8 h-8 rounded-[8px] overflow-hidden bg-sf-surface">
+                        <img src="https://picsum.photos/seed/avatar-user/80/80.jpg" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div id="search-results" class="hidden max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 pb-4 animate-slide-down"><div class="bg-sf-surface/98 border border-white/8 rounded-2xl max-h-96 overflow-y-auto shadow-2xl shadow-black/50"><div id="search-results-content" class="p-4"></div></div></div>
+    <div id="search-results" class="hidden max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 pb-4 animate-slide-down">
+        <div class="bg-sf-surface/98 border border-white/8 rounded-2xl max-h-96 overflow-y-auto shadow-2xl shadow-black/50"><div id="search-results-content" class="p-4"></div></div>
+    </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 z-[90] hidden"><div class="absolute inset-0 bg-black/85" onclick="closeMobileMenu()"></div><div class="absolute left-0 top-0 bottom-0 w-72 bg-sf-dark/98 border-r border-white/5 p-6 animate-slide-up backdrop-blur-xl"><div class="flex items-center justify-between mb-8"><span id="mobile-logo-text" class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span><button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div><div id="mobile-menu-items" class="flex flex-col gap-1"></div></div></div>
+<div id="mobile-menu" class="fixed inset-0 z-[90] hidden">
+    <div class="absolute inset-0 bg-black/85" onclick="closeMobileMenu()"></div>
+    <div class="absolute left-0 top-0 bottom-0 w-72 bg-sf-dark/98 border-r border-white/5 p-6 animate-slide-up backdrop-blur-xl">
+        <div class="flex items-center justify-between mb-8">
+            <span class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span>
+            <button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex flex-col gap-1">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-white bg-white/5 rounded-xl"><i data-lucide="home" class="w-5 h-5 text-sf-red"></i> Home</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="tv" class="w-5 h-5"></i> TV Shows</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="film" class="w-5 h-5"></i> Movies</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="trending-up" class="w-5 h-5"></i> New & Popular</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="heart" class="w-5 h-5"></i> My List</a>
+        </div>
+    </div>
+</div>
 
-<section id="hero" class="relative h-[90vh] sm:h-[92vh] lg:h-[96vh] overflow-hidden section-toggle" data-section="hero">
-    <div id="hero-bg" class="absolute inset-0 transition-opacity duration-1200"></div>
+<section id="hero" class="relative h-[90vh] sm:h-[92vh] lg:h-[96vh] overflow-hidden">
+    <div id="hero-bg" class="absolute inset-0 transition-opacity duration-1200">
+        <img src="https://picsum.photos/seed/hero-cinematic-dark/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">
+    </div>
     <div class="hero-gradient absolute inset-0"></div>
-    <div class="absolute bottom-0 left-0 w-[600px] h-[400px] rounded-full blur-[120px] pointer-events-none" style="background:var(--c-primary);opacity:0.05;animation:glow-pulse 6s ease-in-out infinite;"></div>
-    <div class="relative z-10 h-full flex items-end pb-28 sm:pb-32 lg:pb-36"><div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 w-full"><div id="hero-content" class="max-w-xl lg:max-w-2xl animate-slide-up" style="animation-delay:0.1s;"></div></div></div>
+    <div class="absolute bottom-0 left-0 w-[600px] h-[400px] bg-sf-red/5 rounded-full blur-[120px] pointer-events-none" style="animation:glow-pulse 6s ease-in-out infinite;"></div>
+    <div class="relative z-10 h-full flex items-end pb-28 sm:pb-32 lg:pb-36">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
+            <div id="hero-content" class="max-w-xl lg:max-w-2xl animate-slide-up" style="animation-delay:0.1s;"></div>
+        </div>
+    </div>
     <div id="hero-dots" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5"></div>
 </section>
 
 <main class="relative z-10 -mt-12 sm:-mt-16">
-    <div id="ad-slot-top" class="ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-4 hidden"></div>
-    <section id="genre-filter-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10 section-toggle" data-section="genreFilter"><div class="flex items-center gap-2 overflow-x-auto pb-2 row-scroll"><button class="genre-chip active whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] font-medium" onclick="filterGenre(this,'all')">All</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'action')">Action</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'thriller')">Thriller</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'scifi')">Sci-Fi</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'drama')">Drama</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'comedy')">Comedy</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'horror')">Horror</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'romance')">Romance</button><button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'documentary')">Documentary</button></div></section>
+    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 row-scroll">
+            <button class="genre-chip active whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] font-medium" onclick="filterGenre(this,'all')">All</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'action')">Action</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'thriller')">Thriller</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'scifi')">Sci-Fi</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'drama')">Drama</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'comedy')">Comedy</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'horror')">Horror</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'romance')">Romance</button>
+            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'documentary')">Documentary</button>
+        </div>
+    </section>
     <div id="content-rows"></div>
-    <div id="ad-slot-mid" class="ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 my-6 hidden"></div>
-    <section id="top10-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4 section-toggle" data-section="top10"><h2 class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2><div class="row-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4"><div id="top10-container" class="flex gap-3 sm:gap-4"></div></div></section>
-    <section id="browse-genre-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-6 section-toggle" data-section="browseGenre"><h2 class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="genre-grid"></div></section>
-    <div id="sponsored-section" class="ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 my-10 hidden"></div>
-    <div id="affiliate-section" class="ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-16 hidden"></div>
+    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
+        <h2 class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2>
+        <div class="row-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4"><div id="top10-container" class="flex gap-3 sm:gap-4"></div></div>
+    </section>
+    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-20">
+        <h2 class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="genre-grid"></div>
+    </section>
 </main>
 
-<footer id="site-footer" class="border-t border-white/5 relative overflow-hidden section-toggle" data-section="footer">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] rounded-full blur-[100px] pointer-events-none" style="background:var(--c-primary);opacity:0.03"></div>
+<footer class="border-t border-white/5 relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-sf-red/3 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-14 relative z-10">
-        <div id="footer-social" class="flex items-center gap-5 mb-10"></div>
-        <div id="footer-links" class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10"></div>
-        <div id="footer-bottom" class="flex items-center justify-between flex-wrap gap-4"></div>
+        <div class="flex items-center gap-5 mb-10">
+            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Audio Description</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Investor Relations</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Legal Notices</a></div>
+            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Help Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Jobs</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Cookie Preferences</a></div>
+            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Gift Cards</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Terms of Use</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Corporate Information</a></div>
+            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Media Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Privacy</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Contact Us</a></div>
+        </div>
+        <button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300 mb-5">Service Code</button>
+        <p class="text-[11px] text-white/20">&copy; 2024 StreamFlix. All rights reserved.</p>
     </div>
 </footer>
 
-<div id="modal" class="fixed inset-0 z-[150] hidden"><div class="modal-backdrop absolute inset-0 bg-black/75" onclick="closeModal()"></div><div class="relative z-10 max-w-3xl mx-auto mt-6 sm:mt-10 max-h-[92vh] overflow-y-auto rounded-2xl animate-scale-in shadow-2xl shadow-black/50"><div id="modal-content"></div></div></div>
+<div id="modal" class="fixed inset-0 z-[150] hidden">
+    <div class="modal-backdrop absolute inset-0 bg-black/75" onclick="closeModal()"></div>
+    <div class="relative z-10 max-w-3xl mx-auto mt-6 sm:mt-10 max-h-[92vh] overflow-y-auto rounded-2xl animate-scale-in shadow-2xl shadow-black/50"><div id="modal-content"></div></div>
+</div>
 
 <script>
 var ADMIN_PASS='Haran!stream2026!';
-var editingMovieId=-1,currentHero=0,myList=new Set();
+var editingMovieId=-1;
+var logoClicks=0;
+var logoTimer=null;
 
 function getDefaultData(){
     return {
@@ -203,183 +395,187 @@ function getDefaultData(){
             {id:19,title:"Deep Blue",genre:"documentary",year:2024,duration:"4 episodes",maturity:"TV-G",desc:"A mesmerizing deep-dive into the ocean's most mysterious and unexplored depths.",cast:"Cate Blanchett (narrator)",img:"underwater-ocean-deep",banner:"underwater-ocean-deep"}
         ],
         heroIds:[0,3,5,4],
-        rows:[{title:"Trending Now",ids:[0,4,3,7,5,11,15,8]},{title:"Popular on StreamFlix",ids:[1,9,12,6,14,16,2,18]},{title:"Action & Adventure",ids:[3,7,11,17,0,15]},{title:"Critically Acclaimed",ids:[10,19,4,15,18,12]},{title:"Sci-Fi & Fantasy",ids:[5,12,0,3,11,8]}],
+        rows:[
+            {title:"Trending Now",ids:[0,4,3,7,5,11,15,8]},
+            {title:"Popular on StreamFlix",ids:[1,9,12,6,14,16,2,18]},
+            {title:"Action & Adventure",ids:[3,7,11,17,0,15]},
+            {title:"Critically Acclaimed",ids:[10,19,4,15,18,12]},
+            {title:"Sci-Fi & Fantasy",ids:[5,12,0,3,11,8]}
+        ],
         top10Ids:[4,10,0,15,18,3,12,5,7,1],
-        genres:[{name:"Action",icon:"swords",seed:"action-explosion-fire",gradient:"from-red-900/70 to-orange-950/80"},{name:"Thriller",icon:"eye",seed:"thriller-dark-alley",gradient:"from-purple-900/70 to-indigo-950/80"},{name:"Sci-Fi",icon:"rocket",seed:"scifi-space-rocket",gradient:"from-blue-900/70 to-cyan-950/80"},{name:"Drama",icon:"drama",seed:"drama-theater-stage",gradient:"from-amber-900/70 to-yellow-950/80"},{name:"Comedy",icon:"smile",seed:"comedy-fun-party",gradient:"from-yellow-900/70 to-lime-950/80"},{name:"Horror",icon:"skull",seed:"horror-dark-scary",gradient:"from-gray-900/70 to-slate-950/80"},{name:"Romance",icon:"heart",seed:"romance-sunset-love",gradient:"from-pink-900/70 to-rose-950/80"},{name:"Documentary",icon:"globe",seed:"documentary-nature-earth",gradient:"from-green-900/70 to-emerald-950/80"}],
-        appearance:{
-            logo:{type:'text',text:'StreamFlix',textMobile:'StreamFlix',imageUrl:'',imageMobileUrl:'',favicon:''},
-            theme:'dark',
-            colors:{primary:'#E50914',bg:'#0a0a0f',surface:'#12121a',card:'#16161f',border:'#1e1e2a',muted:'#6b6b80',text:'#ffffff',text2:'#94a3b8'},
-            fonts:{heading:'Inter',body:'Inter',headingWeight:'700',bodyWeight:'300',sizeScale:'1'},
-            buttons:{radius:'12px',style:'filled'},
-            cards:{radius:'12px',hoverEffect:'lift'},
-            header:{showSearch:true,showProfile:true,items:[{label:'Home',active:true},{label:'TV Shows',active:false},{label:'Movies',active:false},{label:'New & Popular',active:false},{label:'My List',active:false}]},
-            footer:{showSocial:true,showLinks:true,showServiceCode:true,copyright:'© 2024 StreamFlix. All rights reserved.',columns:[{title:'Company',links:['About Us','Careers','Press']},{title:'Support',links:['Help Center','Contact','Status']},{title:'Legal',links:['Privacy','Terms','Cookies']},{title:'Explore',links:['Gift Cards','Media Center','Investors']}],socialIcons:['facebook','instagram','twitter','youtube']},
-            announcement:{enabled:false,text:'Welcome to StreamFlix — Your premium streaming destination',bgColor:'#E50914',textColor:'#ffffff',link:''},
-            popup:{enabled:false,title:'Special Offer!',desc:'Get 50% off your first 3 months of Premium.',btnText:'Claim Now',btnLink:'#',bgColor:'#1a1a2e',accentColor:'#E50914'},
-            sections:{hero:true,genreFilter:true,top10:true,browseGenre:true,footer:true}
-        },
-        monetization:{
-            adPlacements:{top:{enabled:false,html:''},betweenRows:{enabled:false,afterRow:2,html:''},abovePlayer:{enabled:false,html:''},belowPlayer:{enabled:false,html:''},sidebar:{enabled:false,position:'right',html:''}},
-            campaigns:[],
-            sponsored:{enabled:false,title:'Recommended For You',items:[]},
-            affiliate:{enabled:false,title:'Partner Offers',items:[]}
-        }
+        genres:[
+            {name:"Action",icon:"swords",seed:"action-explosion-fire",gradient:"from-red-900/70 to-orange-950/80"},
+            {name:"Thriller",icon:"eye",seed:"thriller-dark-alley",gradient:"from-purple-900/70 to-indigo-950/80"},
+            {name:"Sci-Fi",icon:"rocket",seed:"scifi-space-rocket",gradient:"from-blue-900/70 to-cyan-950/80"},
+            {name:"Drama",icon:"drama",seed:"drama-theater-stage",gradient:"from-amber-900/70 to-yellow-950/80"},
+            {name:"Comedy",icon:"smile",seed:"comedy-fun-party",gradient:"from-yellow-900/70 to-lime-950/80"},
+            {name:"Horror",icon:"skull",seed:"horror-dark-scary",gradient:"from-gray-900/70 to-slate-950/80"},
+            {name:"Romance",icon:"heart",seed:"romance-sunset-love",gradient:"from-pink-900/70 to-rose-950/80"},
+            {name:"Documentary",icon:"globe",seed:"documentary-nature-earth",gradient:"from-green-900/70 to-emerald-950/80"}
+        ]
     };
 }
 
 var SD;
-function loadSiteData(){try{var s=localStorage.getItem('streamflix_data');if(s){SD=JSON.parse(s);return}}catch(e){}SD=getDefaultData()}
+function loadSiteData(){
+    try{var s=localStorage.getItem('streamflix_data');if(s){SD=JSON.parse(s);return}}catch(e){}
+    SD=getDefaultData();
+}
 function saveSiteData(){localStorage.setItem('streamflix_data',JSON.stringify(SD))}
+
+var myList=new Set();
+var currentHero=0;
+
 function getMovie(id){return SD.movies.find(function(m){return m.id===id})}
-function esc(s){return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 
-function createCard(m){return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer overflow-hidden relative" onclick="openModal('+m.id+')" style="border-radius:var(--card-radius)"><div class="relative aspect-[2/3] bg-sf-card overflow-hidden" style="border-radius:var(--card-radius)"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy"><div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5"><button onclick="event.stopPropagation();showToast(\'Now Playing: '+esc(m.title)+'\')" class="w-7 h-7 bg-white rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30" style="border-radius:var(--btn-radius)"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button><button onclick="event.stopPropagation();toggleMyList('+m.id+')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(m.id)?'check':'plus')+'" class="w-3 h-3"></i></button><button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div><p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+esc(m.title)+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span></div></div></div></div>'}
-
-function createTop10Card(m,r){return '<div class="flex-shrink-0 flex items-end cursor-pointer" onclick="openModal('+m.id+')"><span class="top10-number mr-[-14px] relative z-10 select-none">'+r+'</span><div class="w-[110px] sm:w-[135px] lg:w-[155px] overflow-hidden relative card-hover" style="border-radius:var(--card-radius)"><div class="aspect-[2/3] bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy"></div></div></div>'}
-
-function applyAppearance(){
-    var a=SD.appearance,c=a.colors;
-    var r=document.documentElement.style;
-    r.setProperty('--c-primary',c.primary);r.setProperty('--c-bg',c.bg);r.setProperty('--c-surface',c.surface);r.setProperty('--c-card',c.card);r.setProperty('--c-border',c.border);r.setProperty('--c-muted',c.muted);r.setProperty('--c-text',c.text);r.setProperty('--c-text2',c.text2);
-    r.setProperty('--f-heading',a.fonts.heading+',sans-serif');r.setProperty('--f-body',a.fonts.body+',sans-serif');r.setProperty('--f-hw',a.fonts.headingWeight);r.setProperty('--f-bw',a.fonts.bodyWeight);r.setProperty('--btn-radius',a.buttons.radius);r.setProperty('--card-radius',a.cards.radius);
-    document.body.style.background=c.bg;
-    // Logo
-    var lt=document.getElementById('logo-text'),li=document.getElementById('logo-icon'),mlt=document.getElementById('mobile-logo-text');
-    if(a.logo.type==='text'){lt.innerHTML=esc(a.logo.text)+'<span style="color:'+c.primary+'">Flix</span>';lt.classList.remove('hidden');li.classList.remove('hidden');mlt.innerHTML=esc(a.logo.textMobile||a.logo.text)+'<span class="text-sf-red">Flix</span>'}
-    else if(a.logo.type==='image'&&a.logo.imageUrl){lt.innerHTML='<img src="'+esc(a.logo.imageUrl)+'" class="h-7 lg:h-8 object-contain">';lt.classList.remove('hidden');li.classList.add('hidden');mlt.innerHTML='<img src="'+esc(a.logo.imageMobileUrl||a.logo.imageUrl)+'" class="h-6 object-contain">'}
-    else{lt.innerHTML='<span style="color:'+c.primary+'">S</span>F';lt.classList.remove('hidden');li.classList.remove('hidden');mlt.innerHTML='<span class="text-sf-red">S</span>F'}
-    // Favicon
-    var fl=document.querySelector('link[rel="icon"]');if(!fl){fl=document.createElement('link');fl.rel='icon';document.head.appendChild(fl)}if(a.logo.type==='image'&&a.logo.imageUrl){fl.href=a.logo.imageUrl}else{fl.href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="'+encodeURIComponent(c.primary)+'"/><text x="16" y="22" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="sans-serif">S</text></svg>'}
-    // Font scale
-    var fs=parseFloat(a.fonts.sizeScale)||1;r.setProperty('--font-scale',fs);
-    // Nav menu
-    var nm=document.getElementById('nav-menu'),mmi=document.getElementById('mobile-menu-items');
-    nm.innerHTML='';mmi.innerHTML='';
-    a.header.items.forEach(function(it,i){nm.innerHTML+='<a href="#" class="px-3.5 py-2 text-[13px] '+(it.active?'font-medium text-white relative':'font-light text-sf-muted hover:text-white')+' transition-colors duration-300">'+(it.active?'<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 rounded-full" style="background:'+c.primary+'"></span>':'')+esc(it.label)+'</a>';mmi.innerHTML+='<a href="#" class="flex items-center gap-3 px-4 py-3 text-sm '+(it.active?'font-medium text-white bg-white/5':'text-sf-muted hover:text-white hover:bg-white/5')+' rounded-xl transition-colors"><i data-lucide="home" class="w-5 h-5 '+(it.active?'text-sf-red':'')+'"></i> '+esc(it.label)+'</a>'});
-    document.getElementById('search-wrapper').style.display=a.header.showSearch?'':'none';
-    document.getElementById('nav-profile').style.display=a.header.showProfile?'':'none';
-    // Announcement
-    var ab=document.getElementById('announcement-bar');
-    if(a.announcement.enabled&&a.announcement.text){ab.className='';ab.innerHTML='<div class="text-center py-2.5 px-4 text-sm font-medium" style="background:'+a.announcement.bgColor+';color:'+a.announcement.textColor+'">'+esc(a.announcement.text)+(a.announcement.link?' <a href="'+esc(a.announcement.link)+'" class="underline font-semibold ml-2">Learn More →</a>':'')+'</div>';document.getElementById('navbar').style.top='40px'}else{ab.className='hidden';ab.innerHTML='';document.getElementById('navbar').style.top='0'}
-    // Sections toggle
-    document.querySelectorAll('.section-toggle').forEach(function(el){var s=el.dataset.section;if(!s)return;var on=a.sections[s];if(on===false)el.classList.add('off');else el.classList.remove('off')});
-    // Footer
-    renderFooter();
-    // Popup
-    if(a.popup.enabled&&!sessionStorage.getItem('popup_shown')){setTimeout(showPromoPopup,2000)}
-    // Ad slots
-    renderAds();
+function createCard(m){
+    return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer rounded-xl overflow-hidden relative" onclick="openModal('+m.id+')"><div class="relative aspect-[2/3] bg-sf-card rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+m.title+'" class="card-img w-full h-full object-cover" loading="lazy"><div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5"><button onclick="event.stopPropagation();showToast(\'Now Playing: '+m.title+'\')" class="w-7 h-7 bg-white rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button><button onclick="event.stopPropagation();toggleMyList('+m.id+')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(m.id)?'check':'plus')+'" class="w-3 h-3"></i></button><button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div><p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+m.title+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span><span class="text-[9px] text-slate-500">'+m.duration+'</span></div></div></div></div>';
 }
 
-function renderFooter(){
-    var a=SD.appearance,f=document.getElementById('site-footer');
-    var socialHTML=a.footer.showSocial?a.footer.socialIcons.map(function(ic){return '<a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="'+ic+'" class="w-4 h-4"></i></a>'}).join(''):'';
-    document.getElementById('footer-social').innerHTML=socialHTML;
-    var linksHTML=a.footer.showLinks?a.footer.columns.map(function(col){return '<div class="flex flex-col gap-2.5"><p class="text-xs font-semibold mb-1" style="color:var(--c-text2)">'+esc(col.title)+'</p>'+col.links.map(function(l){return '<a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">'+esc(l)+'</a>'}).join('')+'</div>'}).join(''):'';
-    document.getElementById('footer-links').innerHTML=linksHTML;
-    document.getElementById('footer-bottom').innerHTML=(a.footer.showServiceCode?'<button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300">Service Code</button>':'')+'<p class="text-[11px] text-white/20">'+esc(a.footer.copyright)+'</p>';
+function createTop10Card(m,r){
+    return '<div class="flex-shrink-0 flex items-end cursor-pointer group" onclick="openModal('+m.id+')"><span class="top10-number mr-[-14px] relative z-10 select-none">'+r+'</span><div class="w-[110px] sm:w-[135px] lg:w-[155px] rounded-xl overflow-hidden relative card-hover"><div class="aspect-[2/3] bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+m.title+'" class="card-img w-full h-full object-cover" loading="lazy"></div></div></div>';
 }
 
-function renderAds(){
-    var m=SD.monetization;
-    var top=document.getElementById('ad-slot-top'),mid=document.getElementById('ad-slot-mid');
-    top.className='ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-4'+(m.adPlacements.top.enabled?'':' hidden');top.innerHTML=m.adPlacements.top.html||'';
-    mid.className='ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 my-6'+(m.adPlacements.betweenRows.enabled?'':' hidden');mid.innerHTML=m.adPlacements.betweenRows.html||'';
-    var sp=document.getElementById('sponsored-section'),af=document.getElementById('affiliate-section');
-    if(m.sponsored.enabled&&m.sponsored.items.length){sp.className='ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 my-10';sp.innerHTML='<h2 class="row-title text-lg font-semibold mb-5">'+esc(m.sponsored.title)+'</h2><div class="grid grid-cols-1 sm:grid-cols-3 gap-4">'+m.sponsored.items.filter(function(i){return i.enabled}).map(function(i){return '<div class="rounded-xl overflow-hidden border border-white/5 hover:border-white/15 transition-all cursor-pointer" style="background:var(--c-card)" onclick="if(\''+esc(i.link)+'\')window.open(\''+esc(i.link)+'\')"><div class="aspect-video"><img src="'+esc(i.imageUrl||'https://picsum.photos/seed/spon-'+i.id+'/600/340.jpg')+'" class="w-full h-full object-cover" loading="lazy"></div><div class="p-4"><p class="text-[10px] font-bold uppercase tracking-wider mb-1" style="color:var(--c-primary)">Sponsored</p><p class="text-sm font-medium">'+esc(i.title)+'</p><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+esc(i.desc)+'</p></div></div>'}).join('')+'</div>'}else{sp.className='ad-slot hidden';sp.innerHTML=''}
-    if(m.affiliate.enabled&&m.affiliate.items.length){af.className='ad-slot max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-16';af.innerHTML='<h2 class="row-title text-lg font-semibold mb-5">'+esc(m.affiliate.title)+'</h2><div class="grid grid-cols-2 sm:grid-cols-4 gap-3">'+m.affiliate.items.filter(function(i){return i.enabled}).map(function(i){return '<a href="'+esc(i.link)+'" target="_blank" class="rounded-xl p-4 border border-white/5 hover:border-white/15 transition-all flex flex-col items-center text-center gap-2" style="background:var(--c-card)"><div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center"><i data-lucide="'+esc(i.icon||'external-link')+'" class="w-5 h-5 text-sf-muted"></i></div><p class="text-xs font-medium">'+esc(i.title)+'</p><p class="text-[10px] text-sf-muted">'+esc(i.desc)+'</p></a>'}).join('')+'</div>'}else{af.className='ad-slot hidden';af.innerHTML=''}
-    lucide.createIcons();
+function renderAll(){renderHero();renderRows();renderTop10();renderGenreGrid();lucide.createIcons()}
+
+function renderHero(){
+    var hm=SD.heroIds.map(getMovie).filter(Boolean);
+    if(!hm.length)return;
+    if(currentHero>=hm.length)currentHero=0;
+    var m=hm[currentHero];
+    document.getElementById('hero-bg').innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';
+    document.getElementById('hero-content').innerHTML='<div class="flex items-center gap-3 mb-5"><span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg shadow-sf-red/25">StreamFlix Original</span><span class="text-sf-muted text-sm font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-sm font-light">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</span></div><h1 class="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow:0 8px 60px rgba(0,0,0,0.6);">'+m.title.replace(/(.{15,}?)\s/g,'$1<br>')+'</h1><div class="flex items-center gap-2.5 mb-5 text-sm"><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-xs font-medium tracking-wider">4K</span><span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HDR</span></div><p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">'+m.desc+'</p><div class="flex items-center gap-3"><button onclick="showToast(\'Now Playing: '+m.title+'\')" class="flex items-center gap-2.5 bg-white text-black font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/90 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xl shadow-white/10"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button><button onclick="openModal('+m.id+')" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5"><i data-lucide="info" class="w-5 h-5"></i> More Info</button><button onclick="toggleMyList('+m.id+')" class="p-3.5 rounded-xl border border-white/15 hover:border-white/40 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm" title="Add to My List"><i data-lucide="plus" class="w-5 h-5"></i></button></div>';
+    var dots='';for(var i=0;i<hm.length;i++){dots+='<button class="hero-dot '+(i===currentHero?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500" onclick="changeHero('+i+')"></button>'}
+    document.getElementById('hero-dots').innerHTML=dots;
 }
 
-function showPromoPopup(){var p=SD.appearance.popup;if(!p.enabled)return;sessionStorage.setItem('popup_shown','1');document.getElementById('promo-popup').classList.remove('hidden');document.getElementById('promo-popup-content').innerHTML='<div class="rounded-2xl overflow-hidden" style="background:'+p.bgColor+'"><div class="p-8"><button onclick="closePromoPopup()" class="absolute top-4 right-4 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button><div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5" style="background:'+p.accentColor+'20"><i data-lucide="gift" class="w-7 h-7" style="color:'+p.accentColor+'"></i></div><h3 class="text-2xl font-bold mb-3">'+esc(p.title)+'</h3><p class="text-sf-muted text-sm mb-6 leading-relaxed">'+esc(p.desc)+'</p><button onclick="closePromoPopup()" class="ab w-full text-center" style="background:'+p.accentColor+'">'+esc(p.btnText)+'</button></div></div>';lucide.createIcons()}
-function closePromoPopup(){document.getElementById('promo-popup').classList.add('hidden')}
-
-function renderAll(){applyAppearance();renderHero();renderRows();renderTop10();renderGenreGrid();lucide.createIcons()}
-
-function renderHero(){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(!hm.length)return;if(currentHero>=hm.length)currentHero=0;var m=hm[currentHero];document.getElementById('hero-bg').innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';document.getElementById('hero-content').innerHTML='<div class="flex items-center gap-3 mb-5"><span class="text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg" style="background:var(--c-primary);box-shadow:0 4px 20px '+SD.appearance.colors.primary+'40">StreamFlix Original</span><span class="text-sf-muted text-sm font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-sm font-light">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</span></div><h1 class="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow:0 8px 60px rgba(0,0,0,0.6);font-family:var(--f-heading);font-weight:var(--f-hw)">'+m.title.replace(/(.{15,}?)\s/g,'$1<br>')+'</h1><div class="flex items-center gap-2.5 mb-5 text-sm"><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span></div><p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">'+m.desc+'</p><div class="flex items-center gap-3"><button onclick="showToast(\'Now Playing: '+esc(m.title)+'\')" class="flex items-center gap-2.5 bg-white text-black font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 hover:bg-white/90 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xl shadow-white/10" style="border-radius:var(--btn-radius)"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button><button onclick="openModal('+m.id+')" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5" style="border-radius:var(--btn-radius)"><i data-lucide="info" class="w-5 h-5"></i> More Info</button></div>';var dots='';for(var i=0;i<hm.length;i++){dots+='<button class="hero-dot '+(i===currentHero?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500" onclick="changeHero('+i+')"></button>'}document.getElementById('hero-dots').innerHTML=dots}
-function changeHero(i){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(i===currentHero||i>=hm.length)return;currentHero=i;var bg=document.getElementById('hero-bg');bg.style.opacity=0;setTimeout(function(){bg.innerHTML='<img src="https://picsum.photos/seed/'+hm[i].banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity=1},600);document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500'})}
+function changeHero(i){
+    var hm=SD.heroIds.map(getMovie).filter(Boolean);
+    if(i===currentHero||i>=hm.length)return;
+    currentHero=i;var bg=document.getElementById('hero-bg');bg.style.opacity=0;
+    setTimeout(function(){var m=hm[i];bg.innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity=1},600);
+    document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500'});
+}
 setInterval(function(){var hm=SD.heroIds.map(getMovie).filter(Boolean);changeHero((currentHero+1)%hm.length)},8000);
 
-function renderRows(){document.getElementById('content-rows').innerHTML=SD.rows.map(function(r,ri){return '<section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-9 mb-3 row-container"><h2 class="row-title text-lg sm:text-xl font-semibold mb-5">'+esc(r.title)+'</h2><div class="relative group/row"><button onclick="scrollRow(\'row-'+ri+'\',-1)" class="scroll-arrow absolute left-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-r-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div id="row-'+ri+'" class="row-scroll flex gap-2.5 sm:gap-3 overflow-x-auto pb-4">'+r.ids.map(function(id){var m=getMovie(id);return m?createCard(m):''}).join('')+'</div><button onclick="scrollRow(\'row-'+ri+'\',1)" class="scroll-arrow absolute right-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-l-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div></section>'}).join('')}
-function renderTop10(){document.getElementById('top10-container').innerHTML=SD.top10Ids.map(function(id,i){var m=getMovie(id);return m?createTop10Card(m,i+1):''}).join('')}
-function renderGenreGrid(){document.getElementById('genre-grid').innerHTML=SD.genres.map(function(g,gi){return '<div class="genre-tile relative h-32 sm:h-36 rounded-2xl overflow-hidden cursor-pointer group" onclick="filterGenre(document.querySelectorAll(\'.genre-chip\')['+(gi+1)+'],\''+g.name.toLowerCase().replace('-','')+'\')"><div class="genre-tile-img absolute inset-0"><img src="https://picsum.photos/seed/'+g.seed+'/600/300.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="absolute inset-0 bg-gradient-to-br '+g.gradient+'"></div><div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div><div class="absolute inset-0 flex items-center gap-3 px-5"><div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10"><i data-lucide="'+g.icon+'" class="w-5 h-5 text-white/80"></i></div><span class="text-base sm:text-lg font-semibold drop-shadow-lg">'+g.name+'</span></div><div class="absolute inset-0 border border-white/5 rounded-2xl group-hover:border-white/15 transition-colors duration-500"></div></div>'}).join('')}
+function renderRows(){
+    document.getElementById('content-rows').innerHTML=SD.rows.map(function(r,ri){
+        return '<section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-9 mb-3 row-container"><h2 class="row-title text-lg sm:text-xl font-semibold mb-5">'+r.title+'</h2><div class="relative group/row"><button onclick="scrollRow(\'row-'+ri+'\',-1)" class="scroll-arrow absolute left-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-r-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div id="row-'+ri+'" class="row-scroll flex gap-2.5 sm:gap-3 overflow-x-auto pb-4">'+r.ids.map(function(id){var m=getMovie(id);return m?createCard(m):''}).join('')+'</div><button onclick="scrollRow(\'row-'+ri+'\',1)" class="scroll-arrow absolute right-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-l-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div></section>';
+    }).join('');
+}
+
+function renderTop10(){
+    document.getElementById('top10-container').innerHTML=SD.top10Ids.map(function(id,i){var m=getMovie(id);return m?createTop10Card(m,i+1):''}).join('');
+}
+
+function renderGenreGrid(){
+    document.getElementById('genre-grid').innerHTML=SD.genres.map(function(g,gi){
+        return '<div class="genre-tile relative h-32 sm:h-36 rounded-2xl overflow-hidden cursor-pointer group" onclick="filterGenre(document.querySelectorAll(\'.genre-chip\')['+(gi+1)+'],\''+g.name.toLowerCase().replace('-','')+'\')"><div class="genre-tile-img absolute inset-0"><img src="https://picsum.photos/seed/'+g.seed+'/600/300.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="absolute inset-0 bg-gradient-to-br '+g.gradient+'"></div><div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div><div class="absolute inset-0 flex items-center gap-3 px-5"><div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10"><i data-lucide="'+g.icon+'" class="w-5 h-5 text-white/80"></i></div><span class="text-base sm:text-lg font-semibold drop-shadow-lg">'+g.name+'</span></div><div class="absolute inset-0 border border-white/5 rounded-2xl group-hover:border-white/15 transition-colors duration-500"></div></div>';
+    }).join('');
+}
+
 function scrollRow(id,d){document.getElementById(id).scrollBy({left:d*document.getElementById(id).clientWidth*0.75,behavior:'smooth'})}
 
-function openModal(id){var m=getMovie(id);if(!m)return;document.getElementById('modal-content').innerHTML='<div class="relative"><div class="relative h-[280px] sm:h-[380px] lg:h-[420px]"><img src="https://picsum.photos/seed/'+m.banner+'/1200/600.jpg" alt="'+esc(m.title)+'" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-[#16161f] via-black/50 to-transparent"></div><button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-black/70 transition-colors border border-white/5"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute bottom-6 left-6 right-6"><h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5" style="text-shadow:0 4px 30px rgba(0,0,0,0.5);font-family:var(--f-heading)">'+esc(m.title)+'</h2><div class="flex items-center gap-3"><button onclick="showToast(\'Now Playing\');closeModal()" class="flex items-center gap-2 bg-white text-black font-semibold text-sm px-7 py-3 rounded-xl hover:bg-white/90 transition-all shadow-xl shadow-white/10" style="border-radius:var(--btn-radius)"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button><button onclick="toggleMyList('+id+')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(id)?'check':'plus')+'" class="w-5 h-5"></i></button></div></div></div><div class="p-6 sm:p-8 rounded-b-2xl" style="background:var(--c-card)"><div class="flex flex-col sm:flex-row gap-6"><div class="flex-1"><div class="flex items-center gap-2.5 mb-4 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-slate-300 font-light">'+m.duration+'</span></div><p class="text-slate-400 text-sm font-light leading-[1.75] mb-4">'+esc(m.desc)+'</p></div><div class="sm:w-52 space-y-3 text-sm border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6 pt-4 sm:pt-0"><div><span class="text-sf-muted text-xs">Cast</span><p class="text-slate-300 font-light mt-0.5">'+esc(m.cast)+'</p></div><div><span class="text-sf-muted text-xs">Genre</span><p class="text-slate-300 font-light mt-0.5">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</p></div></div></div><div class="mt-8 border-t border-white/5 pt-6"><h3 class="text-base font-semibold mb-4">More Like This</h3><div class="grid grid-cols-3 gap-2.5">'+SD.movies.filter(function(x){return x.genre===m.genre&&x.id!==id}).slice(0,6).map(function(x){return '<div class="rounded-xl overflow-hidden cursor-pointer hover:ring-1 hover:ring-white/10 transition-all duration-300" style="background:rgba(255,255,255,0.03);border-radius:var(--card-radius)" onclick="event.stopPropagation();openModal('+x.id+')"><div class="aspect-video"><img src="https://picsum.photos/seed/'+x.img+'/400/225.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="p-2.5"><p class="text-[11px] font-medium line-clamp-1">'+esc(x.title)+'</p></div></div>'}).join('')+'</div></div></div></div>';document.getElementById('modal').classList.remove('hidden');document.body.style.overflow='hidden';lucide.createIcons()}
+function openModal(id){
+    var m=getMovie(id);if(!m)return;
+    document.getElementById('modal-content').innerHTML='<div class="relative"><div class="relative h-[280px] sm:h-[380px] lg:h-[420px]"><img src="https://picsum.photos/seed/'+m.banner+'/1200/600.jpg" alt="'+m.title+'" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-[#16161f] via-black/50 to-transparent"></div><button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-black/70 transition-colors border border-white/5"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute bottom-6 left-6 right-6"><h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5" style="text-shadow:0 4px 30px rgba(0,0,0,0.5);">'+m.title+'</h2><div class="flex items-center gap-3"><button onclick="showToast(\'Now Playing: '+m.title+'\');closeModal();" class="flex items-center gap-2 bg-white text-black font-semibold text-sm px-7 py-3 rounded-xl hover:bg-white/90 transition-all shadow-xl shadow-white/10"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button><button onclick="toggleMyList('+id+')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(id)?'check':'plus')+'" class="w-5 h-5"></i></button><button onclick="showToast(\'Liked!\')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-5 h-5"></i></button></div></div></div><div class="bg-[#16161f] p-6 sm:p-8 rounded-b-2xl"><div class="flex flex-col sm:flex-row gap-6"><div class="flex-1"><div class="flex items-center gap-2.5 mb-4 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="border border-sf-muted/40 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HD</span></div><p class="text-slate-400 text-sm font-light leading-[1.75] mb-4">'+m.desc+'</p></div><div class="sm:w-52 space-y-3 text-sm border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6 pt-4 sm:pt-0"><div><span class="text-sf-muted text-xs">Cast</span><p class="text-slate-300 font-light mt-0.5">'+m.cast+'</p></div><div><span class="text-sf-muted text-xs">Genres</span><p class="text-slate-300 font-light mt-0.5">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</p></div></div></div><div class="mt-8 border-t border-white/5 pt-6"><h3 class="text-base font-semibold mb-4">More Like This</h3><div class="grid grid-cols-3 gap-2.5">'+SD.movies.filter(function(x){return x.genre===m.genre&&x.id!==id}).slice(0,6).map(function(x){return '<div class="rounded-xl overflow-hidden bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] hover:ring-1 hover:ring-white/10 transition-all duration-300" onclick="event.stopPropagation();openModal('+x.id+')"><div class="aspect-video"><img src="https://picsum.photos/seed/'+x.img+'/400/225.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="p-2.5"><div class="flex items-center gap-1.5 mb-1"><span class="text-[9px] text-sf-muted">'+x.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+x.maturity+'</span></div><p class="text-[11px] font-medium line-clamp-1">'+x.title+'</p></div></div>'}).join('')+'</div></div></div></div>';
+    document.getElementById('modal').classList.remove('hidden');document.body.style.overflow='hidden';lucide.createIcons();
+}
 function closeModal(){document.getElementById('modal').classList.add('hidden');document.body.style.overflow=''}
+
 function toggleMyList(id){if(myList.has(id)){myList.delete(id);showToast('Removed from My List')}else{myList.add(id);showToast('Added to My List')}renderRows();renderTop10();lucide.createIcons()}
 
 function openSearch(){document.getElementById('search-closed').classList.add('hidden');var o=document.getElementById('search-open');o.classList.remove('hidden');o.classList.add('flex');document.getElementById('search-input').focus()}
 function closeSearch(){document.getElementById('search-closed').classList.remove('hidden');var o=document.getElementById('search-open');o.classList.add('hidden');o.classList.remove('flex');document.getElementById('search-input').value='';document.getElementById('search-results').classList.add('hidden')}
-function handleSearch(q){var res=document.getElementById('search-results'),ct=document.getElementById('search-results-content');if(q.length<2){res.classList.add('hidden');return}var f=SD.movies.filter(function(m){return m.title.toLowerCase().includes(q.toLowerCase())||m.genre.toLowerCase().includes(q.toLowerCase())||m.cast.toLowerCase().includes(q.toLowerCase())});ct.innerHTML=f.length===0?'<p class="text-sm text-sf-muted text-center py-6">No results found</p>':f.map(function(m){return '<div class="flex items-center gap-4 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors" onclick="closeSearch();openModal('+m.id+')"><div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/160/240.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">'+esc(m.title)+'</p><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+esc(m.desc)+'</p></div></div>'}).join('');res.classList.remove('hidden')}
-function filterGenre(btn,genre){document.querySelectorAll('.genre-chip').forEach(function(c){c.classList.remove('active')});btn.classList.add('active');var secs=document.querySelectorAll('#content-rows section');if(genre==='all'){secs.forEach(function(s){s.style.opacity='1'})}else{secs.forEach(function(s){var t=s.querySelector('h2')?s.querySelector('h2').textContent.toLowerCase():'',cards=s.querySelectorAll('.card-hover'),hit=false;cards.forEach(function(c){try{var mid=parseInt(c.getAttribute('onclick').match(/openModal\((\d+)\)/)[1]),m=getMovie(mid);if(m&&(m.genre===genre||t.includes(genre))){c.style.opacity='1';hit=true}else{c.style.opacity='0.15'}}catch(e){}});s.style.opacity=hit?'1':'0.15'})}window.scrollTo({top:400,behavior:'smooth'})}
+function handleSearch(q){var res=document.getElementById('search-results'),ct=document.getElementById('search-results-content');if(q.length<2){res.classList.add('hidden');return}var f=SD.movies.filter(function(m){return m.title.toLowerCase().includes(q.toLowerCase())||m.genre.toLowerCase().includes(q.toLowerCase())||m.cast.toLowerCase().includes(q.toLowerCase())});ct.innerHTML=f.length===0?'<p class="text-sm text-sf-muted text-center py-6">No results found for "'+q+'"</p>':f.map(function(m){return '<div class="flex items-center gap-4 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors duration-200" onclick="closeSearch();openModal('+m.id+')"><div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/160/240.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">'+m.title+'</p><div class="flex items-center gap-2 mt-1"><span class="text-xs text-sf-muted">'+m.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+m.maturity+'</span></div><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+m.desc+'</p></div></div>'}).join('');res.classList.remove('hidden')}
 
-function showToast(msg){var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='animate-toast-in flex items-center gap-3 rounded-2xl shadow-2xl shadow-black/40 min-w-[240px] backdrop-blur-xl px-5 py-3.5';t.style.cssText='background:var(--c-surface);border:1px solid var(--c-border)';t.innerHTML='<div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:'+SD.appearance.colors.primary+'20"><i data-lucide="check" class="w-3.5 h-3.5" style="color:'+SD.appearance.colors.primary+'"></i></div><span class="text-[13px] font-light" style="color:var(--c-text2)">'+esc(msg)+'</span>';c.appendChild(t);lucide.createIcons();setTimeout(function(){t.classList.remove('animate-toast-in');t.classList.add('animate-toast-out');setTimeout(function(){t.remove()},400)},2500)}
+function filterGenre(btn,genre){document.querySelectorAll('.genre-chip').forEach(function(c){c.classList.remove('active')});btn.classList.add('active');var secs=document.querySelectorAll('#content-rows section');if(genre==='all'){secs.forEach(function(s){s.style.opacity='1'})}else{secs.forEach(function(s){var t=s.querySelector('h2')?s.querySelector('h2').textContent.toLowerCase():'',cards=s.querySelectorAll('.card-hover'),hit=false;cards.forEach(function(c){var mid=parseInt(c.getAttribute('onclick').match(/openModal\((\d+)\)/)[1]),m=getMovie(mid);if(m&&(m.genre===genre||t.includes(genre))){c.style.opacity='1';hit=true}else{c.style.opacity='0.15'}});s.style.opacity=hit?'1':'0.15'})}window.scrollTo({top:400,behavior:'smooth'})}
+
+function showToast(msg){var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='animate-toast-in flex items-center gap-3 bg-sf-surface/95 border border-white/8 px-5 py-3.5 rounded-2xl shadow-2xl shadow-black/40 min-w-[240px] backdrop-blur-xl';t.innerHTML='<div class="w-7 h-7 bg-sf-red/15 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-sf-red"></i></div><span class="text-[13px] text-slate-300 font-light">'+msg+'</span>';c.appendChild(t);lucide.createIcons();setTimeout(function(){t.classList.remove('animate-toast-in');t.classList.add('animate-toast-out');setTimeout(function(){t.remove()},400)},2500)}
 
 document.getElementById('mobile-menu-btn').addEventListener('click',function(){document.getElementById('mobile-menu').classList.remove('hidden')});
 function closeMobileMenu(){document.getElementById('mobile-menu').classList.add('hidden')}
-window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>40){n.classList.add('nav-blur');n.style.background=SD.appearance.colors.bg+'cc';n.classList.add('border-b');n.style.borderColor='var(--c-border)'}else{n.classList.remove('nav-blur');n.style.background='transparent';n.classList.remove('border-b');n.style.borderColor='transparent'}});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeSearch();closeMobileMenu();closeAdminLogin();closeMovieEditor();closePromoPopup()}if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();openSearch()}});
+window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>40){n.classList.add('nav-blur','bg-sf-dark/80','border-b','border-white/5')}else{n.classList.remove('nav-blur','bg-sf-dark/80','border-b','border-white/5')}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeSearch();closeMobileMenu();closeAdminLogin();closeMovieEditor()}if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();openSearch()}});
 
-// ========== ADMIN ==========
-function openAdminLogin(){document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-pass').value='';document.getElementById('login-error').classList.add('hidden');setTimeout(function(){document.getElementById('admin-pass').focus()},100)}
+// ========== ADMIN SYSTEM ==========
+
+function logoClick(e){e.preventDefault();logoClicks++;clearTimeout(logoTimer);logoTimer=setTimeout(function(){logoClicks=0},1500);if(logoClicks>=5){logoClicks=0;document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-pass').value='';document.getElementById('login-error').classList.add('hidden');document.getElementById('admin-pass').focus()}}
 function closeAdminLogin(){document.getElementById('admin-login').classList.add('hidden')}
-function attemptAdminLogin(){var p=document.getElementById('admin-pass').value;if(p===ADMIN_PASS){closeAdminLogin();openAdmin()}else{var err=document.getElementById('login-error');err.classList.remove('hidden');err.textContent='Incorrect password.';document.getElementById('admin-pass').value='';document.getElementById('admin-pass').focus()}}
+function attemptAdminLogin(){var p=document.getElementById('admin-pass').value;if(p===ADMIN_PASS){closeAdminLogin();openAdmin()}else{var err=document.getElementById('login-error');err.classList.remove('hidden');err.textContent='Incorrect password. Access denied.';document.getElementById('admin-pass').value='';document.getElementById('admin-pass').focus()}}
 
-function openAdmin(){document.getElementById('admin-panel').classList.remove('hidden');document.body.style.overflow='hidden';buildMobileAdminTabs();switchAdminTab('movies');lucide.createIcons()}
+function openAdmin(){document.getElementById('admin-panel').classList.remove('hidden');document.body.style.overflow='hidden';renderMoviesTable();renderRowsEditor();renderHeroSelector();renderTop10Editor();renderGenresEditor();switchAdminTab('movies');lucide.createIcons()}
 function closeAdmin(){document.getElementById('admin-panel').classList.add('hidden');document.body.style.overflow='';renderAll()}
-function resetAllData(){if(confirm('Reset ALL data to defaults? This cannot be undone.')){localStorage.removeItem('streamflix_data');location.reload()}}
 
-function buildMobileAdminTabs(){document.querySelectorAll('#admin-panel .st[data-tab]').forEach(function(btn){var t=btn.dataset.tab;var labels={movies:'Movies',rows:'Rows',hero:'Hero',top10:'Top 10',genres:'Genres',branding:'Brand',colors:'Colors',typography:'Fonts',components:'Style',header:'Header',footer:'Footer',banners:'Banners',sections:'Sections',adplacements:'Ads',campaigns:'Campaigns',sponsored:'Sponsored'};document.getElementById('mobile-admin-tabs').innerHTML+='<button class="st whitespace-nowrap flex-shrink-0" data-tab="'+t+'" onclick="switchAdminTab(\''+t+'\')">'+(labels[t]||t)+'</button>'})}
+function switchAdminTab(t){document.querySelectorAll('.admin-tab').forEach(function(b){b.classList.remove('active');b.style.background='transparent';b.style.color='#6b6b80'});document.querySelector('.admin-tab[data-tab="'+t+'"]').classList.add('active');document.querySelector('.admin-tab[data-tab="'+t+'"]').style.background='#1e1e2a';document.querySelector('.admin-tab[data-tab="'+t+'"]').style.color='#fff';document.querySelectorAll('.admin-tab-content').forEach(function(c){c.classList.add('hidden')});document.getElementById('tab-'+t).classList.remove('hidden')}
 
-var allTabs=['movies','rows','hero','top10','genres','branding','colors','typography','components','header','footer','banners','sections','adplacements','campaigns','sponsored'];
-function switchAdminTab(t){document.querySelectorAll('.st[data-tab]').forEach(function(b){b.classList.remove('active')});document.querySelectorAll('.st[data-tab="'+t+'"]').forEach(function(b){b.classList.add('active')});var c=document.getElementById('admin-content');var fn={movies:renderMoviesTable,rows:renderRowsEditor,hero:renderHeroSelector,top10:renderTop10Editor,genres:renderGenresEditor,branding:renderBrandingTab,colors:renderColorsTab,typography:renderTypographyTab,components:renderComponentsTab,header:renderHeaderTab,footer:renderFooterTab,banners:renderBannersTab,sections:renderSectionsTab,adplacements:renderAdPlacementsTab,campaigns:renderCampaignsTab,sponsored:renderSponsoredTab};if(fn[t])fn[t](c);else c.innerHTML='<p class="text-sf-muted text-sm">Tab not found</p>';lucide.createIcons()}
+function renderMoviesTable(){
+    var h='<thead><tr><th>ID</th><th>Title</th><th>Genre</th><th>Year</th><th>Duration</th><th>Actions</th></tr></thead><tbody>';
+    SD.movies.forEach(function(m){h+='<tr><td class="text-sf-muted">'+m.id+'</td><td class="font-medium max-w-[200px] truncate">'+m.title+'</td><td><span class="text-xs px-2 py-0.5 rounded bg-white/5 text-sf-muted">'+m.genre+'</span></td><td class="text-sf-muted">'+m.year+'</td><td class="text-sf-muted">'+m.duration+'</td><td class="flex gap-2"><button onclick="openMovieEditor('+m.id+')" class="admin-btn-secondary text-[11px] py-1 px-3">Edit</button><button onclick="deleteMovie('+m.id+')" class="admin-btn-danger text-[11px] py-1 px-3">Delete</button></td></tr>'});
+    h+='</tbody>';document.getElementById('movies-table').innerHTML=h;
+}
 
-function toggleEl(id){var el=document.getElementById(id);el.classList.toggle('on');return el.classList.contains('on')}
-
-// Content tabs
-function renderMoviesTable(c){c.innerHTML='<div class="flex items-center justify-between mb-4"><p class="text-sm text-sf-muted">Manage all movies</p><button onclick="openMovieEditor(-1)" class="ab text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Movie</button></div><div class="overflow-x-auto rounded-xl border border-white/5"><table class="at"><thead><tr><th>ID</th><th>Title</th><th>Genre</th><th>Year</th><th>Duration</th><th>Actions</th></tr></thead><tbody>'+SD.movies.map(function(m){return '<tr><td class="text-sf-muted">'+m.id+'</td><td class="font-medium max-w-[200px] truncate">'+esc(m.title)+'</td><td><span class="text-xs px-2 py-0.5 rounded bg-white/5 text-sf-muted">'+m.genre+'</span></td><td class="text-sf-muted">'+m.year+'</td><td class="text-sf-muted">'+m.duration+'</td><td class="flex gap-2"><button onclick="openMovieEditor('+m.id+')" class="ab2 text-[11px] py-1 px-3">Edit</button><button onclick="deleteMovie('+m.id+')" class="abd text-[11px] py-1 px-3">Delete</button></td></tr>'}).join('')+'</tbody></table></div>'}
-function renderRowsEditor(c){c.innerHTML='<p class="text-sm text-sf-muted mb-4">Edit row titles and movie assignments</p><div class="space-y-4">'+SD.rows.map(function(r,ri){return '<div class="ac"><div class="flex items-center justify-between mb-3"><input value="'+esc(r.title)+'" onchange="SD.rows['+ri+'].title=this.value" class="ai max-w-xs" placeholder="Row title"><button onclick="SD.rows.splice('+ri+',1);saveSiteData();switchAdminTab(\'rows\')" class="abd text-[11px] py-1 px-3">Remove</button></div><div class="flex flex-wrap gap-1.5">'+r.ids.map(function(mid,mi){var m=getMovie(mid);return '<span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5">'+(m?esc(m.title):'#'+mid)+'<button onclick="SD.rows['+ri+'].ids.splice('+mi+',1);saveSiteData();switchAdminTab(\'rows\')" class="text-sf-muted hover:text-red-400">&times;</button></span>'}).join('')+'</div><div class="mt-3 pt-3 border-t border-white/5"><select id="row-add-'+ri+'" class="ai text-xs py-1.5"><option value="">Add movie...</option>'+SD.movies.map(function(m){return '<option value="'+m.id+'">'+esc(m.title)+'</option>'}).join('')+'</select><button onclick="var s=document.getElementById(\'row-add-'+ri+'\');if(s.value){SD.rows['+ri+'].ids.push(parseInt(s.value));saveSiteData();switchAdminTab(\'rows\')}" class="ab text-[11px] py-1.5 px-3 mt-1">Add</button></div></div>'}).join('')+'<button onclick="SD.rows.push({title:\'New Row\',ids:[]});saveSiteData();switchAdminTab(\'rows\')" class="ab2 text-xs py-2 px-4 flex items-center gap-2 mt-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Row</button></div>'}
-function renderHeroSelector(c){c.innerHTML='<p class="text-sm text-sf-muted mb-4">Select hero banner movies (max 6)</p><div class="ac"><div id="hero-selector" class="flex flex-wrap gap-2">'+SD.movies.map(function(m){var sel=SD.heroIds.indexOf(m.id)!==-1;return '<button onclick="toggleHeroMovie('+m.id+')" class="text-xs px-3 py-2 rounded-lg border transition-all '+(sel?'bg-sf-red/20 border-sf-red/40 text-white':'bg-white/3 border-white/5 text-sf-muted hover:border-white/20')+'">'+esc(m.title)+'</button>'}).join('')+'</div></div>'}
-function toggleHeroMovie(id){var i=SD.heroIds.indexOf(id);if(i===-1){if(SD.heroIds.length>=6){showToast('Max 6');return}SD.heroIds.push(id)}else{SD.heroIds.splice(i,1)}saveSiteData();renderHeroSelector(document.getElementById('admin-content'))}
-function renderTop10Editor(c){c.innerHTML='<p class="text-sm text-sf-muted mb-4">Reorder with arrows, remove with ×</p><div class="ac"><div id="top10-editor" class="space-y-2">'+SD.top10Ids.map(function(mid,i){var m=getMovie(mid);return '<div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]"><span class="text-sf-muted text-xs font-bold w-6">'+(i+1)+'</span><span class="flex-1 text-sm">'+(m?esc(m.title):'#'+mid)+'</span><div class="flex gap-1">'+(i>0?'<button onclick="SD.top10Ids.splice('+i+',1);SD.top10Ids.splice('+(i-1)+',0,'+mid+');saveSiteData();switchAdminTab(\'top10\')" class="text-sf-muted hover:text-white text-xs p-1">&uarr;</button>':'')+(i<SD.top10Ids.length-1?'<button onclick="SD.top10Ids.splice('+i+',1);SD.top10Ids.splice('+(i+1)+',0,'+mid+');saveSiteData();switchAdminTab(\'top10\')" class="text-sf-muted hover:text-white text-xs p-1">&darr;</button>':'')+'<button onclick="SD.top10Ids.splice('+i+',1);saveSiteData();switchAdminTab(\'top10\')" class="text-sf-muted hover:text-red-400 text-xs p-1">&times;</button></div></div>'}).join('')+'</div><div class="mt-4 pt-4 border-t border-white/5"><select id="top10-add-select" class="ai flex-1"><option value="">Select...</option>'+SD.movies.filter(function(m){return SD.top10Ids.indexOf(m.id)===-1}).map(function(m){return '<option value="'+m.id+'">'+esc(m.title)+'</option>'}).join('')+'</select><button onclick="var s=document.getElementById(\'top10-add-select\');if(s.value){SD.top10Ids.push(parseInt(s.value));saveSiteData();switchAdminTab(\'top10\')}" class="ab text-xs py-2 px-4">Add</button></div></div>'}
-function renderGenresEditor(c){c.innerHTML='<p class="text-sm text-sf-muted mb-4">Edit genre display names</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'+SD.genres.map(function(g,i){return '<div class="ac flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"><i data-lucide="'+g.icon+'" class="w-4 h-4 text-sf-muted"></i></div><input value="'+esc(g.name)+'" onchange="SD.genres['+i+'].name=this.value" class="ai text-sm"></div>'}).join('')+'</div>'}
-
-// Appearance tabs
-function renderBrandingTab(c){var a=SD.appearance.logo;c.innerHTML='<div class="space-y-6"><div class="ac"><h3 class="text-sm font-semibold mb-4">Logo Type</h3><div class="flex gap-2 mb-4"><button onclick="SD.appearance.logo.type=\'text\';saveSiteData();switchAdminTab(\'branding\')" class="ab2 text-xs py-2 px-4 '+(a.type==='text'?'!bg-white/10 !text-white':'')+'">Text Logo</button><button onclick="SD.appearance.logo.type=\'image\';saveSiteData();switchAdminTab(\'branding\')" class="ab2 text-xs py-2 px-4 '+(a.type==='image'?'!bg-white/10 !text-white':'')+'">Image Logo</button></div>'+(a.type==='text'?'<div class="space-y-3"><div><label class="text-xs text-sf-muted block mb-1.5">Desktop Text</label><input value="'+esc(a.text)+'" onchange="SD.appearance.logo.text=this.value" class="ai" placeholder="StreamFlix"></div><div><label class="text-xs text-sf-muted block mb-1.5">Mobile Text</label><input value="'+esc(a.textMobile)+'" onchange="SD.appearance.logo.textMobile=this.value" class="ai" placeholder="SF"></div></div>':'<div class="space-y-3"><div><label class="text-xs text-sf-muted block mb-1.5">Desktop Logo URL</label><input value="'+esc(a.imageUrl)+'" onchange="SD.appearance.logo.imageUrl=this.value" class="ai" placeholder="https://..."></div><div><label class="text-xs text-sf-muted block mb-1.5">Mobile Logo URL</label><input value="'+esc(a.imageMobileUrl)+'" onchange="SD.appearance.logo.imageMobileUrl=this.value" class="ai" placeholder="https://..."></div></div>')+'</div><div class="ac"><h3 class="text-sm font-semibold mb-4">Favicon</h3><input value="'+esc(a.favicon)+'" onchange="SD.appearance.logo.favicon=this.value" class="ai" placeholder="https://example.com/favicon.ico"><p class="text-[10px] text-sf-muted mt-1">Leave empty for auto-generated favicon</p></div><div class="ac"><h3 class="text-sm font-semibold mb-2">Preview</h3><div class="p-4 rounded-xl bg-white/3 border border-white/5 flex items-center gap-3"><div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:var(--c-primary)"><i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i></div><span class="text-xl font-bold" id="brand-preview-text">'+esc(a.type==='text'?a.text:'Image Logo')+'</span></div></div></div>'}
-
-function renderColorsTab(c){var co=SD.appearance.colors;c.innerHTML='<div class="space-y-6"><div class="ac"><h3 class="text-sm font-semibold mb-4">Theme Presets</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">'+[{n:'Midnight',p:'#E50914',b:'#0a0a0f',s:'#12121a',c:'#16161f',bd:'#1e1e2a',m:'#6b6b80'},{n:'Ocean',p:'#0ea5e9',b:'#0c1222',s:'#131d33',c:'#182540',bd:'#1e3050',m:'#6b8baa'},{n:'Emerald',p:'#10b981',b:'#0a120e',s:'#111f16',c:'#15291d',bd:'#1a3325',m:'#6baa88'},{n:'Royal',p:'#8b5cf6',b:'#0f0a1a',s:'#16112a',c:'#1d1640',bd:'#241d55',m:'#8b7ac0'},{n:'Sunset',p:'#f97316',b:'#120c08',s:'#1e1510',c:'#2a1e15',bd:'#3a2a1e',m:'#aa8866'},{n:'Rose',p:'#ec4899',b:'#120a10',s:'#1e1018',c:'#2a1525',bd:'#3a1a33',m:'#aa6688'},{n:'Slate',p:'#94a3b8',b:'#0f172a',s:'#1e293b',c:'#283548',bd:'#334155',m:'#64748b'},{n:'Gold',p:'#eab308',b:'#0c0a04',s:'#181508',c:'#24200e',bd:'#302a14',m:'#aa9944'},{n:'Minimal',p:'#ffffff',b:'#000000',s:'#111111',c:'#1a1a1a',bd:'#333333',m:'#888888'}].map(function(pr){return '<button onclick="applyPreset('+JSON.stringify(pr).replace(/"/g,'&quot;')+')" class="text-left p-3 rounded-xl border border-white/5 hover:border-white/20 transition-all"><div class="flex items-center gap-2 mb-2"><div class="w-4 h-4 rounded" style="background:'+pr.p+'"></div><span class="text-xs font-medium">'+pr.n+'</span></div><div class="flex gap-0.5">'+[pr.b,pr.s,pr.c].map(function(cl){return '<div class="w-6 h-3 rounded" style="background:'+cl+'"></div>'}).join('')+'</div></button>'}).join('')+'</div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Custom Colors</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-4">'+[{k:'primary',l:'Primary'},{k:'bg',l:'Background'},{k:'surface',l:'Surface'},{k:'card',l:'Card'},{k:'border',l:'Border'},{k:'muted',l:'Muted'},{k:'text',l:'Text'},{k:'text2',l:'Text Secondary'}].map(function(ci){return '<div><label class="text-xs text-sf-muted block mb-2">'+ci.l+'</label><div class="flex items-center gap-2"><div class="clr-swatch" style="background:'+co[ci.k]+'"><input type="color" value="'+co[ci.k]+'" onchange="SD.appearance.colors.'+ci.k+'=this.value;saveSiteData()"></div><input value="'+co[ci.k]+'" onchange="SD.appearance.colors.'+ci.k+'=this.value;saveSiteData()" class="ai text-xs py-1.5 font-mono" style="width:90px"></div></div>'}).join('')+'</div></div></div>'}
-function applyPreset(pr){SD.appearance.colors={primary:pr.p,bg:pr.b,surface:pr.s,card:pr.c,border:pr.bd,muted:pr.m,text:pr.n==='Minimal'?'#ffffff':'#ffffff',text2:pr.m};saveSiteData();switchAdminTab('colors');showToast('Preset applied: '+pr.n)}
-
-function renderTypographyTab(c){var f=SD.appearance.fonts;c.innerHTML='<div class="space-y-6"><div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div class="ac"><h3 class="text-sm font-semibold mb-4">Heading Font</h3><select onchange="SD.appearance.fonts.heading=this.value;saveSiteData()" class="ai"><option value="Inter"'+(f.heading==='Inter'?' selected':'')+'>Inter</option><option value="Poppins"'+(f.heading==='Poppins'?' selected':'')+'>Poppins</option><option value="Montserrat"'+(f.heading==='Montserrat'?' selected':'')+'>Montserrat</option><option value="Playfair Display"'+(f.heading==='Playfair Display'?' selected':'')+'>Playfair Display</option><option value="Roboto"'+(f.heading==='Roboto'?' selected':'')+'>Roboto</option></select><div class="mt-3 p-4 rounded-xl bg-white/3 border border-white/5"><p class="text-2xl" style="font-family:'+f.heading+';font-weight:'+f.headingWeight+'">The Last Horizon</p></div><div class="mt-3"><label class="text-xs text-sf-muted block mb-1.5">Weight</label><select onchange="SD.appearance.fonts.headingWeight=this.value;saveSiteData()" class="ai"><option value="400"'+(f.headingWeight==='400'?' selected':'')+'>Regular (400)</option><option value="500"'+(f.headingWeight==='500'?' selected':'')+'>Medium (500)</option><option value="600"'+(f.headingWeight==='600'?' selected':'')+'>Semibold (600)</option><option value="700"'+(f.headingWeight==='700'?' selected':'')+'>Bold (700)</option><option value="800"'+(f.headingWeight==='800'?' selected':'')+'>Extra Bold (800)</option><option value="900"'+(f.headingWeight==='900'?' selected':'')+'>Black (900)</option></select></div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Body Font</h3><select onchange="SD.appearance.fonts.body=this.value;saveSiteData()" class="ai"><option value="Inter"'+(f.body==='Inter'?' selected':'')+'>Inter</option><option value="Poppins"'+(f.body==='Poppins'?' selected':'')+'>Poppins</option><option value="Montserrat"'+(f.body==='Montserrat'?' selected':'')+'>Montserrat</option><option value="Roboto"'+(f.body==='Roboto'?' selected':'')+'>Roboto</option></select><div class="mt-3 p-4 rounded-xl bg-white/3 border border-white/5"><p class="text-sm leading-relaxed" style="font-family:'+f.body+';font-weight:'+f.bodyWeight+'">In a world where the boundaries between reality and simulation blur, one woman discovers she holds the key to humanity\'s survival.</p></div><div class="mt-3"><label class="text-xs text-sf-muted block mb-1.5">Weight</label><select onchange="SD.appearance.fonts.bodyWeight=this.value;saveSiteData()" class="ai"><option value="300"'+(f.bodyWeight==='300'?' selected':'')+'>Light (300)</option><option value="400"'+(f.bodyWeight==='400'?' selected':'')+'>Regular (400)</option><option value="500"'+(f.bodyWeight==='500'?' selected':'')+'>Medium (500)</option></select></div></div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Size Scale</h3><input type="range" min="0.85" max="1.3" step="0.05" value="'+f.sizeScale+'" onchange="SD.appearance.fonts.sizeScale=this.value;saveSiteData()" class="w-full accent-[var(--c-primary)]"><div class="flex justify-between text-[10px] text-sf-muted mt-1"><span>85%</span><span>100%</span><span>130%</span></div></div></div>'}
-
-function renderComponentsTab(c){var a=SD.appearance;c.innerHTML='<div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div class="ac"><h3 class="text-sm font-semibold mb-4">Button Radius</h3><input type="range" min="0" max="24" value="'+parseInt(a.buttons.radius)+'" onchange="SD.appearance.buttons.radius=this.value+'px';saveSiteData()" class="w-full accent-[var(--c-primary)]"><div class="flex justify-between text-[10px] text-sf-muted mt-1"><span>Sharp</span><span>Round</span></div><div class="mt-4 flex gap-2"><button class="ab text-xs py-2 px-4" style="border-radius:var(--btn-radius)">Primary</button><button class="ab2 text-xs py-2 px-4" style="border-radius:var(--btn-radius)">Secondary</button></div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Card Radius</h3><input type="range" min="0" max="24" value="'+parseInt(a.cards.radius)+'" onchange="SD.appearance.cards.radius=this.value+'px';saveSiteData()" class="w-full accent-[var(--c-primary)]"><div class="flex justify-between text-[10px] text-sf-muted mt-1"><span>Sharp</span><span>Round</span></div><div class="mt-4 w-32 aspect-[2/3] rounded-xl overflow-hidden border border-white/10" style="border-radius:var(--card-radius)"><img src="https://picsum.photos/seed/card-preview/300/450.jpg" class="w-full h-full object-cover"></div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Card Hover Effect</h3><div class="flex gap-2"><button onclick="SD.appearance.cards.hoverEffect=\'lift\';saveSiteData();switchAdminTab(\'components\')" class="ab2 text-xs py-2 px-4 '+(a.cards.hoverEffect==='lift'?'!bg-white/10 !text-white':'')+'">Lift</button><button onclick="SD.appearance.cards.hoverEffect=\'scale\';saveSiteData();switchAdminTab(\'components\')" class="ab2 text-xs py-2 px-4 '+(a.cards.hoverEffect==='scale'?'!bg-white/10 !text-white':'')+'">Scale</button><button onclick="SD.appearance.cards.hoverEffect=\'glow\';saveSiteData();switchAdminTab(\'components\')" class="ab2 text-xs py-2 px-4 '+(a.cards.hoverEffect==='glow'?'!bg-white/10 !text-white':'')+'">Glow</button><button onclick="SD.appearance.cards.hoverEffect=\'none\';saveSiteData();switchAdminTab(\'components\')" class="ab2 text-xs py-2 px-4 '+(a.cards.hoverEffect==='none'?'!bg-white/10 !text-white':'')+'">None</button></div></div></div>'}
-
-function renderHeaderTab(c){var h=SD.appearance.header;c.innerHTML='<div class="space-y-6"><div class="ac"><h3 class="text-sm font-semibold mb-4">Navigation Items</h3><p class="text-xs text-sf-muted mb-3">Click × to remove, type to rename</p><div class="space-y-2">'+h.items.map(function(it,i){return '<div class="flex items-center gap-2"><input value="'+esc(it.label)+'" onchange="SD.appearance.header.items['+i+'].label=this.value" class="ai text-sm flex-1"><button onclick="SD.appearance.header.items.splice('+i+',1);saveSiteData();switchAdminTab(\'header\')" class="text-sf-muted hover:text-red-400 text-xs p-1">&times;</button>'+(i>0?'<button onclick="SD.appearance.header.items.splice('+i+',1);SD.appearance.header.items.splice('+(i-1)+',0,'+JSON.stringify(it).replace(/"/g,'&quot;')+');saveSiteData();switchAdminTab(\'header\')" class="text-sf-muted hover:text-white text-xs p-1">&uarr;</button>':'')+(i<h.items.length-1?'<button onclick="SD.appearance.header.items.splice('+i+',1);SD.appearance.header.items.splice('+(i+1)+',0,'+JSON.stringify(it).replace(/"/g,'&quot;')+');saveSiteData();switchAdminTab(\'header\')" class="text-sf-muted hover:text-white text-xs p-1">&darr;</button>':'')+'</div>'}).join('')+'</div><div class="flex gap-2"><button onclick="SD.appearance.header.items.push({label:\'New Item\',active:false});saveSiteData();switchAdminTab(\'header\')" class="ab2 text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Item</button><button onclick="SD.appearance.header.items[0].active=true;SD.appearance.header.items.forEach(function(x,i){if(i>0)x.active=false});saveSiteData();switchAdminTab(\'header\')" class="ab2 text-xs py-2 px-4">Reset Active</button></div></div><div class="grid grid-cols-2 gap-4"><div class="ac"><h3 class="text-sm font-semibold mb-3">Show Search</h3><button class="tgl '+(h.showSearch?'on':'')+'" onclick="SD.appearance.header.showSearch=toggleEl(this);saveSiteData()"></button></div><div class="ac"><h3 class="text-sm font-semibold mb-3">Show Profile</h3><button class="tgl '+(h.showProfile?'on':'')+'" onclick="SD.appearance.header.showProfile=toggleEl(this);saveSiteData()"></button></div></div></div>'}
-
-function renderFooterTab(c){var f=SD.appearance.footer;c.innerHTML='<div class="space-y-6"><div class="grid grid-cols-2 gap-4"><div class="ac"><h3 class="text-sm font-semibold mb-3">Show Social Icons</h3><button class="tgl '+(f.showSocial?'on':'')+'" onclick="SD.appearance.footer.showSocial=toggleEl(this);saveSiteData()"></button></div><div class="ac"><h3 class="text-sm font-semibold mb-3">Show Link Columns</h3><button class="tgl '+(f.showLinks?'on':'')+'" onclick="SD.appearance.footer.showLinks=toggleEl(this);saveSiteData()"></button></div><div class="ac"><h3 class="text-sm font-semibold mb-3">Show Service Code</h3><button class="tgl '+(f.showServiceCode?'on':'')+'" onclick="SD.appearance.footer.showServiceCode=toggleEl(this);saveSiteData()"></button></div></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Copyright Text</h3><input value="'+esc(f.copyright)+'" onchange="SD.appearance.footer.copyright=this.value;saveSiteData()" class="ai"></div><div class="ac"><h3 class="text-sm font-semibold mb-4">Footer Columns</h3>'+f.columns.map(function(col,ci){return '<div class="mb-3 p-3 rounded-xl bg-white/[0.02] border border-white/5"><div class="flex items-center justify-between mb-2"><input value="'+esc(col.title)+'" onchange="SD.appearance.footer.columns['+ci+'].title=this.value" class="ai text-xs py-1 font-semibold">'+(ci>0?'<button onclick="SD.appearance.footer.columns.splice('+ci+',1);saveSiteData();switchAdminTab(\'footer\')" class="text-sf-muted hover:text-red-400 text-xs">&times;</button>':'')+'</div><div class="space-y-1">'+col.links.map(function(l,li){return '<div class="flex items-center gap-1"><input value="'+esc(l)+'" onchange="SD.appearance.footer.columns['+ci+'].links['+li+']=this.value" class="ai text-xs py-1"><button onclick="SD.appearance.footer.columns['+ci+'].links.splice('+li+',1);saveSiteData();switchAdminTab(\'footer\')" class="text-sf-muted hover:text-red-400 text-[10px]">&times;</button></div>'}).join('')+'<button onclick="SD.appearance.footer.columns['+ci+'].links.push(\'New Link\');saveSiteData();switchAdminTab(\'footer\')" class="text-[10px] text-sf-muted hover:text-white mt-1">+ Add link</button></div>'}).join('')+'<button onclick="SD.appearance.footer.columns.push({title:\'New Column\',links:[\'Link 1\']});saveSiteData();switchAdminTab(\'footer\')" class="ab2 text-xs py-2 px-4 flex items-center gap-2 mt-3"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Column</button></div>'}
-
-function renderBannersTab(c){var a=SD.appearance;c.innerHTML='<div class="space-y-6"><div class="ac"><div class="flex items-center justify-between mb-4"><h3 class="text-sm font-semibold">Announcement Bar</h3><button class="tgl '+(a.announcement.enabled?'on':'')+'" onclick="SD.appearance.announcement.enabled=toggleEl(this);saveSiteData()"></button></div><input value="'+esc(a.announcement.text)+'" onchange="SD.appearance.announcement.text=this.value;saveSiteData()" class="ai mb-3" placeholder="Announcement text..."><div class="grid grid-cols-2 gap-3"><div><label class="text-xs text-sf-muted block mb-1.5">Background Color</label><div class="flex items-center gap-2"><div class="clr-swatch" style="background:'+a.announcement.bgColor+'"><input type="color" value="'+a.announcement.bgColor+'" onchange="SD.appearance.announcement.bgColor=this.value;saveSiteData()"></div><input value="'+a.announcement.bgColor+'" onchange="SD.appearance.announcement.bgColor=this.value;saveSiteData()" class="ai text-xs py-1 font-mono" style="width:80px"></div></div><div><label class="text-xs text-sf-muted block mb-1.5">Text Color</label><div class="flex items-center gap-2"><div class="clr-swatch" style="background:'+a.announcement.textColor+'"><input type="color" value="'+a.announcement.textColor+'" onchange="SD.appearance.announcement.textColor=this.value;saveSiteData()"></div><input value="'+a.announcement.textColor+'" onchange="SD.appearance.announcement.textColor=this.value;saveSiteData()" class="ai text-xs py-1 font-mono" style="width:80px"></div></div></div><div><label class="text-xs text-sf-muted block mb-1.5">Link URL (optional)</label><input value="'+esc(a.announcement.link)+'" onchange="SD.appearance.announcement.link=this.value;saveSiteData()" class="ai" placeholder="https://..."></div></div><div class="ac"><div class="flex items-center justify-between mb-4"><h3 class="text-sm font-semibold">Promo Popup</h3><button class="tgl '+(a.popup.enabled?'on':'')+'" onclick="SD.appearance.popup.enabled=toggleEl(this);saveSiteData()"></button></div><div class="space-y-3"><input value="'+esc(a.popup.title)+'" onchange="SD.appearance.popup.title=this.value;saveSiteData()" class="ai" placeholder="Popup title"><textarea value="'+esc(a.popup.desc)+'" onchange="SD.appearance.popup.desc=this.value;saveSiteData()" rows="2" class="ai resize-none" placeholder="Popup description"></textarea><input value="'+esc(a.popup.btnText)+'" onchange="SD.appearance.popup.btnText=this.value;saveSiteData()" class="ai" placeholder="Button text"><input value="'+esc(a.popup.btnLink)+'" onchange="SD.appearance.popup.btnLink=this.value;saveSiteData()" class="ai" placeholder="Button link"><div class="grid grid-cols-2 gap-3"><div><label class="text-xs text-sf-muted block mb-1.5">Background</label><div class="flex items-center gap-2"><div class="clr-swatch" style="background:'+a.popup.bgColor+'"><input type="color" value="'+a.popup.bgColor+'" onchange="SD.appearance.popup.bgColor=this.value;saveSiteData()"></div><input value="'+a.popup.bgColor+'" onchange="SD.appearance.popup.bgColor=this.value;saveSiteData()" class="ai text-xs py-1 font-mono" style="width:80px"></div></div><div><label class="text-xs text-sf-muted block mb-1.5">Accent</label><div class="flex items-center gap-2"><div class="clr-swatch" style="background:'+a.popup.accentColor+'"><input type="color" value="'+a.popup.accentColor+'" onchange="SD.appearance.popup.accentColor=this.value;saveSiteData()"></div><input value="'+a.popup.accentColor+'" onchange="SD.appearance.popup.accentColor=this.value;saveSiteData()" class="ai text-xs py-1 font-mono" style="width:80px"></div></div></div><p class="text-[10px] text-sf-muted mt-2">Popup shows once per session. Clear localStorage to test again.</p></div></div>'}
-
-function renderSectionsTab(c){var s=SD.appearance.sections;var items=[{k:'hero',l:'Hero Banner'},{k:'genreFilter',l:'Genre Filter Bar'},{k:'top10',l:'Top 10 Section'},{k:'browseGenre',l:'Browse by Genre'},{k:'footer',l:'Footer'}];c.innerHTML='<div class="ac"><h3 class="text-sm font-semibold mb-4">Toggle Homepage Sections</h3><p class="text-xs text-sf-muted mb-4">Turn sections on or off. They will hide from the live site.</p><div class="space-y-2">'+items.map(function(it){return '<div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5"><span class="text-sm">'+it.l+'</span><button class="tgl '+(s[it.k]!==false?'on':'')+'" onclick="SD.appearance.sections.'+it.k+'=toggleEl(this);saveSiteData()"></button></div>'}).join('')+'</div><div class="ac mt-6"><h3 class="text-sm font-semibold mb-2">Row Order</h3><p class="text-xs text-sf-muted mb-4">Reorder content rows with arrows</p><div class="space-y-2">'+SD.rows.map(function(r,i){return '<div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]"><span class="text-sf-muted text-xs font-bold w-6">'+(i+1)+'</span><span class="flex-1 text-sm">'+esc(r.title)+' ('+r.ids.length+' movies)</span><div class="flex gap-1">'+(i>0?'<button onclick="SD.rows.splice('+i+',1);SD.rows.splice('+(i-1)+',0,'+JSON.stringify(r).replace(/"/g,'&quot;')+');saveSiteData();switchAdminTab(\'sections\')" class="text-sf-muted hover:text-white text-xs p-1">&uarr;</button>':'')+(i<SD.rows.length-1?'<button onclick="SD.rows.splice('+i+',1);SD.rows.splice('+(i+1)+',0,'+JSON.stringify(r).replace(/"/g,'&quot;')+');saveSiteData();switchAdminTab(\'sections\')" class="text-sf-muted hover:text-white text-xs p-1">&darr;</button>':'')+'</div></div>'}).join('')+'</div></div>'}
-
-// Monetization tabs
-function renderAdPlacementsTab(c){var ap=SD.monetization.adPlacements;var slots=[{k:'top',l:'Homepage Top Banner'},{k:'betweenRows',l:'Between Content Rows'},{k:'abovePlayer',l:'Above Video Player'},{k:'belowPlayer',l:'Below Video Player'}];c.innerHTML='<div class="space-y-4"><div class="ac"><h3 class="text-sm font-semibold mb-4">Ad Placements</h3><p class="text-xs text-sf-muted mb-4">Enable ad slots and paste ad HTML/code. Ads render live on the website.</p>'+slots.map(function(s){return '<div class="p-4 rounded-xl border border-white/5 bg-white/[0.02]"><div class="flex items-center justify-between mb-3"><span class="text-sm font-medium">'+s.l+'</span><button class="tgl '+(ap[s.k].enabled?'on':'')+'" onclick="SD.monetization.adPlacements.'+s.k+'.enabled=toggleEl(this);saveSiteData()"></button></div>'+(s.k==='betweenRows'?'<div class="mb-3"><label class="text-xs text-sf-muted block mb-1">After Row #</label><input type="number" min="0" max="10" value="'+ap[s.k].afterRow+'" onchange="SD.monetization.adPlacements.betweenRows.afterRow=parseInt(this.value)||0;saveSiteData()" class="ai text-xs py-1.5" style="width:80px"></div>':'')+'<textarea rows="4" onchange="SD.monetization.adPlacements.'+s.k+'.html=this.value;saveSiteData()" class="ai text-xs font-mono resize-none" placeholder="Paste ad HTML code here...">'+esc(ap[s.k].html||'')+'</textarea></div>'}).join('')+'</div></div>'}
-
-function renderCampaignsTab(c){var cm=SD.monetization.campaigns;c.innerHTML='<div class="space-y-4"><div class="flex items-center justify-between mb-2"><p class="text-sm text-sf-muted">Manage ad campaigns</p><button onclick="addCampaign()" class="ab text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> New Campaign</button></div>'+(cm.length===0?'<div class="ac text-center py-8"><p class="text-sf-muted text-sm">No campaigns yet</p></div>':'<div class="space-y-3">'+cm.map(function(cm,i){return '<div class="ac"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3"><input value="'+esc(cm.name)+'" onchange="SD.monetization.campaigns['+i+'].name=this.value" class="ai text-sm font-medium" style="width:200px"><span class="text-[10px] px-2 py-0.5 rounded '+(cm.enabled?'bg-green-900/50 text-green-400 border border-green-800/50':'bg-white/5 text-sf-muted')+'">'+(cm.enabled?'Active':'Paused')+'</span></div><div class="flex gap-1"><button onclick="SD.monetization.campaigns['+i+'].enabled=!SD.monetization.campaigns['+i+'].enabled;saveSiteData();switchAdminTab(\'campaigns\')" class="ab2 text-[11px] py-1 px-3">Toggle</button><button onclick="SD.monetization.campaigns.splice('+i+',1);saveSiteData();switchAdminTab(\'campaigns\')" class="abd text-[11px] py-1 px-3">Delete</button></div></div><div><label class="text-xs text-sf-muted block mb-1">Placement</label><select onchange="SD.monetization.campaigns['+i+'].placement=this.value;saveSiteData()" class="ai text-xs py-1.5"><option value="top"'+(cm.placement==='top'?' selected':'')+'>Homepage Top</option><option value="betweenRows"'+(cm.placement==='betweenRows'?' selected':'')+'>Between Rows</option><option value="abovePlayer"'+(cm.placement==='abovePlayer'?' selected':'')+'>Above Player</option><option value="belowPlayer"'+(cm.placement==='belowPlayer?' selected':'')+'>Below Player</option></select></div><textarea rows="3" onchange="SD.monetization.campaigns['+i+'].html=this.value;saveSiteData()" class="ai text-xs font-mono resize-none mt-2" placeholder="Campaign HTML...">'+esc(cm.html||'')+'</textarea></div>'}).join('')+'</div>'}</div>'}
-function addCampaign(){SD.monetization.campaigns.push({id:Date.now(),name:'Campaign '+(SD.monetization.campaigns.length+1),placement:'top',html:'',enabled:true});saveSiteData();switchAdminTab('campaigns')}
-
-function renderSponsoredTab(c){var sp=SD.monetization.sponsored,af=SD.monetization.affiliate;c.innerHTML='<div class="space-y-6"><div class="ac"><div class="flex items-center justify-between mb-4"><h3 class="text-sm font-semibold">Sponsored Content</h3><button class="tgl '+(sp.enabled?'on':'')+'" onclick="SD.monetization.sponsored.enabled=toggleEl(this);saveSiteData()"></button></div><input value="'+esc(sp.title)+'" onchange="SD.monetization.sponsored.title=this.value;saveSiteData()" class="ai mb-3" placeholder="Section title"><p class="text-xs text-sf-muted mb-3">Sponsored items appear as cards on the homepage.</p>'+sp.items.map(function(it,i){return '<div class="p-3 rounded-xl border border-white/5 bg-white/[0.02] mb-2"><div class="flex items-center justify-between mb-2"><span class="text-xs font-medium">Item '+(i+1)+'</span><div class="flex gap-1"><button onclick="SD.monetization.sponsored.items['+i+'].enabled=!SD.monetization.sponsored.items['+i+'].enabled;saveSiteData();switchAdminTab(\'sponsored\')" class="ab2 text-[10px] py-0.5 px-2">'+(it.enabled?'On':'Off')+'</button><button onclick="SD.monetization.sponsored.items.splice('+i+',1);saveSiteData();switchAdminTab(\'sponsored\')" class="text-sf-muted hover:text-red-400 text-[10px]">&times;</button></div></div><input value="'+esc(it.title)+'" onchange="SD.monetization.sponsored.items['+i+'].title=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Title"><input value="'+esc(it.desc)+'" onchange="SD.monetization.sponsored.items['+i+'].desc=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Short description"><input value="'+esc(it.imageUrl)+'" onchange="SD.monetization.sponsored.items['+i+'].imageUrl=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Image URL"><input value="'+esc(it.link)+'" onchange="SD.monetization.sponsored.items['+i+'].link=this.value;saveSiteData()" class="ai text-xs py-1.5" placeholder="Link URL"></div>'}).join('')+'<button onclick="SD.monetization.sponsored.items.push({id:Date.now(),title:\'New\',desc:\'Description\',imageUrl:\'\',link:\'\',enabled:true});saveSiteData();switchAdminTab(\'sponsored\')" class="ab2 text-xs py-2 px-4 flex items-center gap-2 mt-3"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Item</button></div><div class="ac"><div class="flex items-center justify-between mb-4"><h3 class="text-sm font-semibold">Affiliate Section</h3><button class="tgl '+(af.enabled?'on':'')+'" onclick="SD.monetization.affiliate.enabled=toggleEl(this);saveSiteData()"></button></div><input value="'+esc(af.title)+'" onchange="SD.monetization.affiliate.title=this.value;saveSiteData()" class="ai mb-3" placeholder="Section title"><p class="text-xs text-sf-muted mb-3">Affiliate cards with icons linking to partner offers.</p>'+af.items.map(function(it,i){return '<div class="p-3 rounded-xl border border-white/5 bg-white/[0.02] mb-2"><div class="flex items-center justify-between mb-2"><span class="text-xs font-medium">Affiliate '+(i+1)+'</span><div class="flex gap-1"><button onclick="SD.monetization.affiliate.items['+i+'].enabled=!SD.monetization.affiliate.items['+i+'].enabled;saveSiteData();switchAdminTab(\'sponsored\')" class="ab2 text-[10px] py-0.5 px-2">'+(it.enabled?'On':'Off')+'</button><button onclick="SD.monetization.affiliate.items.splice('+i+',1);saveSiteData();switchAdminTab(\'sponsored\')" class="text-sf-muted hover:text-red-400 text-[10px]">&times;</button></div></div><input value="'+esc(it.title)+'" onchange="SD.monetization.affiliate.items['+i+'].title=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Title"><input value="'+esc(it.desc)+'" onchange="SD.monetization.affiliate.items['+i+'].desc=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Short description"><input value="'+esc(it.icon||'')+'" onchange="SD.monetization.affiliate.items['+i+'].icon=this.value;saveSiteData()" class="ai text-xs py-1.5 mb-1.5" placeholder="Lucide icon name"><input value="'+esc(it.link)+'" onchange="SD.monetization.affiliate.items['+i+'].link=this.value;saveSiteData()" class="ai text-xs py-1.5" placeholder="Affiliate link URL"></div>'}).join('')+'<button onclick="SD.monetization.affiliate.items.push({id:Date.now(),title:\'Partner\',desc:\'Great deal\',icon:\'external-link\',link:\'https://example.com\',enabled:true});saveSiteData();switchAdminTab(\'sponsored\')" class="ab2 text-xs py-2 px-4 flex items-center gap-2 mt-3"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Affiliate</button></div></div>'}
-
-// Movie CRUD
-function openMovieEditor(id){editingMovieId=id;document.getElementById('movie-editor').classList.remove('hidden');if(id===-1){document.getElementById('editor-title').textContent='Add Movie';['ed-title','ed-duration','ed-desc','ed-cast','ed-img','ed-banner'].forEach(function(x){document.getElementById(x).value=''});document.getElementById('ed-genre').value='action';document.getElementById('ed-year').value='2024';document.getElementById('ed-maturity').value='R'}else{var m=getMovie(id);if(!m)return;document.getElementById('editor-title').textContent='Edit Movie';document.getElementById('ed-title').value=m.title;document.getElementById('ed-genre').value=m.genre;document.getElementById('ed-year').value=m.year;document.getElementById('ed-duration').value=m.duration;document.getElementById('ed-maturity').value=m.maturity;document.getElementById('ed-desc').value=m.desc;document.getElementById('ed-cast').value=m.cast;document.getElementById('ed-img').value=m.img;document.getElementById('ed-banner').value=m.banner}}
+function openMovieEditor(id){
+    editingMovieId=id;document.getElementById('movie-editor').classList.remove('hidden');
+    if(id===-1){document.getElementById('editor-title').textContent='Add Movie';document.getElementById('ed-title').value='';document.getElementById('ed-genre').value='action';document.getElementById('ed-year').value='2024';document.getElementById('ed-duration').value='';document.getElementById('ed-maturity').value='R';document.getElementById('ed-desc').value='';document.getElementById('ed-cast').value='';document.getElementById('ed-img').value='';document.getElementById('ed-banner').value=''}
+    else{var m=getMovie(id);if(!m)return;document.getElementById('editor-title').textContent='Edit Movie';document.getElementById('ed-title').value=m.title;document.getElementById('ed-genre').value=m.genre;document.getElementById('ed-year').value=m.year;document.getElementById('ed-duration').value=m.duration;document.getElementById('ed-maturity').value=m.maturity;document.getElementById('ed-desc').value=m.desc;document.getElementById('ed-cast').value=m.cast;document.getElementById('ed-img').value=m.img;document.getElementById('ed-banner').value=m.banner}
+}
 function closeMovieEditor(){document.getElementById('movie-editor').classList.add('hidden')}
-function saveMovieEdits(){var t=document.getElementById('ed-title').value.trim();if(!t){showToast('Title required');return}var obj={title:t,genre:document.getElementById('ed-genre').value,year:parseInt(document.getElementById('ed-year').value)||2024,duration:document.getElementById('ed-duration').value.trim(),maturity:document.getElementById('ed-maturity').value,desc:document.getElementById('ed-desc').value.trim(),cast:document.getElementById('ed-cast').value.trim(),img:document.getElementById('ed-img').value.trim()||'default-movie',banner:document.getElementById('ed-banner').value.trim()||'default-movie'};if(editingMovieId===-1){obj.id=SD.movies.length>0?Math.max.apply(null,SD.movies.map(function(m){return m.id}))+1:0;SD.movies.push(obj);showToast('Movie added')}else{var m=getMovie(editingMovieId);if(m)Object.assign(m,obj);showToast('Movie updated')}saveSiteData();closeMovieEditor();switchAdminTab('movies')}
-function deleteMovie(id){SD.movies=SD.movies.filter(function(m){return m.id!==id});SD.rows.forEach(function(r){r.ids=r.ids.filter(function(i){return i!==id})});SD.heroIds=SD.heroIds.filter(function(i){return i!==id});SD.top10Ids=SD.top10Ids.filter(function(i){return i!==id});saveSiteData();switchAdminTab('movies');showToast('Deleted')}
 
-function saveAll(){saveSiteData();showToast('All changes saved!');renderAll();setTimeout(closeAdmin,600)}
+function saveMovieEdits(){
+    var t=document.getElementById('ed-title').value.trim();if(!t){showToast('Title is required');return}
+    var obj={title:t,genre:document.getElementById('ed-genre').value,year:parseInt(document.getElementById('ed-year').value)||2024,duration:document.getElementById('ed-duration').value.trim(),maturity:document.getElementById('ed-maturity').value,desc:document.getElementById('ed-desc').value.trim(),cast:document.getElementById('ed-cast').value.trim(),img:document.getElementById('ed-img').value.trim()||'default-movie',banner:document.getElementById('ed-banner').value.trim()||'default-movie'};
+    if(editingMovieId===-1){obj.id=SD.movies.length>0?Math.max.apply(null,SD.movies.map(function(m){return m.id}))+1:0;SD.movies.push(obj);showToast('Movie added')}
+    else{var m=getMovie(editingMovieId);if(m){Object.assign(m,obj)}showToast('Movie updated')}
+    saveSiteData();closeMovieEditor();renderMoviesTable();lucide.createIcons();
+}
 
+function deleteMovie(id){
+    SD.movies=SD.movies.filter(function(m){return m.id!==id});
+    SD.rows.forEach(function(r){r.ids=r.ids.filter(function(i){return i!==id})});
+    SD.heroIds=SD.heroIds.filter(function(i){return i!==id});
+    SD.top10Ids=SD.top10Ids.filter(function(i){return i!==id});
+    saveSiteData();renderMoviesTable();renderRowsEditor();renderHeroSelector();renderTop10Editor();showToast('Movie deleted');
+}
+
+function renderRowsEditor(){
+    var h='';SD.rows.forEach(function(r,ri){
+        h+='<div class="admin-card"><div class="flex items-center justify-between mb-3"><input value="'+r.title+'" onchange="SD.rows['+ri+'].title=this.value" class="admin-input max-w-xs" placeholder="Row title"><button onclick="deleteRow('+ri+')" class="admin-btn-danger text-[11px] py-1 px-3">Remove Row</button></div><div class="flex flex-wrap gap-1.5">';
+        r.ids.forEach(function(mid,mi){var m=getMovie(mid);h+='<span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5">'+(m?m.title:'#'+mid)+'<button onclick="SD.rows['+ri+'].ids.splice('+mi+',1);saveSiteData();renderRowsEditor()" class="text-sf-muted hover:text-red-400 transition-colors">&times;</button></span>'});
+        h+='</div><div class="mt-3 pt-3 border-t border-white/5"><select id="row-add-'+ri+'" class="admin-input text-xs py-1.5"><option value="">Add movie to this row...</option>'+SD.movies.map(function(m){return '<option value="'+m.id+'">'+m.title+'</option>'}).join('')+'</select><button onclick="var s=document.getElementById(\'row-add-'+ri+'\');if(s.value){SD.rows['+ri+'].ids.push(parseInt(s.value));saveSiteData();renderRowsEditor()}" class="admin-btn text-[11px] py-1.5 px-3 mt-1">Add</button></div></div>';
+    });
+    h+='<button onclick="SD.rows.push({title:\'New Row\',ids:[]});saveSiteData();renderRowsEditor()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add New Row</button>';
+    document.getElementById('rows-editor').innerHTML=h;lucide.createIcons();
+}
+function deleteRow(i){SD.rows.splice(i,1);saveSiteData();renderRowsEditor()}
+
+function renderHeroSelector(){
+    var h='';SD.movies.forEach(function(m){
+        var sel=SD.heroIds.indexOf(m.id)!==-1;
+        h+='<button onclick="toggleHeroMovie('+m.id+')" class="text-xs px-3 py-2 rounded-lg border transition-all '+(sel?'bg-sf-red/20 border-sf-red/40 text-white':'bg-white/3 border-white/5 text-sf-muted hover:border-white/20')+'">'+m.title+'</button>';
+    });
+    document.getElementById('hero-selector').innerHTML=h;
+}
+function toggleHeroMovie(id){var i=SD.heroIds.indexOf(id);if(i===-1){if(SD.heroIds.length>=6){showToast('Max 6 hero movies');return}SD.heroIds.push(id)}else{SD.heroIds.splice(i,1)}saveSiteData();renderHeroSelector()}
+
+function renderTop10Editor(){
+    var h='';SD.top10Ids.forEach(function(mid,i){var m=getMovie(mid);h+='<div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]"><span class="text-sf-muted text-xs font-bold w-6">'+(i+1)+'</span><span class="flex-1 text-sm">'+(m?m.title:'#'+mid)+'</span><div class="flex gap-1">'+(i>0?'<button onclick="SD.top10Ids.splice('+i+',1);SD.top10Ids.splice('+(i-1)+',0,'+mid+');saveSiteData();renderTop10Editor()" class="text-sf-muted hover:text-white text-xs p-1 rounded">&uarr;</button>':'')+(i<SD.top10Ids.length-1?'<button onclick="SD.top10Ids.splice('+i+',1);SD.top10Ids.splice('+(i+1)+',0,'+mid+');saveSiteData();renderTop10Editor()" class="text-sf-muted hover:text-white text-xs p-1 rounded">&darr;</button>':'')+'<button onclick="SD.top10Ids.splice('+i+',1);saveSiteData();renderTop10Editor()" class="text-sf-muted hover:text-red-400 text-xs p-1 rounded">&times;</button></div></div>'});
+    document.getElementById('top10-editor').innerHTML=h;
+    var sel='<option value="">Select a movie...</option>'+SD.movies.filter(function(m){return SD.top10Ids.indexOf(m.id)===-1}).map(function(m){return '<option value="'+m.id+'">'+m.title+'</option>'}).join('');
+    document.getElementById('top10-add-select').innerHTML=sel;
+}
+function addToTop10(){var s=document.getElementById('top10-add-select');if(!s.value)return;SD.top10Ids.push(parseInt(s.value));saveSiteData();renderTop10Editor()}
+
+function renderGenresEditor(){
+    var h='';SD.genres.forEach(function(g,i){
+        h+='<div class="admin-card flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"><i data-lucide="'+g.icon+'" class="w-4 h-4 text-sf-muted"></i></div><input value="'+g.name+'" onchange="SD.genres['+i+'].name=this.value" class="admin-input text-sm"></div>';
+    });
+    document.getElementById('genres-editor').innerHTML=h;lucide.createIcons();
+}
+
+function saveAll(){saveSiteData();showToast('All changes saved!');renderAll();setTimeout(closeAdmin,800)}
+
+// ========== INIT ==========
 document.addEventListener('DOMContentLoaded',function(){loadSiteData();renderAll();switchAdminTab('movies')});
 </script>
 </body>
