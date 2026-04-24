@@ -3,220 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamFlix | Master OTT Platform</title>
+    <title>StreamFlix — Premium Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { 'sf-red': '#E50914', 'sf-dark': '#0a0a0f', 'sf-surface': '#12121a', 'sf-border': '#1e1e2a', 'sf-muted': '#6b6b80' },
+                    colors: {
+                        'sf-red': '#E50914',
+                        'sf-dark': '#0a0a0f',
+                        'sf-surface': '#12121a',
+                        'sf-card': '#16161f',
+                        'sf-border': '#1e1e2a',
+                        'sf-muted': '#6b6b80',
+                    },
                     fontFamily: { 'inter': ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
-        body { background: #0a0a0f; color: #fff; font-family: 'Inter', sans-serif; }
-        .hero-gradient { background: linear-gradient(to top, #0a0a0f 10%, transparent 80%), linear-gradient(to right, #0a0a0f 20%, transparent); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; overflow-x: hidden; }
+        ::-webkit-scrollbar { height: 3px; width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+        .row-scroll { scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
         .row-scroll::-webkit-scrollbar { display: none; }
-        .card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .card-hover:hover { transform: scale(1.1) translateY(-10px); z-index: 50; }
-        .film-grain::after {
-            content: ''; position: fixed; inset: -50%; width: 200%; height: 200%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 9999;
+        .card-hover { transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 500ms ease; }
+        .card-hover:hover { transform: scale(1.12) translateY(-8px); z-index: 30; box-shadow: 0 30px 80px -20px rgba(0,0,0,0.9), 0 0 60px -10px rgba(229,9,20,0.12); }
+        .card-hover:hover .card-info { opacity: 1; transform: translateY(0); }
+        .card-hover:hover .card-overlay { opacity: 1; }
+        .card-hover:hover .card-img { transform: scale(1.05); }
+        .card-info { opacity: 0; transform: translateY(12px); transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1) 80ms; }
+        .card-overlay { opacity: 0; transition: opacity 400ms ease; }
+        .card-img { transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .hero-gradient { background: linear-gradient(135deg, rgba(10,10,15,0.97) 0%, rgba(10,10,15,0.8) 30%, rgba(10,10,15,0.3) 55%, transparent 80%), linear-gradient(to top, #0a0a0f 0%, rgba(10,10,15,0.85) 25%, rgba(10,10,15,0.2) 55%, transparent 75%); }
+        .nav-blur { backdrop-filter: blur(24px) saturate(120%); -webkit-backdrop-filter: blur(24px) saturate(120%); }
+        .modal-backdrop { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(100%) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateX(0) scale(1); } to { opacity: 0; transform: translateX(100%) scale(0.9); } }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes glow-pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+        @keyframes grain { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-2%,-2%); } 30% { transform: translate(1%,2%); } 50% { transform: translate(-1%,1%); } 70% { transform: translate(2%,-1%); } 90% { transform: translate(-2%,1%); } }
+        .animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-slide-down { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-toast-in { animation: toastIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-toast-out { animation: toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .film-grain::after { content: ''; position: fixed; inset: -50%; width: 200%; height: 200%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); animation: grain 6s steps(8) infinite; pointer-events: none; z-index: 9999; }
+        .genre-chip { transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .genre-chip:hover { background: #E50914; color: white; border-color: #E50914; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(229,9,20,0.3); }
+        .genre-chip.active { background: #E50914; color: white; border-color: #E50914; box-shadow: 0 2px 16px rgba(229,9,20,0.25); }
+        .scroll-arrow { transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; transform: scale(0.8); }
+        .row-container:hover .scroll-arrow { opacity: 1; transform: scale(1); }
+        .scroll-arrow:hover { background: rgba(229,9,20,0.95); transform: scale(1.1) !important; box-shadow: 0 4px 24px rgba(229,9,20,0.4); }
+        .top10-number { font-size: 9rem; font-weight: 900; -webkit-text-stroke: 3px rgba(229,9,20,0.25); color: transparent; line-height: 0.85; font-style: italic; filter: drop-shadow(0 0 30px rgba(229,9,20,0.1)); }
+        .search-input:focus { outline: none; }
+        .maturity-badge { border: 1px solid rgba(255,255,255,0.3); padding: 0 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+        .genre-tile { transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .genre-tile:hover { transform: translateY(-4px) scale(1.02); }
+        .genre-tile:hover .genre-tile-img { transform: scale(1.1); }
+        .genre-tile-img { transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .promo-card { transition: all 500ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .promo-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px -15px rgba(229,9,20,0.2); }
+        .row-title { position: relative; display: inline-block; }
+        .row-title::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 32px; height: 3px; background: #E50914; border-radius: 2px; transition: width 300ms ease; }
+        .row-container:hover .row-title::after { width: 100%; }
+        .avatar-ring { background: conic-gradient(from 0deg, #E50914, #ff6b6b, #E50914); padding: 2px; border-radius: 10px; }
+        @media (max-width: 768px) {
+            .top10-number { font-size: 5.5rem; -webkit-text-stroke: 2px rgba(229,9,20,0.2); }
+            .card-hover:hover { transform: scale(1.04) translateY(-4px); }
+            .card-info { opacity: 1; transform: translateY(0); }
+            .card-overlay { opacity: 1; }
         }
     </style>
 </head>
-<body class="film-grain">
+<body class="font-inter film-grain">
 
-    <nav id="navbar" class="fixed top-0 w-full z-[100] transition-all duration-500"></nav>
-    <div id="app-viewport"></div>
-    <footer id="footer"></footer>
+    <div id="toast-container" class="fixed top-24 right-6 z-[200] flex flex-col gap-3"></div>
+
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-700">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div class="flex items-center justify-between h-16 lg:h-20">
+                <div class="flex items-center gap-6 lg:gap-10">
+                    <a href="#" class="flex items-center gap-2.5 group">
+                        <div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500">
+                            <i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
+                    </a>
+                    <div class="hidden lg:flex items-center gap-0.5">
+                        <a href="#" class="px-3.5 py-2 text-[13px] font-medium text-white relative">Home<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span></a>
+                        <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">TV Shows</a>
+                        <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">Movies</a>
+                        <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">New & Popular</a>
+                        <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">My List</a>
+                    </div>
+                    <button id="mobile-menu-btn" class="lg:hidden p-2 text-sf-muted hover:text-white transition-colors"><i data-lucide="menu" class="w-5 h-5"></i></button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div id="search-wrapper" class="relative flex items-center">
+                        <div id="search-closed" class="cursor-pointer p-2 text-sf-muted hover:text-white transition-colors duration-300" onclick="openSearch()"><i data-lucide="search" class="w-[18px] h-[18px]"></i></div>
+                        <div id="search-open" class="hidden items-center animate-slide-down">
+                            <i data-lucide="search" class="w-4 h-4 text-sf-muted absolute left-3"></i>
+                            <input id="search-input" type="text" placeholder="Titles, people, genres..." class="search-input bg-sf-surface/95 border border-white/10 text-sm text-white pl-10 pr-10 py-2.5 w-60 lg:w-96 rounded-xl placeholder:text-sf-muted focus:border-sf-red/40 transition-all duration-300 shadow-xl" oninput="handleSearch(this.value)">
+                            <button onclick="closeSearch()" class="absolute right-3 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    <div class="avatar-ring cursor-pointer hover:shadow-lg hover:shadow-sf-red/20 transition-shadow duration-500">
+                        <div class="w-8 h-8 rounded-[8px] overflow-hidden bg-sf-surface">
+                            <img src="https://picsum.photos/seed/avatar-user/80/80.jpg" alt="Profile" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="search-results" class="hidden max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 pb-4 animate-slide-down">
+            <div class="bg-sf-surface/98 border border-white/8 rounded-2xl max-h-96 overflow-y-auto shadow-2xl shadow-black/50">
+                <div id="search-results-content" class="p-4"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 z-[90] hidden">
+        <div class="absolute inset-0 bg-black/85" onclick="closeMobileMenu()"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-72 bg-sf-dark/98 border-r border-white/5 p-6 animate-slide-up backdrop-blur-xl">
+            <div class="flex items-center justify-between mb-8">
+                <span class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span>
+                <button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-white bg-white/5 rounded-xl"><i data-lucide="home" class="w-5 h-5 text-sf-red"></i> Home</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="tv" class="w-5 h-5"></i> TV Shows</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="film" class="w-5 h-5"></i> Movies</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="trending-up" class="w-5 h-5"></i> New & Popular</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="heart" class="w-5 h-5"></i> My List</a>
+            </div>
+        </div>
+    </div>
+
+    <section id="hero" class="relative h-[90vh] sm:h-[92vh] lg:h-[96vh] overflow-hidden">
+        <div id="hero-bg" class="absolute inset-0 transition-opacity duration-1200">
+            <img src="https://picsum.photos/seed/hero-cinematic-dark/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation: float 12s ease-in-out infinite;">
+        </div>
+        <div class="hero-gradient absolute inset-0"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[400px] bg-sf-red/5 rounded-full blur-[120px] pointer-events-none" style="animation: glow-pulse 6s ease-in-out infinite;"></div>
+        <div class="relative z-10 h-full flex items-end pb-28 sm:pb-32 lg:pb-36">
+            <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
+                <div class="max-w-xl lg:max-w-2xl animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg shadow-sf-red/25">StreamFlix Original</span>
+                        <span class="text-sf-muted text-sm font-light">2024</span>
+                        <span class="w-1 h-1 bg-sf-muted rounded-full"></span>
+                        <span class="text-sf-muted text-sm font-light">Sci-Fi</span>
+                    </div>
+                    <h1 class="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow: 0 8px 60px rgba(0,0,0,0.6);">The Last<br>Horizon</h1>
+                    <div class="flex items-center gap-2.5 mb-5 text-sm">
+                        <span class="text-slate-300 font-light">2h 34m</span>
+                        <span class="w-1 h-1 bg-sf-muted rounded-full"></span>
+                        <span class="maturity-badge text-slate-300 rounded">TV-MA</span>
+                        <span class="w-1 h-1 bg-sf-muted rounded-full"></span>
+                        <span class="text-sf-muted text-xs font-medium tracking-wider">4K</span>
+                        <span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HDR</span>
+                        <span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">DOLBY ATMOS</span>
+                    </div>
+                    <p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">In a world where the boundaries between reality and simulation blur, one woman discovers she holds the key to humanity's survival. A gripping sci-fi epic that challenges everything you believe.</p>
+                    <div class="flex items-center gap-3">
+                        <button onclick="showToast('Now Playing: The Last Horizon')" class="flex items-center gap-2.5 bg-white text-black font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/90 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-xl shadow-white/10"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button>
+                        <button onclick="openModal(0)" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5"><i data-lucide="info" class="w-5 h-5"></i> More Info</button>
+                        <button onclick="toggleMyList(0)" class="p-3.5 rounded-xl border border-white/15 hover:border-white/40 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm" title="Add to My List"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5">
+            <button class="hero-dot w-8 h-1 bg-white rounded-full transition-all duration-500" onclick="changeHero(0)"></button>
+            <button class="hero-dot w-3 h-1 bg-white/20 rounded-full transition-all duration-500 hover:bg-white/50" onclick="changeHero(1)"></button>
+            <button class="hero-dot w-3 h-1 bg-white/20 rounded-full transition-all duration-500 hover:bg-white/50" onclick="changeHero(2)"></button>
+            <button class="hero-dot w-3 h-1 bg-white/20 rounded-full transition-all duration-500 hover:bg-white/50" onclick="changeHero(3)"></button>
+        </div>
+    </section>
+
+    <main class="relative z-10 -mt-12 sm:-mt-16">
+        <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 row-scroll">
+                <button class="genre-chip active whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] font-medium" onclick="filterGenre(this, 'all')">All</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'action')">Action</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'thriller')">Thriller</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'scifi')">Sci-Fi</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'drama')">Drama</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'comedy')">Comedy</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'horror')">Horror</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'romance')">Romance</button>
+                <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this, 'documentary')">Documentary</button>
+            </div>
+        </section>
+        <div id="content-rows"></div>
+        <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
+            <div class="promo-card relative rounded-2xl overflow-hidden cursor-pointer" onclick="showToast('Upgrading to Premium...')">
+                <div class="absolute inset-0 bg-gradient-to-r from-sf-red/90 via-sf-red/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-[url('https://picsum.photos/seed/promo-cinematic/1400/400.jpg')] bg-cover bg-center mix-blend-overlay opacity-30"></div>
+                <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between p-8 sm:p-10 lg:p-12 gap-4">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-white/60 mb-2 block">Limited Offer</span>
+                        <h3 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Upgrade to 4K Premium</h3>
+                        <p class="text-sm text-white/70 font-light max-w-md">Enjoy Dolby Vision, Dolby Atmos, and 4K Ultra HD on all your favorite titles. First month free.</p>
+                    </div>
+                    <button class="flex items-center gap-2 bg-white text-sf-red font-semibold text-sm px-7 py-3.5 rounded-xl hover:bg-white/90 transition-all whitespace-nowrap shadow-xl shadow-black/20">Try Free <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
+            <h2 class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2>
+            <div class="row-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4"><div id="top10-container" class="flex gap-3 sm:gap-4"></div></div>
+        </section>
+        <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-20">
+            <h2 class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="genre-grid"></div>
+        </section>
+    </main>
+
+    <footer class="border-t border-white/5 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-sf-red/3 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-14 relative z-10">
+            <div class="flex items-center gap-5 mb-10">
+                <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+                <div class="flex flex-col gap-2.5">
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Audio Description</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Investor Relations</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Legal Notices</a>
+                </div>
+                <div class="flex flex-col gap-2.5">
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Help Center</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Jobs</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Cookie Preferences</a>
+                </div>
+                <div class="flex flex-col gap-2.5">
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Gift Cards</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Terms of Use</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Corporate Information</a>
+                </div>
+                <div class="flex flex-col gap-2.5">
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Media Center</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Privacy</a>
+                    <a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors duration-300">Contact Us</a>
+                </div>
+            </div>
+            <button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300 mb-5">Service Code</button>
+            <p class="text-[11px] text-white/20">&copy; 2024 StreamFlix. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="fixed inset-0 z-[150] hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black/75" onclick="closeModal()"></div>
+        <div class="relative z-10 max-w-3xl mx-auto mt-6 sm:mt-10 max-h-[92vh] overflow-y-auto rounded-2xl animate-scale-in shadow-2xl shadow-black/50">
+            <div id="modal-content"></div>
+        </div>
+    </div>
 
     <script>
-        // --- DATA ENGINE ---
-        const state = {
-            movies: JSON.parse(localStorage.getItem('sf_movies')) || [
-                { id: 1, title: 'Welcome to StreamFlix', desc: 'Go to Admin to add your first movie.', banner: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop', type: 'Trending Now', url: '', featured: true }
-            ],
-            config: JSON.parse(localStorage.getItem('sf_config')) || {
-                siteName: 'StreamFlix',
-                primaryColor: '#E50914',
-                rows: ['Trending Now', 'Action', 'Anime', 'Tamil Movies'],
-                admin: { user: 'admin', pass: 'Haran@stream2026!' }
-            },
-            save() {
-                localStorage.setItem('sf_movies', JSON.stringify(this.movies));
-                localStorage.setItem('sf_config', JSON.stringify(this.config));
-            }
-        };
+        const movies=[
+            {id:0,title:"The Last Horizon",genre:"scifi",year:2024,duration:"2h 34m",maturity:"TV-MA",desc:"In a world where the boundaries between reality and simulation blur, one woman discovers she holds the key to humanity's survival.",cast:"Emma Stone, Oscar Isaac, Dev Patel",img:"hero-cinematic-dark",banner:"hero-cinematic-dark"},
+            {id:1,title:"Midnight Protocol",genre:"thriller",year:2024,duration:"1h 58m",maturity:"TV-14",desc:"A retired intelligence operative is pulled back into the shadows when a ghost from the past threatens global security.",cast:"Idris Elba, Cate Blanchett",img:"midnight-spy",banner:"midnight-spy"},
+            {id:2,title:"Echoes of War",genre:"drama",year:2023,duration:"2h 47m",maturity:"R",desc:"Three generations of a family grapple with the lasting consequences of a conflict that shaped their nation.",cast:"Viola Davis, Daniel Kaluuya",img:"war-drama-scene",banner:"war-drama-scene"},
+            {id:3,title:"Neon Streets",genre:"action",year:2024,duration:"2h 11m",maturity:"TV-MA",desc:"In a cyberpunk metropolis, a street racer gets entangled in a deadly conspiracy that could topple the city's elite.",cast:"John Boyega, Ana de Armas",img:"neon-city-night",banner:"neon-city-night"},
+            {id:4,title:"The Silent Patient",genre:"thriller",year:2024,duration:"1h 52m",maturity:"TV-MA",desc:"A renowned psychotherapist becomes obsessed with treating a woman who shot her husband and hasn't spoken since.",cast:"Saoirse Ronan, Jake Gyllenhaal",img:"dark-moody-portrait",banner:"dark-moody-portrait"},
+            {id:5,title:"Starfall",genre:"scifi",year:2024,duration:"2h 22m",maturity:"PG-13",desc:"When fragments of an alien civilization rain down on Earth, a team of scientists races to decode their message.",cast:"Zendaya, Timothée Chalamet",img:"space-stars-galaxy",banner:"space-stars-galaxy"},
+            {id:6,title:"Laugh Factory",genre:"comedy",year:2023,duration:"1h 38m",maturity:"PG-13",desc:"A struggling comedian accidentally becomes the face of a corporate brand and must choose between authenticity and wealth.",cast:"Ke Huy Quan, Awkwafina",img:"comedy-stage-lights",banner:"comedy-stage-lights"},
+            {id:7,title:"Crimson Tide Rising",genre:"action",year:2024,duration:"2h 19m",maturity:"R",desc:"An elite Navy SEAL team undertakes an impossible rescue mission behind enemy lines as tensions escalate to war.",cast:"Michael B. Jordan, Florence Pugh",img:"ocean-military-ship",banner:"ocean-military-ship"},
+            {id:8,title:"Whispers in the Dark",genre:"horror",year:2024,duration:"1h 45m",maturity:"R",desc:"A family moves into a historic mansion only to discover that its walls hold secrets better left buried.",cast:"Jenna Ortega, Pedro Pascal",img:"haunted-dark-house",banner:"haunted-dark-house"},
+            {id:9,title:"Love in Transit",genre:"romance",year:2023,duration:"1h 55m",maturity:"PG-13",desc:"Two strangers meet on a cross-country train journey and discover that sometimes the best destinations are unexpected.",cast:"Sydney Sweeney, Glen Powell",img:"romantic-train-sunset",banner:"romantic-train-sunset"},
+            {id:10,title:"Planet Earth: The Next Chapter",genre:"documentary",year:2024,duration:"6 episodes",maturity:"TV-G",desc:"An breathtaking exploration of how our planet's ecosystems are adapting to the challenges of the modern age.",cast:"David Attenborough (narrator)",img:"nature-landscape-green",banner:"nature-landscape-green"},
+            {id:11,title:"Shadow Empire",genre:"action",year:2024,duration:"2h 28m",maturity:"TV-MA",desc:"In a dystopian future, a rebel faction fights against a totalitarian regime that controls the world's resources.",cast:"Tom Hardy, Lupita Nyong'o",img:"dystopian-ruins-city",banner:"dystopian-ruins-city"},
+            {id:12,title:"The Mind's Eye",genre:"scifi",year:2023,duration:"2h 05m",maturity:"TV-14",desc:"A neuroscientist develops technology to enter other people's memories, but discovers some doors should stay closed.",cast:"Natalie Portman, Adam Driver",img:"brain-neural-lights",banner:"brain-neural-lights"},
+            {id:13,title:"Kitchen Confidential",genre:"drama",year:2024,duration:"8 episodes",maturity:"TV-MA",desc:"The intense, cutthroat world of high-end restaurant kitchens as seen through the eyes of a rising chef.",cast:"Jeremy Allen White, Ayo Edebiri",img:"chef-kitchen-fire",banner:"chef-kitchen-fire"},
+            {id:14,title:"Dead of Night",genre:"horror",year:2024,duration:"1h 40m",maturity:"R",desc:"A group of friends stranded in the wilderness discover that the local legends about creatures in the woods are terrifyingly real.",cast:"Megan Sweeney, Harris Dickinson",img:"dark-forest-night-fog",banner:"dark-forest-night-fog"},
+            {id:15,title:"The Grand Illusion",genre:"thriller",year:2023,duration:"2h 15m",maturity:"TV-14",desc:"A world-famous magician's latest trick goes horribly wrong, revealing a conspiracy that stretches back decades.",cast:"Benedict Cumberbatch, Margot Robbie",img:"magic-show-stage",banner:"magic-show-stage"},
+            {id:16,title:"Wild Hearts",genre:"romance",year:2024,duration:"1h 50m",maturity:"PG-13",desc:"A wildlife photographer and a veterinarian find unexpected love while working to save an endangered species.",cast:"Florence Pugh, Andrew Garfield",img:"safari-animals-sunset",banner:"safari-animals-sunset"},
+            {id:17,title:"Code Zero",genre:"action",year:2024,duration:"2h 01m",maturity:"R",desc:"When a cyber attack threatens to disable the world's nuclear arsenals, a hacker and a soldier must work together.",cast:"John David Washington, Gal Gadot",img:"cyber-hack-screen",banner:"cyber-hack-screen"},
+            {id:18,title:"Breaking Point",genre:"drama",year:2024,duration:"2h 30m",maturity:"TV-MA",desc:"An athlete's journey from poverty to Olympic glory, and the personal cost of chasing perfection.",cast:"Jonathan Majors, Jodie Comer",img:"sports-stadium-crowd",banner:"sports-stadium-crowd"},
+            {id:19,title:"Deep Blue",genre:"documentary",year:2024,duration:"4 episodes",maturity:"TV-G",desc:"A mesmerizing deep-dive into the ocean's most mysterious and unexplored depths.",cast:"Cate Blanchett (narrator)",img:"underwater-ocean-deep",banner:"underwater-ocean-deep"}
+        ];
+        const heroMovies=[movies[0],movies[3],movies[5],movies[4]];
+        const rows=[
+            {title:"Trending Now",ids:[0,4,3,7,5,11,15,8]},
+            {title:"Popular on StreamFlix",ids:[1,9,12,6,14,16,2,18]},
+            {title:"Action & Adventure",ids:[3,7,11,17,0,15]},
+            {title:"Critically Acclaimed",ids:[10,19,4,15,18,12]},
+            {title:"Sci-Fi & Fantasy",ids:[5,12,0,3,11,8]}
+        ];
+        const genres=[
+            {name:"Action",icon:"swords",seed:"action-explosion-fire",gradient:"from-red-900/70 to-orange-950/80"},
+            {name:"Thriller",icon:"eye",seed:"thriller-dark-alley",gradient:"from-purple-900/70 to-indigo-950/80"},
+            {name:"Sci-Fi",icon:"rocket",seed:"scifi-space-rocket",gradient:"from-blue-900/70 to-cyan-950/80"},
+            {name:"Drama",icon:"drama",seed:"drama-theater-stage",gradient:"from-amber-900/70 to-yellow-950/80"},
+            {name:"Comedy",icon:"smile",seed:"comedy-fun-party",gradient:"from-yellow-900/70 to-lime-950/80"},
+            {name:"Horror",icon:"skull",seed:"horror-dark-scary",gradient:"from-gray-900/70 to-slate-950/80"},
+            {name:"Romance",icon:"heart",seed:"romance-sunset-love",gradient:"from-pink-900/70 to-rose-950/80"},
+            {name:"Documentary",icon:"globe",seed:"documentary-nature-earth",gradient:"from-green-900/70 to-emerald-950/80"}
+        ];
+        const myList=new Set();
 
-        // --- APP ENGINE ---
-        const app = {
-            isAuth: false,
-            adminTab: 'content',
+        function createCard(m){return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer rounded-xl overflow-hidden relative" onclick="openModal('+m.id+')"><div class="relative aspect-[2/3] bg-sf-card rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+m.title+'" class="card-img w-full h-full object-cover" loading="lazy"><div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5"><button onclick="event.stopPropagation();showToast(\'Now Playing: '+m.title+'\')" class="w-7 h-7 bg-white rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button><button onclick="event.stopPropagation();toggleMyList('+m.id+')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(m.id)?'check':'plus')+'" class="w-3 h-3"></i></button><button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div><p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+m.title+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span><span class="text-[9px] text-slate-500">'+m.duration+'</span></div></div></div></div>'}
 
-            init() {
-                window.addEventListener('hashchange', () => this.router());
-                window.addEventListener('scroll', () => {
-                    document.getElementById('navbar').classList.toggle('bg-sf-dark/90', window.scrollY > 50);
-                    document.getElementById('navbar').classList.toggle('backdrop-blur-xl', window.scrollY > 50);
-                });
-                this.router();
-            },
+        function createTop10Card(m,r){return '<div class="flex-shrink-0 flex items-end cursor-pointer group" onclick="openModal('+m.id+')"><span class="top10-number mr-[-14px] relative z-10 select-none">'+r+'</span><div class="w-[110px] sm:w-[135px] lg:w-[155px] rounded-xl overflow-hidden relative card-hover"><div class="aspect-[2/3] bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+m.title+'" class="card-img w-full h-full object-cover" loading="lazy"></div></div></div>'}
 
-            router() {
-                const hash = window.location.hash || '#/';
-                this.renderNav();
-                if (hash === '#/portal') this.handleAuth();
-                else if (hash.startsWith('#/watch')) this.renderWatch(new URLSearchParams(hash.split('?')[1]).get('id'));
-                else this.renderHome();
-                this.renderFooter();
-                if (window.lucide) lucide.createIcons();
-            },
+        function renderRows(){document.getElementById('content-rows').innerHTML=rows.map(function(r,ri){return '<section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-9 mb-3 row-container"><h2 class="row-title text-lg sm:text-xl font-semibold mb-5">'+r.title+'</h2><div class="relative group/row"><button onclick="scrollRow(\'row-'+ri+'\',-1)" class="scroll-arrow absolute left-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-r-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div id="row-'+ri+'" class="row-scroll flex gap-2.5 sm:gap-3 overflow-x-auto pb-4">'+r.ids.map(function(id){return createCard(movies[id])}).join('')+'</div><button onclick="scrollRow(\'row-'+ri+'\',1)" class="scroll-arrow absolute right-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-l-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div></section>'}).join('');lucide.createIcons()}
 
-            handleAuth() {
-                if (!this.isAuth) {
-                    const u = prompt("Admin User:");
-                    const p = prompt("Admin Pass:");
-                    if (u === state.config.admin.user && p === state.config.admin.pass) {
-                        this.isAuth = true; this.renderAdmin();
-                    } else { window.location.hash = "#/"; }
-                } else { this.renderAdmin(); }
-            },
+        function renderTop10(){document.getElementById('top10-container').innerHTML=[4,10,0,15,18,3,12,5,7,1].map(function(id,i){return createTop10Card(movies[id],i+1)}).join('');lucide.createIcons()}
 
-            renderNav() {
-                document.getElementById('navbar').innerHTML = `
-                    <div class="max-w-[1920px] mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
-                        <a href="#/" class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-white fill-white"></i></div>
-                            <span class="text-xl font-black italic tracking-tighter">${state.config.siteName}</span>
-                        </a>
-                        <div class="flex items-center gap-6 text-xs font-bold text-sf-muted">
-                            <a href="#/" class="text-white">HOME</a>
-                            <a href="#/portal" class="hover:text-white transition-colors">ADMIN</a>
-                        </div>
-                    </div>`;
-            },
+        function renderGenreGrid(){document.getElementById('genre-grid').innerHTML=genres.map(function(g,gi){return '<div class="genre-tile relative h-32 sm:h-36 rounded-2xl overflow-hidden cursor-pointer group" onclick="filterGenre(document.querySelectorAll(\'.genre-chip\')['+(gi+1)+'],\''+g.name.toLowerCase().replace('-','')+'\')"><div class="genre-tile-img absolute inset-0"><img src="https://picsum.photos/seed/'+g.seed+'/600/300.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="absolute inset-0 bg-gradient-to-br '+g.gradient+'"></div><div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div><div class="absolute inset-0 flex items-center gap-3 px-5"><div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10"><i data-lucide="'+g.icon+'" class="w-5 h-5 text-white/80"></i></div><span class="text-base sm:text-lg font-semibold drop-shadow-lg">'+g.name+'</span></div><div class="absolute inset-0 border border-white/5 rounded-2xl group-hover:border-white/15 transition-colors duration-500"></div></div>'}).join('');lucide.createIcons()}
 
-            renderHome() {
-                const feat = state.movies.find(m => m.featured) || state.movies[0];
-                const viewport = document.getElementById('app-viewport');
-                viewport.innerHTML = `
-                    <section class="relative h-[85vh] flex items-end pb-32 px-6 lg:px-12 overflow-hidden">
-                        <img src="${feat.banner}" class="absolute inset-0 w-full h-full object-cover">
-                        <div class="hero-gradient absolute inset-0"></div>
-                        <div class="relative z-10 max-w-2xl">
-                            <h1 class="text-6xl lg:text-8xl font-black mb-4 leading-none uppercase tracking-tighter">${feat.title}</h1>
-                            <p class="text-sf-muted text-lg mb-8 line-clamp-3">${feat.desc}</p>
-                            <a href="#/watch?id=${feat.id}" class="bg-sf-red text-white px-10 py-4 rounded-xl font-bold inline-flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-sf-red/20"><i data-lucide="play" fill="white"></i> WATCH NOW</a>
-                        </div>
-                    </section>
-                    <div class="px-6 lg:px-12 -mt-20 relative z-20 pb-20">
-                        ${state.config.rows.map(row => {
-                            const rowMovies = state.movies.filter(m => m.type === row);
-                            if (rowMovies.length === 0) return '';
-                            return `
-                                <div class="mb-12">
-                                    <h2 class="text-xl font-black mb-6 flex items-center gap-2">${row} <i data-lucide="chevron-right" class="text-sf-red w-5 h-5"></i></h2>
-                                    <div class="row-scroll flex gap-5 overflow-x-auto pb-4">
-                                        ${rowMovies.map(m => `
-                                            <div class="card-hover w-[260px] flex-shrink-0 cursor-pointer" onclick="window.location.hash='#/watch?id=${m.id}'">
-                                                <div class="aspect-video bg-sf-card rounded-2xl overflow-hidden border border-white/5"><img src="${m.banner}" class="w-full h-full object-cover"></div>
-                                                <h3 class="mt-3 text-sm font-bold text-slate-200">${m.title}</h3>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>`;
-                        }).join('')}
-                    </div>`;
-            },
+        function scrollRow(id,d){document.getElementById(id).scrollBy({left:d*document.getElementById(id).clientWidth*0.75,behavior:'smooth'})}
 
-            renderAdmin() {
-                const viewport = document.getElementById('app-viewport');
-                viewport.innerHTML = `
-                    <div class="flex min-h-screen pt-20">
-                        <aside class="w-72 bg-sf-surface p-10 border-r border-sf-border">
-                            <h3 class="text-sf-red font-black text-2xl mb-12 tracking-tighter italic">MASTER DASH</h3>
-                            <nav class="flex flex-col gap-3">
-                                <button onclick="app.setTab('content')" class="text-left px-5 py-3 rounded-xl ${this.adminTab==='content'?'bg-sf-red':'text-sf-muted'}">Library</button>
-                                <button onclick="app.setTab('appearance')" class="text-left px-5 py-3 rounded-xl ${this.adminTab==='appearance'?'bg-sf-red':'text-sf-muted'}">Settings</button>
-                                <button onclick="window.location.hash='#/'" class="text-left px-5 py-3 text-sf-muted mt-10">Exit</button>
-                            </nav>
-                        </aside>
-                        <main class="flex-1 p-12">
-                            ${this.adminTab === 'content' ? this.renderContentTab() : this.renderAppearanceTab()}
-                        </main>
-                    </div>`;
-                this.attachListeners();
-            },
+        var currentHero=0;
+        function changeHero(i){if(i===currentHero)return;currentHero=i;var m=heroMovies[i],bg=document.getElementById('hero-bg');bg.style.opacity=0;setTimeout(function(){bg.innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity=1},600);document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500'})}
+        setInterval(function(){changeHero((currentHero+1)%heroMovies.length)},8000);
 
-            setTab(t) { this.adminTab = t; this.renderAdmin(); },
+        function openModal(id){var m=movies[id];document.getElementById('modal-content').innerHTML='<div class="relative"><div class="relative h-[280px] sm:h-[380px] lg:h-[420px]"><img src="https://picsum.photos/seed/'+m.banner+'/1200/600.jpg" alt="'+m.title+'" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-[#16161f] via-black/50 to-transparent"></div><button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-black/70 transition-colors border border-white/5"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute bottom-6 left-6 right-6"><h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5" style="text-shadow:0 4px 30px rgba(0,0,0,0.5);">'+m.title+'</h2><div class="flex items-center gap-3"><button onclick="showToast(\'Now Playing: '+m.title+'\');closeModal();" class="flex items-center gap-2 bg-white text-black font-semibold text-sm px-7 py-3 rounded-xl hover:bg-white/90 transition-all shadow-xl shadow-white/10"><i data-lucide="play" class="w-5 h-5 fill-black"></i> Play</button><button onclick="toggleMyList('+id+')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(id)?'check':'plus')+'" class="w-5 h-5"></i></button><button onclick="showToast(\'Liked!\')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-5 h-5"></i></button></div></div></div><div class="bg-[#16161f] p-6 sm:p-8 rounded-b-2xl"><div class="flex flex-col sm:flex-row gap-6"><div class="flex-1"><div class="flex items-center gap-2.5 mb-4 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="border border-sf-muted/40 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HD</span></div><p class="text-slate-400 text-sm font-light leading-[1.75] mb-4">'+m.desc+'</p></div><div class="sm:w-52 space-y-3 text-sm border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6 pt-4 sm:pt-0"><div><span class="text-sf-muted text-xs">Cast</span><p class="text-slate-300 font-light mt-0.5">'+m.cast+'</p></div><div><span class="text-sf-muted text-xs">Genres</span><p class="text-slate-300 font-light mt-0.5">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</p></div></div></div><div class="mt-8 border-t border-white/5 pt-6"><h3 class="text-base font-semibold mb-4">More Like This</h3><div class="grid grid-cols-3 gap-2.5">'+movies.filter(function(x){return x.genre===m.genre&&x.id!==id}).slice(0,6).map(function(x){return '<div class="rounded-xl overflow-hidden bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] hover:ring-1 hover:ring-white/10 transition-all duration-300" onclick="event.stopPropagation();openModal('+x.id+')"><div class="aspect-video"><img src="https://picsum.photos/seed/'+x.img+'/400/225.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="p-2.5"><div class="flex items-center gap-1.5 mb-1"><span class="text-[9px] text-sf-muted">'+x.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+x.maturity+'</span></div><p class="text-[11px] font-medium line-clamp-1">'+x.title+'</p></div></div>'}).join('')+'</div></div></div></div>';document.getElementById('modal').classList.remove('hidden');document.body.style.overflow='hidden';lucide.createIcons()}
 
-            renderContentTab() {
-                return `
-                    <h1 class="text-4xl font-black mb-10">Manage Library</h1>
-                    <div class="grid lg:grid-cols-2 gap-10">
-                        <form id="add-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border flex flex-col gap-4">
-                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="title" placeholder="Title" required>
-                            <textarea class="bg-sf-dark border border-sf-border p-4 rounded-xl h-32" name="desc" placeholder="Synopsis" required></textarea>
-                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="banner" placeholder="Banner URL" required>
-                            <select class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="type">${state.config.rows.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
-                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="url" placeholder="Abyss Link" required>
-                            <button type="submit" class="bg-sf-red p-4 rounded-xl font-bold">PUBLISH NOW</button>
-                        </form>
-                        <div>
-                            <h3 class="font-bold mb-4">Inventory</h3>
-                            <div class="flex flex-col gap-2">${state.movies.map(m=>`<div class="p-4 bg-sf-surface border border-sf-border rounded-xl flex justify-between"><span>${m.title}</span><button onclick="app.delMovie(${m.id})" class="text-sf-red font-bold">DEL</button></div>`).reverse().join('')}</div>
-                        </div>
-                    </div>`;
-            },
+        function closeModal(){document.getElementById('modal').classList.add('hidden');document.body.style.overflow=''}
 
-            renderAppearanceTab() {
-                return `
-                    <h1 class="text-4xl font-black mb-10">Settings</h1>
-                    <form id="app-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border max-w-xl">
-                        <label class="text-xs font-bold text-sf-muted">Site Name</label>
-                        <input class="bg-sf-dark border border-sf-border w-full p-4 rounded-xl mt-2 mb-6" name="name" value="${state.config.siteName}">
-                        <button type="submit" class="bg-sf-red w-full p-4 rounded-xl font-bold">SAVE SETTINGS</button>
-                    </form>`;
-            },
+        function toggleMyList(id){if(myList.has(id)){myList.delete(id);showToast('Removed from My List')}else{myList.add(id);showToast('Added to My List')}renderRows();renderTop10()}
 
-            attachListeners() {
-                const f = document.getElementById('add-form');
-                if (f) f.onsubmit = (e) => {
-                    e.preventDefault(); const d = new FormData(f);
-                    state.movies.push({ id: Date.now(), title: d.get('title'), desc: d.get('desc'), banner: d.get('banner'), type: d.get('type'), url: d.get('url'), featured: false });
-                    state.save(); alert("Published!"); this.renderAdmin();
-                };
-                const af = document.getElementById('app-form');
-                if (af) af.onsubmit = (e) => {
-                    e.preventDefault(); state.config.siteName = new FormData(af).get('name');
-                    state.save(); alert("Updated!"); this.renderAdmin();
-                };
-            },
+        function openSearch(){document.getElementById('search-closed').classList.add('hidden');var o=document.getElementById('search-open');o.classList.remove('hidden');o.classList.add('flex');document.getElementById('search-input').focus()}
+        function closeSearch(){document.getElementById('search-closed').classList.remove('hidden');var o=document.getElementById('search-open');o.classList.add('hidden');o.classList.remove('flex');document.getElementById('search-input').value='';document.getElementById('search-results').classList.add('hidden')}
+        function handleSearch(q){var res=document.getElementById('search-results'),ct=document.getElementById('search-results-content');if(q.length<2){res.classList.add('hidden');return}var f=movies.filter(function(m){return m.title.toLowerCase().includes(q.toLowerCase())||m.genre.toLowerCase().includes(q.toLowerCase())||m.cast.toLowerCase().includes(q.toLowerCase())});ct.innerHTML=f.length===0?'<p class="text-sm text-sf-muted text-center py-6">No results found for "'+q+'"</p>':f.map(function(m){return '<div class="flex items-center gap-4 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors duration-200" onclick="closeSearch();openModal('+m.id+')"><div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-sf-card shadow-lg shadow-black/30"><img src="https://picsum.photos/seed/'+m.img+'/160/240.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">'+m.title+'</p><div class="flex items-center gap-2 mt-1"><span class="text-xs text-sf-muted">'+m.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+m.maturity+'</span><span class="text-xs text-sf-muted">'+m.duration+'</span></div><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+m.desc+'</p></div></div>'}).join('');res.classList.remove('hidden')}
 
-            delMovie(id) { if(confirm("Delete?")) { state.movies = state.movies.filter(m=>m.id!==id); state.save(); this.renderAdmin(); } },
+        function filterGenre(btn,genre){document.querySelectorAll('.genre-chip').forEach(function(c){c.classList.remove('active')});btn.classList.add('active');var secs=document.querySelectorAll('#content-rows section');if(genre==='all'){secs.forEach(function(s){s.style.opacity='1'})}else{secs.forEach(function(s){var t=s.querySelector('h2')?s.querySelector('h2').textContent.toLowerCase():'',cards=s.querySelectorAll('.card-hover'),hit=false;cards.forEach(function(c){var mid=parseInt(c.getAttribute('onclick').match(/openModal\((\d+)\)/)[1]),m=movies[mid];if(m&&(m.genre===genre||t.includes(genre))){c.style.opacity='1';hit=true}else{c.style.opacity='0.15'}});s.style.opacity=hit?'1':'0.15'})}window.scrollTo({top:400,behavior:'smooth'})}
 
-            renderWatch(id) {
-                const m = state.movies.find(m=>m.id==id);
-                document.getElementById('app-viewport').innerHTML = `
-                    <div class="pt-20 bg-black min-h-screen">
-                        <div class="max-w-[1920px] mx-auto px-6 lg:px-12">
-                            <iframe src="${m.url}" class="w-full aspect-video rounded-2xl shadow-2xl border border-white/5" allowfullscreen></iframe>
-                            <div class="py-12"><h1 class="text-6xl font-black mb-4 uppercase tracking-tighter">${m.title}</h1><p class="text-sf-muted text-xl max-w-4xl">${m.desc}</p></div>
-                        </div>
-                    </div>`;
-            },
+        function showToast(msg){var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='animate-toast-in flex items-center gap-3 bg-sf-surface/95 border border-white/8 px-5 py-3.5 rounded-2xl shadow-2xl shadow-black/40 min-w-[240px] backdrop-blur-xl';t.innerHTML='<div class="w-7 h-7 bg-sf-red/15 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-sf-red"></i></div><span class="text-[13px] text-slate-300 font-light">'+msg+'</span>';c.appendChild(t);lucide.createIcons();setTimeout(function(){t.classList.remove('animate-toast-in');t.classList.add('animate-toast-out');setTimeout(function(){t.remove()},400)},2500)}
 
-            renderFooter() { document.getElementById('footer').innerHTML = `<div class="p-20 text-center opacity-10 font-black italic tracking-tighter text-2xl">${state.config.siteName}</div>`; }
-        };
+        document.getElementById('mobile-menu-btn').addEventListener('click',function(){document.getElementById('mobile-menu').classList.remove('hidden')});
+        function closeMobileMenu(){document.getElementById('mobile-menu').classList.add('hidden')}
 
-        window.app = app;
-        document.addEventListener('DOMContentLoaded', () => app.init());
+        window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>40){n.classList.add('nav-blur','bg-sf-dark/80','border-b','border-white/5')}else{n.classList.remove('nav-blur','bg-sf-dark/80','border-b','border-white/5')}});
+
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeSearch();closeMobileMenu()}if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();openSearch()}});
+
+        document.addEventListener('DOMContentLoaded',function(){renderRows();renderTop10();renderGenreGrid();lucide.createIcons()});
     </script>
 </body>
 </html>
