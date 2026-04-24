@@ -1,45 +1,47 @@
 :root {
-    --bg-deep: #020205;
-    --accent-primary: #6366f1;
+    /* Dynamic Theme Variables - Controlled by CMS */
+    --bg-main: #020205;
+    --accent: #6366f1;
     --accent-secondary: #a855f7;
-    --text-main: #ffffff;
+    --text-primary: #ffffff;
     --text-muted: #94a3b8;
-    --glass-bg: rgba(10, 10, 20, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --font-heading: 'Outfit', sans-serif;
+    --card-radius: 12px;
+    --glass: rgba(10, 10, 20, 0.85);
+    --font-main: 'Outfit', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    background-color: var(--bg-deep);
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-main);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-.container { max-width: 1440px; margin: 0 auto; padding: 0 3rem; }
+.container { max-width: 1600px; margin: 0 auto; padding: 0 4rem; }
 
-.btn {
-    padding: 12px 28px;
-    border-radius: 50px;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
+/* Sticky Premium Navbar */
+.sticky-nav {
+    position: fixed;
+    top: 0; width: 100%; z-index: 1000;
+    padding: 1.5rem 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    transition: all 0.4s ease;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    color: white;
-}
-
-.glass-dark {
-    background: var(--glass-bg);
+.sticky-nav.scrolled {
+    background: var(--glass);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-footer { padding: 4rem 0; border-top: 1px solid var(--glass-border); opacity: 0.6; }
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* CMS Sidebar Layout */
+.admin-layout { display: flex; min-height: 100vh; padding-top: 70px; }
+.admin-sidebar { width: 280px; background: #08080a; border-right: 1px solid #1a1a1a; padding: 2rem; position: fixed; height: 100%; }
+.admin-content { margin-left: 280px; flex: 1; padding: 4rem; }
