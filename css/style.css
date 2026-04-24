@@ -1,25 +1,17 @@
 :root {
-    --bg-deep: #050505;
-    --bg-nebula: #0a0a12;
-    --accent-primary: #6366f1; /* Indigo */
-    --accent-secondary: #a855f7; /* Purple */
-    --accent-gold: #f59e0b;
-    --text-main: #f8fafc;
+    --bg-deep: #020205;
+    --accent-primary: #6366f1;
+    --accent-secondary: #a855f7;
+    --accent-glow: rgba(99, 102, 241, 0.5);
+    --text-main: #ffffff;
     --text-muted: #94a3b8;
-    --glass-bg: rgba(15, 15, 25, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --glass-bg: rgba(10, 10, 20, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     background-color: var(--bg-deep);
     color: var(--text-main);
@@ -28,124 +20,53 @@ body {
     line-height: 1.6;
 }
 
-h1, h2, h3, h4 {
-    font-family: var(--font-heading);
-    font-weight: 700;
-}
+.container { max-width: 1400px; margin: 0 auto; padding: 0 4rem; }
 
-/* Glassmorphism Utilities */
-.glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-}
-
-.glass-dark {
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-deep);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--accent-primary);
-    border-radius: 10px;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse-glow {
-    0% { box-shadow: 0 0 5px var(--accent-primary); }
-    50% { box-shadow: 0 0 20px var(--accent-primary); }
-    100% { box-shadow: 0 0 5px var(--accent-primary); }
-}
-
-.fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
-}
-
-/* Buttons */
+/* Luxury Button */
 .btn {
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-family: var(--font-heading);
     cursor: pointer;
-    transition: var(--transition-smooth);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-decoration: none;
-    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     color: white;
+    box-shadow: 0 10px 20px -10px var(--accent-primary);
 }
 
 .btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 30px -10px var(--accent-primary);
 }
 
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    backdrop-filter: blur(5px);
+/* Glass Navbar */
+.glass-dark {
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid var(--glass-border);
 }
 
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
+.fade-in { animation: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Layout */
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
-
-section {
-    padding: 4rem 0;
-}
-
-/* Footer & Secret Access */
 footer {
-    padding: 3rem 0;
-    margin-top: 4rem;
-    border-top: 1px solid var(--glass-border);
+    padding: 6rem 0 3rem;
+    background: linear-gradient(to top, #000, transparent);
     color: var(--text-muted);
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.secret-link {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.8rem;
-    opacity: 0.15;
-    transition: var(--transition-smooth);
-}
-
-.secret-link:hover {
-    opacity: 1;
-    color: var(--accent-primary);
 }
