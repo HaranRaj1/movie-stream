@@ -2,29 +2,28 @@ import { state } from './state.js';
 
 class App {
     constructor() {
-        this.mainContent = document.getElementById('main-content');
-        this.navbar = document.getElementById('navbar');
-        this.activeTab = 'content';
+        this.viewport = document.getElementById('view-port');
+        this.nav = document.getElementById('main-nav');
         this.isAuthenticated = false;
+        this.adminTab = 'overview';
         this.init();
     }
 
     init() {
-        // This ensures the page refreshes properly when you click Admin
-        window.addEventListener('hashchange', () => {
-            this.handleRoute();
-            window.scrollTo(0,0);
+        window.addEventListener('hashchange', () => this.router());
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) this.nav.classList.add('scrolled');
+            else this.nav.classList.remove('scrolled');
         });
-        this.handleRoute();
+        this.router();
     }
 
-    handleRoute() {
+    router() {
         const hash = window.location.hash || '#/';
-        this.renderNavbar();
+        this.renderNav();
         
-        // Fix: Explicitly check for portal
-        if (hash.includes('portal')) {
-            this.checkAuth();
+        if (hash === '#/portal') {
+            this.handleAdminAuth();
         } else if (hash.startsWith('#/watch')) {
             const id = new URLSearchParams(hash.split('?')[1]).get('id');
             this.renderWatch(id);
@@ -36,68 +35,71 @@ class App {
         if (window.lucide) lucide.createIcons();
     }
 
-    checkAuth() {
+    handleAdminAuth() {
         if (!this.isAuthenticated) {
-            // Delay slightly to ensure the browser is ready
-            setTimeout(() => {
-                const p = prompt("Vela CMS - Enter Password (Default is admin123):");
-                if (p === 'admin123' || p === state.adminPassword) {
-                    this.isAuthenticated = true;
-                    this.renderAdmin();
-                } else {
-                    alert("Access Denied.");
-                    window.location.hash = "#/";
-                }
-            }, 100);
+            const p = prompt("Vela Master Login:");
+            if (p === state.adminPass) {
+                this.isAuthenticated = true;
+                this.renderAdmin();
+            } else {
+                window.location.hash = "#/";
+            }
         } else {
             this.renderAdmin();
         }
     }
 
-    renderNavbar() {
-        const s = state.settings;
-        this.navbar.innerHTML = `
-            <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1.5rem 0;">
-                <a href="#/" style="text-decoration:none; color:white; font-size:2rem; font-weight:900; letter-spacing:-1px;">${s.siteName}</a>
-                <div style="display:flex; gap:20px; align-items:center;">
-                    <div style="background:rgba(255,255,255,0.05); padding:8px 20px; border-radius:50px; border:1px solid rgba(255,255,255,0.1);">
-                        <input type="text" placeholder="Search..." style="background:none; border:none; color:white; outline:none;">
-                    </div>
+    renderNav() {
+        const a = state.config.appearance;
+        this.nav.innerHTML = `
+            <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+                <a href="#/" style="text-decoration:none; color:white; font-size:2rem; font-weight:900;">${a.siteName}</a>
+                <div style="display:flex; gap:30px; font-weight:600; font-size:0.9rem;">
+                    <a href="#/" style="text-decoration:none; color:white;">Home</a>
+                    <a href="#/" style="text-decoration:none; color:var(--text-muted);">Movies</a>
+                    <a href="#/" style="text-decoration:none; color:var(--text-muted);">Series</a>
+                </div>
+                <div style="background:rgba(255,255,255,0.08); padding:10px 20px; border-radius:50px; display:flex; align-items:center; gap:10px;">
+                    <i data-lucide="search" style="width:18px;"></i>
+                    <input type="text" placeholder="Search titles..." style="background:none; border:none; color:white; outline:none;">
                 </div>
             </div>
         `;
     }
 
     renderHome() {
-        const feat = state.movies.find(m => m.featured) || state.movies[0];
-        const rows = state.settings.homepageLayout || ['Trending'];
+        const f = state.getFeatured();
+        const rows = state.config.layout.homepageOrder;
 
-        this.mainContent.innerHTML = `
-            <section class="hero" style="height:85vh; background-size:cover; background-position:center; background-image: url('${feat.banner}')">
-                <div class="hero-overlay" style="position:absolute; inset:0; background: linear-gradient(to top, var(--bg-deep) 10%, transparent 70%), linear-gradient(to right, var(--bg-deep) 20%, transparent);"></div>
-                <div class="container" style="position:relative; z-index:2; height:100%; display:flex; flex-direction:column; justify-content:center;">
-                    <span style="background:var(--accent-primary); color:white; padding:4px 12px; border-radius:4px; font-size:0.7rem; font-weight:900; width:fit-content; margin-bottom:1rem;">SPOTLIGHT</span>
-                    <h1 style="font-size:5rem; font-weight:900; margin-bottom:1rem; line-height:1;">${feat.title}</h1>
-                    <p style="color:var(--text-muted); font-size:1.2rem; margin-bottom:2.5rem; max-width:600px;">${feat.description}</p>
+        this.viewport.innerHTML = `
+            <section class="hero-v4" style="background-image: url('${f.banner}')">
+                <div class="container content fade-in">
+                    <span style="color:var(--accent); font-weight:900; letter-spacing:3px; font-size:0.8rem;">SPOTLIGHT</span>
+                    <h1>${f.title}</h1>
+                    <p style="color:var(--text-muted); font-size:1.3rem; margin-bottom:2.5rem; line-height:1.6; max-width:650px;">${f.description}</p>
                     <div style="display:flex; gap:15px;">
-                        <a href="#/watch?id=${feat.id}" class="btn-primary" style="padding:15px 40px; border-radius:50px; text-decoration:none; font-weight:bold; display:flex; align-items:center; gap:10px;"><i data-lucide="play" fill="white"></i> Watch Now</a>
+                        <a href="#/watch?id=${f.id}" class="cms-btn" style="text-decoration:none; display:flex; align-items:center; gap:10px; border-radius:50px;"><i data-lucide="play" fill="white"></i> Play Now</a>
                     </div>
                 </div>
             </section>
-            <div class="container" style="margin-top:-60px; position:relative; z-index:10;">
+            <div class="container" style="margin-top:-80px; position:relative; z-index:10;">
                 ${rows.map(row => {
-                    const movies = state.getMoviesByCategory(row);
-                    if (movies.length === 0) return '';
+                    const items = state.getContentByRow(row);
+                    if (items.length === 0) return '';
                     return `
                         <section style="margin-bottom:4rem;">
                             <h2 style="font-size:2rem; margin-bottom:1.5rem; font-weight:900;">${row}</h2>
-                            <div class="movie-grid" style="display:flex; gap:25px; overflow-x:auto; padding-bottom:20px; scrollbar-width:none;">
-                                ${movies.map(m => `
-                                    <div class="movie-card" onclick="window.location.hash='#/watch?id=${m.id}'" style="min-width:320px; cursor:pointer;">
-                                        <div class="poster" style="aspect-ratio:16/9; border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-                                            <img src="${m.thumbnail}" style="width:100%; height:100%; object-fit:cover;">
+                            <div class="movie-grid" style="display:flex; gap:25px; overflow-x:auto; padding-bottom:20px;">
+                                ${items.map(m => `
+                                    <div class="ott-card" onclick="window.location.hash='#/watch?id=${m.id}'">
+                                        <div class="poster-wrap">
+                                            <img src="${m.thumbnail}">
+                                            <div class="play-overlay"><i data-lucide="play" style="width:48px; height:48px; color:white;" fill="white"></i></div>
                                         </div>
-                                        <h3 style="margin-top:15px; font-size:1.1rem; font-weight:600;">${m.title}</h3>
+                                        <div class="info">
+                                            <h3>${m.title}</h3>
+                                            <span>${m.genre} • 2024</span>
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -109,117 +111,137 @@ class App {
     }
 
     renderAdmin() {
-        this.mainContent.innerHTML = `
-            <div class="cms-wrapper" style="display:flex; min-height:100vh; padding-top:80px; background:#000;">
-                <aside style="width:260px; background:#0a0a0a; border-right:1px solid #222; padding:3rem 2rem;">
-                    <h2 style="color:var(--accent-primary); font-weight:900;">VELA CMS</h2>
-                    <div style="display:flex; flex-direction:column; gap:12px; margin-top:3rem;">
-                        <button onclick="window.app.setTab('content')" style="background:#111; border:none; color:white; padding:15px; text-align:left; border-radius:10px; cursor:pointer;">Manage Content</button>
-                        <button onclick="window.app.setTab('identity')" style="background:#111; border:none; color:white; padding:15px; text-align:left; border-radius:10px; cursor:pointer;">Site Identity</button>
-                        <button onclick="window.location.hash='#/'" style="background:none; border:1px solid #333; color:white; padding:15px; border-radius:10px; cursor:pointer; margin-top:2rem;">Exit Admin</button>
+        this.viewport.innerHTML = `
+            <div class="admin-layout">
+                <aside class="admin-sidebar">
+                    <h2 style="color:var(--accent); font-weight:900; margin-bottom:3rem;">CMS V4.0</h2>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <button onclick="window.app.setAdminTab('overview')" class="cms-btn" style="background:#111; text-align:left;">Dashboard</button>
+                        <button onclick="window.app.setAdminTab('content')" class="cms-btn" style="background:#111; text-align:left;">Content Manager</button>
+                        <button onclick="window.app.setAdminTab('appearance')" class="cms-btn" style="background:#111; text-align:left;">Site Identity</button>
+                        <button onclick="window.app.setAdminTab('homepage')" class="cms-btn" style="background:#111; text-align:left;">Home Builder</button>
+                        <button onclick="window.location.hash='#/'" class="cms-btn" style="background:none; border:1px solid #333; margin-top:2rem;">Exit Portal</button>
                     </div>
                 </aside>
-                <main style="flex:1; padding:4rem;">
-                    ${this.activeTab === 'identity' ? this.renderIdentityTab() : this.renderContentTab()}
+                <main class="admin-content">
+                    ${this.renderAdminTab()}
                 </main>
             </div>
         `;
-        this.attachListeners();
+        this.attachAdminEvents();
     }
 
-    renderIdentityTab() {
-        const s = state.settings;
-        return `
-            <h1 style="font-size:3rem; margin-bottom:2rem;">Site Identity</h1>
-            <form id="identity-form" style="display:flex; flex-direction:column; gap:1.5rem; max-width:500px;">
-                <div><label>Website Name</label><input name="name" value="${s.siteName}" style="width:100%; padding:15px; background:#111; border:1px solid #333; color:white; border-radius:8px; margin-top:10px;"></div>
-                <div><label>Brand Theme Color</label><input type="color" name="color" value="${s.primaryColor}" style="width:100%; height:60px; background:none; border:none; margin-top:10px;"></div>
-                <button type="submit" class="btn-primary" style="padding:15px; border:none; border-radius:8px; font-weight:bold;">Save Global Settings</button>
-            </form>
-        `;
-    }
+    setAdminTab(tab) { this.adminTab = tab; this.renderAdmin(); }
 
-    renderContentTab() {
-        return `
-            <h1 style="font-size:3rem; margin-bottom:2rem;">Content Manager</h1>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4rem;">
-                <form id="add-form" style="display:flex; flex-direction:column; gap:1rem;">
-                    <h3>Add New Title</h3>
-                    <input name="title" placeholder="Movie Title" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px;">
-                    <textarea name="desc" placeholder="Synopsis" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px; height:100px;"></textarea>
-                    <input name="thumb" placeholder="Poster URL (16:9)" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px;">
-                    <input name="banner" placeholder="Banner URL (Wide)" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px;">
-                    <input name="genre" placeholder="Category (e.g. Anime, Tamil Movies)" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px;">
-                    <input name="url" placeholder="Abyss.to Embed Link" required style="padding:12px; background:#111; border:1px solid #333; color:white; border-radius:8px;">
-                    <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox" name="feat"> Spotlight on Homepage?</label>
-                    <button type="submit" class="btn-primary" style="padding:15px; border:none; border-radius:8px; font-weight:bold;">Publish to Website</button>
+    renderAdminTab() {
+        const c = state.config;
+        if (this.adminTab === 'appearance') {
+            return `
+                <h1>Appearance Settings</h1>
+                <form id="appearance-form" style="max-width:600px; margin-top:2rem;">
+                    <label>Site Name</label><input class="cms-input" name="siteName" value="${c.appearance.siteName}">
+                    <label>Primary Brand Color</label><input class="cms-input" type="color" name="primary" value="${c.appearance.primaryColor}">
+                    <label>Secondary Accent</label><input class="cms-input" type="color" name="secondary" value="${c.appearance.secondaryColor}">
+                    <label>Card Style</label>
+                    <select class="cms-input" name="style">
+                        <option value="rounded" ${c.appearance.cardStyle === 'rounded' ? 'selected' : ''}>Rounded Corner</option>
+                        <option value="sharp" ${c.appearance.cardStyle === 'sharp' ? 'selected' : ''}>Sharp Corner</option>
+                    </select>
+                    <button type="submit" class="cms-btn">Save Identity</button>
                 </form>
-                <div>
-                    <h3>Current Library</h3>
-                    <div style="max-height:600px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
-                        ${state.movies.map(m => `
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:10px; border:1px solid rgba(255,255,255,0.05);">
-                                <span>${m.title}</span>
-                                <button onclick="window.app.deleteMovie('${m.id}')" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:bold;">Remove</button>
+            `;
+        }
+        if (this.adminTab === 'content') {
+            return `
+                <h1>Library Manager</h1>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4rem; margin-top:2rem;">
+                    <form id="add-content-form">
+                        <h3>Publish Title</h3>
+                        <input class="cms-input" name="title" placeholder="Title" required>
+                        <textarea class="cms-input" name="desc" placeholder="Synopsis" required></textarea>
+                        <input class="cms-input" name="thumb" placeholder="Thumbnail URL (16:9)" required>
+                        <input class="cms-input" name="banner" placeholder="Banner URL (Wide)" required>
+                        <input class="cms-input" name="genre" placeholder="Genre" required>
+                        <select class="cms-input" name="type">
+                            ${c.layout.homepageOrder.map(r => `<option value="${r}">${r}</option>`).join('')}
+                        </select>
+                        <input class="cms-input" name="url" placeholder="Abyss.to Embed Link" required>
+                        <label><input type="checkbox" name="feat"> Spotlight on Home?</label>
+                        <button type="submit" class="cms-btn" style="width:100%; margin-top:1rem;">Add to Database</button>
+                    </form>
+                    <div>
+                        <h3>Current Titles</h3>
+                        ${state.content.map(m => `
+                            <div style="padding:15px; background:#111; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between;">
+                                <span>${m.title} (${m.type})</span>
+                                <button onclick="window.app.deleteTitle('${m.id}')" style="color:red; background:none; border:none; cursor:pointer;">Delete</button>
                             </div>
                         `).join('')}
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
+        return `<h1>Dashboard Overview</h1><p>Watch stats and server status coming soon.</p>`;
     }
 
-    setTab(t) { this.activeTab = t; this.renderAdmin(); }
-
-    attachListeners() {
-        const idForm = document.getElementById('identity-form');
-        if (idForm) {
-            idForm.onsubmit = (e) => {
+    attachAdminEvents() {
+        const aForm = document.getElementById('appearance-form');
+        if (aForm) {
+            aForm.onsubmit = (e) => {
                 e.preventDefault();
-                const f = new FormData(idForm);
-                state.settings.siteName = f.get('name');
-                state.settings.primaryColor = f.get('color');
-                state.save(); alert("Site Identity Updated!"); this.renderAdmin();
+                const f = new FormData(aForm);
+                state.config.appearance = {
+                    siteName: f.get('siteName'),
+                    primaryColor: f.get('primary'),
+                    secondaryColor: f.get('secondary'),
+                    cardStyle: f.get('style')
+                };
+                state.save();
+                alert("Site Identity Updated!");
             }
         }
-        const addForm = document.getElementById('add-form');
-        if (addForm) {
-            addForm.onsubmit = (e) => {
+        const cForm = document.getElementById('add-content-form');
+        if (cForm) {
+            cForm.onsubmit = (e) => {
                 e.preventDefault();
-                const f = new FormData(addForm);
-                state.addMovie({
+                const f = new FormData(cForm);
+                state.addContent({
                     title: f.get('title'), description: f.get('desc'), thumbnail: f.get('thumb'),
-                    banner: f.get('banner'), genre: [f.get('genre')], type: f.get('genre'),
+                    banner: f.get('banner'), genre: f.get('genre'), type: f.get('type'),
                     embedUrl: f.get('url'), featured: f.get('feat') === 'on'
                 });
-                alert("Movie Successfully Added!"); this.renderAdmin();
+                alert("Published!");
+                this.renderAdmin();
             }
         }
     }
 
-    deleteMovie(id) { if(confirm("Are you sure?")) { state.deleteMovie(id); this.renderAdmin(); } }
+    deleteTitle(id) { state.deleteContent(id); this.renderAdmin(); }
 
     renderWatch(id) {
-        const m = state.movies.find(x => x.id === id);
+        const m = state.content.find(x => x.id === id);
         if(!m) return this.renderHome();
-        this.mainContent.innerHTML = `
-            <div class="watch-container" style="background:#000;">
-                <div class="player-wrapper"><iframe src="${m.embedUrl}" frameborder="0" allowfullscreen></iframe></div>
-                <div class="container" style="padding:4rem 0;">
-                    <h1 style="font-size:3.5rem; font-weight:900;">${m.title}</h1>
-                    <p style="color:var(--text-muted); font-size:1.3rem; margin-top:1.5rem; line-height:1.8; max-width:850px;">${m.description}</p>
+        this.viewport.innerHTML = `
+            <div style="padding-top:80px; background:#000;">
+                <div style="width:100%; aspect-ratio:16/9; background:#000;">
+                    <iframe src="${m.embedUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
+                </div>
+                <div class="container" style="padding:5rem 0;">
+                    <h1 style="font-size:4rem; font-weight:900;">${m.title}</h1>
+                    <p style="font-size:1.4rem; color:var(--text-muted); margin-top:1rem; max-width:900px; line-height:1.8;">${m.description}</p>
                 </div>
             </div>
         `;
     }
 
     renderFooter() {
-        document.getElementById('footer').innerHTML = `
-            <div class="container" style="padding:5rem 0; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.05);">
-                <span style="font-weight:700;">&copy; 2024 ${state.settings.siteName}</span>
-                <a href="#/portal" style="color:var(--text-muted); text-decoration:none; font-size:0.9rem; font-weight:600; opacity:0.6; transition:0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">Admin Access</a>
+        document.getElementById('main-footer').innerHTML = `
+            <div class="container" style="padding:5rem 0; display:flex; justify-content:space-between; opacity:0.5; border-top:1px solid #222;">
+                <span>&copy; 2024 ${state.config.appearance.siteName} Premium OTT</span>
+                <a href="#/portal" style="color:inherit; text-decoration:none; font-weight:bold;">MASTER DASHBOARD</a>
             </div>
         `;
     }
 }
+
 window.app = new App();
