@@ -1,66 +1,84 @@
-// [js/state.js] - Updated with Password Engine
-const DEFAULT_SETTINGS = {
-    siteName: 'Vela Stream',
-    logoUrl: '',
-    primaryColor: '#6366f1',
-    secondaryColor: '#a855f7',
-    fontFamily: 'Outfit',
-    homepageLayout: ['Trending', 'Anime', 'Tamil Movies', 'Action']
+// [js/state.js] - Vela CMS v4.0 Core
+const INITIAL_CONFIG = {
+    appearance: {
+        siteName: 'VELA STREAM',
+        logoUrl: '',
+        primaryColor: '#6366f1',
+        secondaryColor: '#a855f7',
+        font: 'Outfit',
+        cardStyle: 'rounded' // rounded | sharp
+    },
+    layout: {
+        homepageOrder: ['Trending Now', 'New Releases', 'Action', 'Anime', 'Tamil Movies'],
+        showContinueWatching: true,
+        showHeroTrailer: true
+    },
+    ads: {
+        bannerAdUrl: '',
+        showAds: false
+    },
+    seo: {
+        description: 'Premium Ad-Free OTT Streaming Platform',
+        keywords: 'movies, streaming, ott, watch free'
+    }
 };
 
-const DEFAULT_MOVIES = [
+const INITIAL_CONTENT = [
     {
         id: '1',
-        title: 'Welcome to Vela',
-        description: 'Open the Admin Portal to start adding your own movies.',
-        thumbnail: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop',
-        banner: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop',
-        genre: ['Trending'],
-        type: 'Trending',
+        title: 'Interstellar',
+        description: 'When humanity is on the brink of extinction, a group of astronauts travel through a wormhole...',
+        thumbnail: 'https://image.tmdb.org/t/p/w500/gEU2QniE6EwfVnz6nuzpczhbsNQ.jpg',
+        banner: 'https://image.tmdb.org/t/p/original/rAiT6vL7v9Lp0vRjI6haasP99uP.jpg',
+        genre: 'Sci-Fi',
+        type: 'Trending Now',
+        isSeries: false,
+        embedUrl: 'https://abyss.to/e/placeholder',
         featured: true,
-        embedUrl: ''
+        rating: 8.7
     }
 ];
 
 class State {
     constructor() {
-        this.movies = JSON.parse(localStorage.getItem('vela_movies')) || DEFAULT_MOVIES;
-        this.settings = JSON.parse(localStorage.getItem('vela_settings')) || DEFAULT_SETTINGS;
-        this.adminPassword = 'admin123'; // 🔑 YOUR PASSWORD
-        this.applyTheme();
+        this.content = JSON.parse(localStorage.getItem('vela_content')) || INITIAL_CONTENT;
+        this.config = JSON.parse(localStorage.getItem('vela_config')) || INITIAL_CONFIG;
+        this.adminPass = 'admin123';
+        this.applyConfig();
     }
 
     save() {
-        localStorage.setItem('vela_movies', JSON.stringify(this.movies));
-        localStorage.setItem('vela_settings', JSON.stringify(this.settings));
-        this.applyTheme();
+        localStorage.setItem('vela_content', JSON.stringify(this.content));
+        localStorage.setItem('vela_config', JSON.stringify(this.config));
+        this.applyConfig();
     }
 
-    applyTheme() {
+    applyConfig() {
         const root = document.documentElement;
-        root.style.setProperty('--accent-primary', this.settings.primaryColor || '#6366f1');
-        root.style.setProperty('--accent-secondary', this.settings.secondaryColor || '#a855f7');
-        document.title = this.settings.siteName;
+        const a = this.config.appearance;
+        root.style.setProperty('--accent', a.primaryColor);
+        root.style.setProperty('--accent-secondary', a.secondaryColor);
+        root.style.setProperty('--card-radius', a.cardStyle === 'rounded' ? '12px' : '2px');
+        document.title = a.siteName;
     }
 
-    updateSettings(newSettings) {
-        this.settings = { ...this.settings, ...newSettings };
+    getContentByRow(row) {
+        return this.content.filter(item => item.type === row);
+    }
+
+    addContent(item) {
+        if (item.featured) this.content.forEach(x => x.featured = false);
+        this.content.push({ ...item, id: Date.now().toString() });
         this.save();
     }
 
-    addMovie(movie) {
-        if (movie.featured) this.movies.forEach(m => m.featured = false);
-        this.movies.push({ ...movie, id: Date.now().toString() });
+    deleteContent(id) {
+        this.content = this.content.filter(item => item.id !== id);
         this.save();
     }
 
-    deleteMovie(id) {
-        this.movies = this.movies.filter(m => m.id !== id);
-        this.save();
-    }
-
-    getMoviesByCategory(cat) {
-        return this.movies.filter(m => m.type === cat || m.genre.includes(cat));
+    getFeatured() {
+        return this.content.find(i => i.featured) || this.content[0];
     }
 }
 
