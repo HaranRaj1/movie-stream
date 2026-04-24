@@ -1,4 +1,4 @@
-// [js/state.js] - Vela CMS v4.0 Core
+// [js/state.js] - Security & State Engine v4.5
 const INITIAL_CONFIG = {
     appearance: {
         siteName: 'VELA STREAM',
@@ -6,36 +6,33 @@ const INITIAL_CONFIG = {
         primaryColor: '#6366f1',
         secondaryColor: '#a855f7',
         font: 'Outfit',
-        cardStyle: 'rounded' // rounded | sharp
+        cardStyle: 'rounded'
+    },
+    security: {
+        adminUser: 'admin',
+        adminPass: 'Haran@stream2026!',
+        twoStepEnabled: false,
+        twoStepPin: '0000',
+        autoLogoutMinutes: 15
     },
     layout: {
         homepageOrder: ['Trending Now', 'New Releases', 'Action', 'Anime', 'Tamil Movies'],
-        showContinueWatching: true,
-        showHeroTrailer: true
+        showContinueWatching: true
     },
-    ads: {
-        bannerAdUrl: '',
-        showAds: false
-    },
-    seo: {
-        description: 'Premium Ad-Free OTT Streaming Platform',
-        keywords: 'movies, streaming, ott, watch free'
-    }
+    logs: []
 };
 
 const INITIAL_CONTENT = [
     {
         id: '1',
-        title: 'Interstellar',
-        description: 'When humanity is on the brink of extinction, a group of astronauts travel through a wormhole...',
-        thumbnail: 'https://image.tmdb.org/t/p/w500/gEU2QniE6EwfVnz6nuzpczhbsNQ.jpg',
-        banner: 'https://image.tmdb.org/t/p/original/rAiT6vL7v9Lp0vRjI6haasP99uP.jpg',
-        genre: 'Sci-Fi',
+        title: 'Vela Premium',
+        description: 'Your secure streaming platform is ready. Access the Master Dashboard to begin.',
+        thumbnail: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop',
+        genre: 'Welcome',
         type: 'Trending Now',
-        isSeries: false,
-        embedUrl: 'https://abyss.to/e/placeholder',
         featured: true,
-        rating: 8.7
+        embedUrl: ''
     }
 ];
 
@@ -43,7 +40,6 @@ class State {
     constructor() {
         this.content = JSON.parse(localStorage.getItem('vela_content')) || INITIAL_CONTENT;
         this.config = JSON.parse(localStorage.getItem('vela_config')) || INITIAL_CONFIG;
-        this.adminPass = 'admin123';
         this.applyConfig();
     }
 
@@ -51,6 +47,13 @@ class State {
         localStorage.setItem('vela_content', JSON.stringify(this.content));
         localStorage.setItem('vela_config', JSON.stringify(this.config));
         this.applyConfig();
+    }
+
+    addLog(action) {
+        const entry = { action, time: new Date().toLocaleString() };
+        this.config.logs.unshift(entry);
+        if (this.config.logs.length > 50) this.config.logs.pop();
+        this.save();
     }
 
     applyConfig() {
@@ -62,24 +65,31 @@ class State {
         document.title = a.siteName;
     }
 
-    getContentByRow(row) {
-        return this.content.filter(item => item.type === row);
+    updateSecurity(user, pass, pin, twoStep) {
+        this.config.security.adminUser = user;
+        this.config.security.adminPass = pass;
+        this.config.security.twoStepPin = pin;
+        this.config.security.twoStepEnabled = twoStep;
+        this.addLog("Security settings updated");
+        this.save();
     }
 
     addContent(item) {
         if (item.featured) this.content.forEach(x => x.featured = false);
         this.content.push({ ...item, id: Date.now().toString() });
+        this.addLog(`Added content: ${item.title}`);
         this.save();
     }
 
     deleteContent(id) {
-        this.content = this.content.filter(item => item.id !== id);
+        const item = this.content.find(i => i.id === id);
+        this.content = this.content.filter(i => i.id !== id);
+        this.addLog(`Deleted content: ${item?.title || id}`);
         this.save();
     }
 
-    getFeatured() {
-        return this.content.find(i => i.featured) || this.content[0];
-    }
+    getMoviesByCategory(cat) { return this.content.filter(i => i.type === cat); }
+    getFeatured() { return this.content.find(i => i.featured) || this.content[0]; }
 }
 
 export const state = new State();
