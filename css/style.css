@@ -2,71 +2,44 @@
     --bg-deep: #020205;
     --accent-primary: #6366f1;
     --accent-secondary: #a855f7;
-    --accent-glow: rgba(99, 102, 241, 0.5);
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    --glass-bg: rgba(10, 10, 20, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(10, 10, 20, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
     --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     background-color: var(--bg-deep);
     color: var(--text-main);
-    font-family: var(--font-body);
+    font-family: 'Inter', sans-serif;
     overflow-x: hidden;
-    line-height: 1.6;
 }
 
-.container { max-width: 1400px; margin: 0 auto; padding: 0 4rem; }
+.container { max-width: 1440px; margin: 0 auto; padding: 0 3rem; }
 
-/* Luxury Button */
 .btn {
-    padding: 14px 32px;
+    padding: 12px 28px;
     border-radius: 50px;
     font-weight: 700;
-    font-family: var(--font-heading);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     color: white;
-    box-shadow: 0 10px 20px -10px var(--accent-primary);
 }
 
-.btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 20px 30px -10px var(--accent-primary);
-}
-
-/* Glass Navbar */
 .glass-dark {
     background: var(--glass-bg);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
 }
 
-.fade-in { animation: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-footer {
-    padding: 6rem 0 3rem;
-    background: linear-gradient(to top, #000, transparent);
-    color: var(--text-muted);
-}
+footer { padding: 4rem 0; border-top: 1px solid var(--glass-border); opacity: 0.6; }
