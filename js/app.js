@@ -37,17 +37,27 @@ class App {
         } else if (path.startsWith('/watch')) {
             const id = searchParams.get('id');
             this.renderWatch(id);
-        } else if (path.startsWith('/admin')) {
+        } else if (path.startsWith('/portal')) { // Secret Admin Path
             this.renderAdmin();
-        } else if (path.startsWith('/category')) {
-            const cat = searchParams.get('name');
-            this.renderCategory(cat);
         } else {
             this.renderHome();
         }
 
+        this.renderFooter();
         window.scrollTo(0, 0);
         lucide.createIcons();
+    }
+
+    renderFooter() {
+        const footer = document.getElementById('footer');
+        footer.innerHTML = `
+            <div class="container">
+                <div class="footer-content">
+                    <p>&copy; 2024 Vela Stream. Premium Cinematic Experience.</p>
+                    <a href="/portal" class="secret-link" data-link>Admin</a>
+                </div>
+            </div>
+        `;
     }
 
     renderNavbar() {
@@ -66,9 +76,29 @@ class App {
                 <div class="nav-actions">
                     <div class="search-bar">
                         <i data-lucide="search"></i>
-                        <input type="text" placeholder="Search movies...">
+                        <input type="text" id="movie-search" placeholder="Search movies..." value="${state.searchQuery}">
                     </div>
-                    <a href="/admin" class="admin-btn" data-link><i data-lucide="settings"></i></a>
+                </div>
+            </div>
+        `;
+
+        const searchInput = document.getElementById('movie-search');
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                const results = state.search(e.target.value);
+                this.renderSearchResults(results);
+            };
+        }
+        lucide.createIcons();
+    }
+
+    renderSearchResults(results) {
+        if (!state.searchQuery) return this.handleRoute();
+        this.mainContent.innerHTML = `
+            <div class="container search-results">
+                <h2>Search Results for "${state.searchQuery}"</h2>
+                <div class="movie-grid">
+                    ${results.map(m => this.createMovieCard(m)).join('')}
                 </div>
             </div>
         `;
@@ -77,12 +107,16 @@ class App {
 
     renderHome() {
         const featured = state.getFeatured();
-        const trending = state.getTrending();
-        const recentlyAdded = [...state.movies].reverse();
+        const categories = ['Trending', 'New Releases', 'Top Rated', 'Anime', 'Tamil Movies'];
+        const continueWatching = state.continueWatching.map(item => {
+            const m = state.movies.find(movie => movie.id === item.movieId);
+            return m ? { ...m, progress: item.progress } : null;
+        }).filter(m => m !== null);
 
         this.mainContent.innerHTML = `
             <!-- Hero Section -->
             <section class="hero" style="background-image: linear-gradient(to top, var(--bg-deep), transparent), url('${featured.banner}')">
+                <div class="hero-overlay"></div>
                 <div class="container hero-content fade-in">
                     <div class="featured-badge">FEATURED</div>
                     <h1>${featured.title}</h1>
@@ -103,32 +137,47 @@ class App {
                 </div>
             </section>
 
-            <!-- Carousels -->
             <div class="carousels container">
+                ${continueWatching.length > 0 ? `
                 <section class="carousel-section">
-                    <h2>Trending Now</h2>
+                    <h2>Continue Watching</h2>
                     <div class="movie-grid">
-                        ${trending.map(m => this.createMovieCard(m)).join('')}
+                        ${continueWatching.map(m => this.createMovieCard(m, true)).join('')}
                     </div>
                 </section>
+                ` : ''}
 
-                <section class="carousel-section">
-                    <h2>Recently Added</h2>
-                    <div class="movie-grid">
-                        ${recentlyAdded.map(m => this.createMovieCard(m)).join('')}
-                    </div>
-                </section>
+                ${categories.map(cat => {
+                    const movies = state.getMoviesByCategory(cat);
+                    if (movies.length === 0) return '';
+                    return `
+                    <section class="carousel-section">
+                        <h2>${cat}</h2>
+                        <div class="movie-grid">
+                            ${movies.map(m => this.createMovieCard(m)).join('')}
+                        </div>
+                    </section>
+                    `;
+                }).join('')}
             </div>
         `;
+        lucide.createIcons();
     }
 
-    createMovieCard(movie) {
+    createMovieCard(movie, showProgress = false) {
         return `
             <div class="movie-card" onclick="window.app.navigate('/watch?id=${movie.id}')">
                 <div class="poster">
                     <img src="${movie.thumbnail}" alt="${movie.title}" loading="lazy">
+                    ${showProgress ? `<div class="progress-bar"><div class="progress" style="width: ${movie.progress}%"></div></div>` : ''}
                     <div class="overlay">
-                        <div class="play-btn"><i data-lucide="play"></i></div>
+                        <div class="card-preview-info">
+                            <div class="play-btn-small"><i data-lucide="play"></i></div>
+                            <div class="card-preview-meta">
+                                <span class="rating-small"><i data-lucide="star"></i> ${movie.rating}</span>
+                                <span>${movie.duration}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-info">
