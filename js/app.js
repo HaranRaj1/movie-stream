@@ -12,6 +12,10 @@ class App {
 
     init() {
         window.addEventListener('hashchange', () => this.router());
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) this.nav.classList.add('scrolled');
+            else this.nav.classList.remove('scrolled');
+        });
         this.setupInactivityTracker();
         this.router();
     }
@@ -22,7 +26,7 @@ class App {
             clearTimeout(this.inactivityTimer);
             this.inactivityTimer = setTimeout(() => this.logout(), state.config.security.autoLogoutMinutes * 60000);
         };
-        ['mousemove', 'mousedown', 'click', 'keydown'].forEach(e => window.addEventListener(e, resetTimer));
+        ['mousemove', 'mousedown', 'click', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, resetTimer));
     }
 
     logout() {
@@ -75,10 +79,10 @@ class App {
         const a = state.config.appearance;
         this.nav.innerHTML = `
             <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1.5rem 0;">
-                <a href="#/" style="text-decoration:none; color:white; font-size:2.2rem; font-weight:900;">${a.siteName}</a>
-                <div style="background:rgba(255,255,255,0.08); padding:10px 24px; border-radius:50px; display:flex; align-items:center; gap:12px; border:1px solid rgba(255,255,255,0.1);">
+                <a href="#/" style="text-decoration:none; color:white; font-size:2.2rem; font-weight:900; letter-spacing:-1px;">${a.siteName}</a>
+                <div style="background:rgba(255,255,255,0.08); padding:10px 24px; border-radius:50px; display:flex; align-items:center; gap:12px; border:1px solid rgba(255,255,255,0.1);" class="nav-actions">
                     <i data-lucide="search" style="width:18px; opacity:0.6;"></i>
-                    <input type="text" placeholder="Search movies..." style="background:none; border:none; color:white; outline:none; font-size:1rem;">
+                    <input type="text" placeholder="Search..." style="background:none; border:none; color:white; outline:none; font-size:1rem;">
                 </div>
             </div>
         `;
@@ -90,9 +94,12 @@ class App {
         this.viewport.innerHTML = `
             <section class="hero-v4" style="background-image: url('${f.banner}')">
                 <div class="container content fade-in">
-                    <h1 style="text-shadow: 0 10px 30px rgba(0,0,0,0.5);">${f.title}</h1>
+                    <span style="background:var(--accent); color:white; padding:4px 12px; border-radius:4px; font-size:0.7rem; font-weight:900; width:fit-content; margin-bottom:1rem; letter-spacing:2px;">SPOTLIGHT</span>
+                    <h1>${f.title}</h1>
                     <p style="color:var(--text-muted); font-size:1.3rem; margin-bottom:2.5rem; max-width:700px; line-height:1.6;">${f.description}</p>
-                    <a href="#/watch?id=${f.id}" class="cms-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:10px; border-radius:50px; padding: 16px 40px; font-size:1rem;"><i data-lucide="play" fill="white"></i> WATCH NOW</a>
+                    <div style="display:flex; gap:15px;">
+                        <a href="#/watch?id=${f.id}" class="cms-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:10px; border-radius:50px; padding: 16px 40px;"><i data-lucide="play" fill="white"></i> WATCH NOW</a>
+                    </div>
                 </div>
             </section>
             <div class="container" style="margin-top:-100px; position:relative; z-index:10;">
@@ -101,8 +108,8 @@ class App {
                     if (items.length === 0) return '';
                     return `
                         <section style="margin-bottom:5rem;">
-                            <h2 style="font-size:2.2rem; margin-bottom:1.8rem; font-weight:900; display:flex; align-items:center; gap:15px;">${row} <i data-lucide="chevron-right" style="color:var(--accent);"></i></h2>
-                            <div class="movie-grid" style="display:flex; gap:30px; overflow-x:auto; padding-bottom:30px; scrollbar-width:none;">
+                            <h2 style="font-size:2.2rem; margin-bottom:1.8rem; font-weight:900; display:flex; align-items:center; gap:15px;">${row} <i data-lucide="chevron-right" style="color:var(--accent); width:30px;"></i></h2>
+                            <div class="movie-grid">
                                 ${items.map(m => `
                                     <div class="ott-card" onclick="window.location.hash='#/watch?id=${m.id}'">
                                         <div class="poster-wrap"><img src="${m.thumbnail}"><div class="play-overlay"><i data-lucide="play" style="width:50px; height:50px;" fill="white"></i></div></div>
@@ -121,12 +128,12 @@ class App {
         this.viewport.innerHTML = `
             <div class="admin-layout">
                 <aside class="admin-sidebar">
-                    <h2 style="color:var(--accent); font-weight:900; margin-bottom:3rem;">MASTER CMS</h2>
+                    <h2 style="color:var(--accent); font-weight:900; margin-bottom:2.5rem;">CMS MASTER</h2>
                     <div style="display:flex; flex-direction:column; gap:12px;">
-                        <button onclick="window.app.setAdminTab('overview')" class="cms-btn" style="background:#111; text-align:left;">Dashboard</button>
-                        <button onclick="window.app.setAdminTab('content')" class="cms-btn" style="background:#111; text-align:left;">Library Manager</button>
-                        <button onclick="window.app.setAdminTab('security')" class="cms-btn" style="background:#111; text-align:left;">Security Settings</button>
-                        <button onclick="window.app.logout()" class="cms-btn" style="background:rgba(255,68,68,0.1); color:#ff4444; border:1px solid rgba(255,68,68,0.2); margin-top:3rem;">LOGOUT</button>
+                        <button onclick="window.app.setAdminTab('overview')" class="cms-btn" style="background:#111; text-align:left; border-radius:12px;">Dashboard</button>
+                        <button onclick="window.app.setAdminTab('content')" class="cms-btn" style="background:#111; text-align:left; border-radius:12px;">Library</button>
+                        <button onclick="window.app.setAdminTab('security')" class="cms-btn" style="background:#111; text-align:left; border-radius:12px;">Security</button>
+                        <button onclick="window.app.logout()" class="cms-btn" style="background:rgba(255,68,68,0.1); color:#ff4444; border:1px solid rgba(255,68,68,0.2); margin-top:2rem;">LOGOUT</button>
                     </div>
                 </aside>
                 <main class="admin-content">
@@ -134,6 +141,11 @@ class App {
                 </main>
             </div>
         `;
+        
+        if (window.innerWidth <= 1024) {
+            document.querySelector('.admin-content').style.marginLeft = "0";
+        }
+
         this.attachAdminEvents();
         if (window.lucide) lucide.createIcons();
     }
@@ -144,30 +156,30 @@ class App {
         const c = state.config;
         if (this.adminTab === 'content') {
             return `
-                <h1 style="font-size:3rem; margin-bottom:2rem;">Library Manager</h1>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4rem;">
+                <h1 style="font-size:3rem; margin-bottom:2rem;">Content</h1>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:4rem;">
                     <form id="add-content-form" style="background:#0a0a0a; padding:2.5rem; border-radius:20px; border:1px solid #1a1a1a;">
-                        <h3 style="margin-bottom:1.5rem;">Publish New Title</h3>
-                        <input class="cms-input" name="title" placeholder="Movie Title" required>
-                        <textarea class="cms-input" name="desc" placeholder="Synopsis/Description" required style="height:100px;"></textarea>
-                        <input class="cms-input" name="thumb" placeholder="Poster URL (16:9)" required>
-                        <input class="cms-input" name="banner" placeholder="Wide Banner URL" required>
-                        <label>Select Row/Category:</label>
+                        <h3 style="margin-bottom:1.5rem;">Add Movie</h3>
+                        <input class="cms-input" name="title" placeholder="Title" required>
+                        <textarea class="cms-input" name="desc" placeholder="Synopsis" required></textarea>
+                        <input class="cms-input" name="thumb" placeholder="Poster (16:9)" required>
+                        <input class="cms-input" name="banner" placeholder="Banner (Wide)" required>
+                        <label>Row/Category:</label>
                         <select class="cms-input" name="type">
                             ${c.layout.homepageOrder.map(r => `<option value="${r}">${r}</option>`).join('')}
                         </select>
-                        <input class="cms-input" name="genre" placeholder="Display Genre (e.g. Action / Adventure)" required>
-                        <input class="cms-input" name="url" placeholder="Abyss.to Embed Link" required>
-                        <label style="display:flex; align-items:center; gap:10px; margin-top:10px;"><input type="checkbox" name="feat"> Feature in Main Spotlight?</label>
-                        <button type="submit" class="cms-btn" style="width:100%; margin-top:2rem; font-size:1.1rem;">PUBLISH TO WEBSITE</button>
+                        <input class="cms-input" name="genre" placeholder="Display Genre" required>
+                        <input class="cms-input" name="url" placeholder="Abyss.to Link" required>
+                        <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox" name="feat"> Spotlight?</label>
+                        <button type="submit" class="cms-btn" style="width:100%; margin-top:2rem;">PUBLISH</button>
                     </form>
                     <div>
-                        <h3 style="margin-bottom:1.5rem;">Existing Content</h3>
+                        <h3>Library</h3>
                         <div style="max-height:600px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
                             ${state.content.map(m => `
                                 <div style="padding:15px; background:#0a0a0a; border:1px solid #1a1a1a; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                                    <div><strong style="display:block;">${m.title}</strong><small style="color:var(--text-muted);">${m.type}</small></div>
-                                    <button onclick="window.app.deleteTitle('${m.id}')" style="color:#ff4444; background:none; border:none; cursor:pointer; font-weight:bold;">REMOVE</button>
+                                    <span>${m.title}</span>
+                                    <button onclick="window.app.deleteTitle('${m.id}')" style="color:#ff4444; background:none; border:none; cursor:pointer;">Delete</button>
                                 </div>
                             `).join('')}
                         </div>
@@ -177,18 +189,15 @@ class App {
         }
         if (this.adminTab === 'security') {
             return `
-                <h1 style="font-size:3rem; margin-bottom:2rem;">Security</h1>
+                <h1>Security</h1>
                 <form id="security-form" style="max-width:500px; background:#0a0a0a; padding:2.5rem; border-radius:20px;">
                     <label>Admin Username</label><input class="cms-input" name="user" value="${c.security.adminUser}">
                     <label>Admin Password</label><input class="cms-input" type="password" name="pass" value="${c.security.adminPass}">
-                    <button type="submit" class="cms-btn">Update Credentials</button>
+                    <button type="submit" class="cms-btn">Update</button>
                 </form>
             `;
         }
-        return `
-            <h1 style="font-size:3.5rem; margin-bottom:1rem;">Welcome Back</h1>
-            <p style="color:var(--text-muted); font-size:1.2rem;">Total Movies: ${state.content.length} | Server: Live</p>
-        `;
+        return `<h1>Welcome Back</h1><p>Movies: ${state.content.length}</p>`;
     }
 
     attachAdminEvents() {
@@ -202,7 +211,7 @@ class App {
                     banner: f.get('banner'), genre: f.get('genre'), type: f.get('type'),
                     embedUrl: f.get('url'), featured: f.get('feat') === 'on'
                 });
-                alert("Successfully Published!");
+                alert("Published!");
                 this.renderAdmin();
             }
         }
@@ -219,14 +228,14 @@ class App {
         }
     }
 
-    deleteTitle(id) { if(confirm("Permanently delete this title?")) { state.deleteContent(id); this.renderAdmin(); } }
+    deleteTitle(id) { if(confirm("Delete title?")) { state.deleteContent(id); this.renderAdmin(); } }
 
     renderWatch(id) {
         const m = state.content.find(x => x.id === id);
         if(!m) return this.renderHome();
         this.viewport.innerHTML = `
             <div style="padding-top:80px; background:#000;">
-                <div style="width:100%; aspect-ratio:16/9; background:#000; box-shadow:0 30px 60px rgba(0,0,0,0.8);">
+                <div style="width:100%; aspect-ratio:16/9; background:#000;">
                     <iframe src="${m.embedUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
                 </div>
                 <div class="container" style="padding:5rem 0;">
@@ -239,9 +248,9 @@ class App {
 
     renderFooter() {
         document.getElementById('main-footer').innerHTML = `
-            <div class="container" style="padding:6rem 0; display:flex; justify-content:space-between; opacity:0.2;">
-                <span style="font-weight:900; letter-spacing:2px;">VELA ENGINE</span>
-                <a href="#/portal" style="color:inherit; text-decoration:none; font-weight:bold;">MASTER DASHBOARD</a>
+            <div class="container" style="padding:6rem 0; display:flex; justify-content:space-between; opacity:0.1;">
+                <span style="font-weight:900;">VELA ENGINE</span>
+                <a href="#/portal" style="color:inherit; text-decoration:none;">MASTER DASHBOARD</a>
             </div>
         `;
     }
