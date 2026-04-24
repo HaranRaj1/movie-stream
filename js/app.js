@@ -6,6 +6,7 @@ class App {
         this.nav = document.getElementById('navbar');
         this.isAuth = false;
         this.adminTab = 'content';
+        this.editingMovieId = null; // Tracks if we are editing a movie
         this.init();
     }
 
@@ -60,8 +61,6 @@ class App {
                 </a>
                 <div class="flex items-center gap-8 text-[13px] font-medium text-sf-muted">
                     <a href="#/" class="text-white">Home</a>
-                    <a href="#" class="hover:text-white transition-colors">TV Shows</a>
-                    <a href="#" class="hover:text-white transition-colors">Movies</a>
                     <a href="#/portal" class="hover:text-white transition-colors flex items-center gap-2">
                         <i data-lucide="shield" class="w-4 h-4"></i> Admin
                     </a>
@@ -74,45 +73,34 @@ class App {
         const rows = state.config.layout.homepageRows;
 
         this.viewport.innerHTML = `
-            <!-- Hero -->
             <section class="relative h-[85vh] overflow-hidden">
                 <img src="${feat.banner}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="hero-gradient absolute inset-0"></div>
                 <div class="relative z-10 h-full flex items-end pb-32 px-12">
                     <div class="max-w-2xl animate-slide-up">
-                        <span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded mb-4 inline-block">Featured Now</span>
                         <h1 class="text-7xl font-black mb-4 leading-none">${feat.title}</h1>
                         <p class="text-sf-muted text-lg mb-8 max-w-lg">${feat.desc}</p>
-                        <div class="flex gap-4">
-                            <a href="#/watch?id=${feat.id}" class="bg-white text-black px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform flex items-center gap-2">
-                                <i data-lucide="play" class="fill-black w-5 h-5"></i> Play
-                            </a>
-                        </div>
+                        <a href="#/watch?id=${feat.id}" class="bg-white text-black px-10 py-4 rounded-xl font-bold hover:scale-105 transition-transform inline-flex items-center gap-2">
+                            <i data-lucide="play" class="fill-black w-5 h-5"></i> Watch Now
+                        </a>
                     </div>
                 </div>
             </section>
 
-            <!-- Rows -->
             <div class="px-12 -mt-20 relative z-20 pb-20">
                 ${rows.map(row => {
                     const rowMovies = state.movies.filter(m => m.type === row);
                     if (rowMovies.length === 0) return '';
                     return `
                         <div class="mb-14">
-                            <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-                                ${row} <i data-lucide="chevron-right" class="text-sf-red w-5 h-5"></i>
-                            </h2>
+                            <h2 class="text-xl font-bold mb-6">${row}</h2>
                             <div class="row-scroll flex gap-5 overflow-x-auto pb-4">
                                 ${rowMovies.map(m => `
                                     <div class="card-hover w-[240px] flex-shrink-0 cursor-pointer group" onclick="window.location.hash='#/watch?id=${m.id}'">
                                         <div class="aspect-video bg-sf-card rounded-xl overflow-hidden border border-sf-border">
                                             <img src="${m.banner}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                                         </div>
-                                        <h3 class="mt-3 text-sm font-semibold text-slate-200">${m.title}</h3>
-                                        <div class="flex gap-2 mt-1">
-                                            <span class="text-[10px] text-sf-muted">${m.year || '2024'}</span>
-                                            <span class="text-[10px] border border-sf-border px-1 text-sf-muted">HD</span>
-                                        </div>
+                                        <h3 class="mt-3 text-sm font-semibold">${m.title}</h3>
                                     </div>
                                 `).join('')}
                             </div>
@@ -126,12 +114,11 @@ class App {
         this.viewport.innerHTML = `
             <div class="flex min-h-screen pt-20 bg-sf-dark">
                 <aside class="w-72 bg-sf-surface p-10 border-r border-sf-border">
-                    <h3 class="text-sf-red font-black tracking-tighter text-2xl mb-12">MASTER CMS</h3>
+                    <h3 class="text-sf-red font-black text-2xl mb-12 uppercase">Master Admin</h3>
                     <nav class="flex flex-col gap-3">
-                        <button onclick="window.app.setAdminTab('content')" class="text-left px-5 py-3 rounded-xl transition-all ${this.adminTab === 'content' ? 'bg-sf-red text-white' : 'text-sf-muted hover:bg-white/5'}">Library Manager</button>
-                        <button onclick="window.app.setAdminTab('appearance')" class="text-left px-5 py-3 rounded-xl transition-all ${this.adminTab === 'appearance' ? 'bg-sf-red text-white' : 'text-sf-muted hover:bg-white/5'}">Site Identity</button>
-                        <div class="h-px bg-sf-border my-4"></div>
-                        <button onclick="window.location.hash='#/'" class="text-left px-5 py-3 text-sf-muted hover:text-white">View Website</button>
+                        <button onclick="window.app.setAdminTab('content')" class="text-left px-5 py-3 rounded-xl transition-all ${this.adminTab === 'content' ? 'bg-sf-red text-white' : 'text-sf-muted hover:bg-white/5'}">Manage Movies</button>
+                        <button onclick="window.app.setAdminTab('appearance')" class="text-left px-5 py-3 rounded-xl transition-all ${this.adminTab === 'appearance' ? 'bg-sf-red text-white' : 'text-sf-muted hover:bg-white/5'}">Site Settings</button>
+                        <button onclick="window.location.hash='#/'" class="text-left px-5 py-3 text-sf-muted mt-8">Exit Admin</button>
                     </nav>
                 </aside>
                 <main class="flex-1 p-16">
@@ -141,39 +128,43 @@ class App {
         this.attachAdminListeners();
     }
 
-    setAdminTab(t) { this.adminTab = t; this.renderAdmin(); }
+    setAdminTab(t) { this.adminTab = t; this.editingMovieId = null; this.renderAdmin(); }
 
     renderContentTab() {
+        const editMovie = this.editingMovieId ? state.movies.find(m => m.id == this.editingMovieId) : null;
+
         return `
-            <div class="max-w-4xl">
-                <h1 class="text-4xl font-black mb-2">Library Manager</h1>
-                <p class="text-sf-muted mb-10">Add, edit, and manage your cinematic collection.</p>
-                
+            <div class="max-w-5xl">
+                <h1 class="text-4xl font-black mb-10">${this.editingMovieId ? 'Edit Movie' : 'Library Manager'}</h1>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <form id="add-movie-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border flex flex-col gap-4">
-                        <h3 class="text-lg font-bold mb-2">Publish New Title</h3>
-                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl outline-none focus:border-sf-red/50 transition-all" name="title" placeholder="Movie Title" required>
-                        <textarea class="bg-sf-dark border border-sf-border p-4 rounded-xl outline-none focus:border-sf-red/50 transition-all h-32" name="desc" placeholder="Synopsis" required></textarea>
-                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl outline-none focus:border-sf-red/50 transition-all" name="banner" placeholder="Banner Image URL (16:9)" required>
-                        <label class="text-xs text-sf-muted ml-2">Select Homepage Row:</label>
-                        <select class="bg-sf-dark border border-sf-border p-4 rounded-xl outline-none" name="type">
-                            ${state.config.layout.homepageRows.map(r => `<option value="${r}">${r}</option>`).join('')}
+                        <h3 class="text-lg font-bold mb-2">${this.editingMovieId ? 'Editing: ' + editMovie.title : 'Publish New Title'}</h3>
+                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="title" placeholder="Movie Title" value="${editMovie ? editMovie.title : ''}" required>
+                        <textarea class="bg-sf-dark border border-sf-border p-4 rounded-xl h-32" name="desc" placeholder="Synopsis" required>${editMovie ? editMovie.desc : ''}</textarea>
+                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="banner" placeholder="Banner Image URL" value="${editMovie ? editMovie.banner : ''}" required>
+                        <label class="text-xs text-sf-muted">Row/Category:</label>
+                        <select class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="type">
+                            ${state.config.layout.homepageRows.map(r => `<option value="${r}" ${editMovie && editMovie.type === r ? 'selected' : ''}>${r}</option>`).join('')}
                         </select>
-                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl outline-none focus:border-sf-red/50 transition-all" name="url" placeholder="Abyss.to Embed Link" required>
-                        <label class="flex items-center gap-3 ml-2 cursor-pointer">
-                            <input type="checkbox" name="feat" class="accent-sf-red"> 
-                            <span class="text-sm">Feature in Main Spotlight?</span>
-                        </label>
-                        <button type="submit" class="bg-sf-red hover:bg-red-700 text-white p-4 rounded-xl font-bold mt-4 shadow-lg shadow-sf-red/20 transition-all">PUBLISH NOW</button>
+                        <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="url" placeholder="Abyss Link" value="${editMovie ? editMovie.embedUrl : ''}" required>
+                        <label class="flex items-center gap-3"><input type="checkbox" name="feat" ${editMovie && editMovie.featured ? 'checked' : ''}> Spotlight?</label>
+                        
+                        <div class="flex gap-3 mt-4">
+                            <button type="submit" class="flex-1 bg-sf-red text-white p-4 rounded-xl font-bold">${this.editingMovieId ? 'UPDATE MOVIE' : 'PUBLISH NOW'}</button>
+                            ${this.editingMovieId ? `<button type="button" onclick="window.app.cancelEdit()" class="bg-white/10 p-4 rounded-xl font-bold">Cancel</button>` : ''}
+                        </div>
                     </form>
 
                     <div>
-                        <h3 class="text-lg font-bold mb-6">Current Inventory</h3>
+                        <h3 class="text-lg font-bold mb-6">Inventory</h3>
                         <div class="flex flex-col gap-3">
                             ${state.movies.map(m => `
-                                <div class="bg-sf-surface p-4 rounded-xl border border-sf-border flex justify-between items-center">
-                                    <div><span class="block font-bold">${m.title}</span><span class="text-[10px] text-sf-muted uppercase">${m.type}</span></div>
-                                    <button onclick="window.app.deleteTitle(${m.id})" class="text-sf-red hover:text-red-400 text-xs font-bold">DELETE</button>
+                                <div class="bg-sf-surface p-4 rounded-xl border border-sf-border flex justify-between items-center ${this.editingMovieId == m.id ? 'border-sf-red ring-1 ring-sf-red' : ''}">
+                                    <div class="truncate pr-4"><span class="block font-bold truncate">${m.title}</span><span class="text-[10px] text-sf-muted uppercase">${m.type}</span></div>
+                                    <div class="flex gap-4">
+                                        <button onclick="window.app.startEdit(${m.id})" class="text-white hover:text-sf-red text-xs font-bold">EDIT</button>
+                                        <button onclick="window.app.deleteTitle(${m.id})" class="text-sf-red hover:text-red-400 text-xs font-bold">DELETE</button>
+                                    </div>
                                 </div>
                             `).reverse().join('')}
                         </div>
@@ -185,14 +176,24 @@ class App {
     renderAppearanceTab() {
         return `
             <div class="max-w-xl">
-                <h1 class="text-4xl font-black mb-2">Site Identity</h1>
-                <p class="text-sf-muted mb-10">Control your brand name and design settings.</p>
+                <h1 class="text-4xl font-black mb-10">Site Settings</h1>
                 <form id="identity-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border flex flex-col gap-4">
-                    <label>Website Name</label>
+                    <label>Brand Name</label>
                     <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="name" value="${state.config.appearance.siteName}">
-                    <button type="submit" class="bg-sf-red p-4 rounded-xl font-bold mt-4">Save Changes</button>
+                    <button type="submit" class="bg-sf-red p-4 rounded-xl font-bold mt-4">Save Settings</button>
                 </form>
             </div>`;
+    }
+
+    startEdit(id) {
+        this.editingMovieId = id;
+        this.renderAdmin();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    cancelEdit() {
+        this.editingMovieId = null;
+        this.renderAdmin();
     }
 
     attachAdminListeners() {
@@ -201,15 +202,27 @@ class App {
             mForm.onsubmit = (e) => {
                 e.preventDefault();
                 const f = new FormData(mForm);
-                state.addMovie({
+                const movieData = {
                     title: f.get('title'),
                     desc: f.get('desc'),
                     banner: f.get('banner'),
                     type: f.get('type'),
                     embedUrl: f.get('url'),
                     featured: f.get('feat') === 'on'
-                });
-                alert("Movie Successfully Published!");
+                };
+
+                if (this.editingMovieId) {
+                    // Update existing
+                    const idx = state.movies.findIndex(m => m.id == this.editingMovieId);
+                    state.movies[idx] = { ...state.movies[idx], ...movieData };
+                    state.save();
+                    alert("Movie Updated Successfully!");
+                    this.editingMovieId = null;
+                } else {
+                    // Add new
+                    state.addMovie(movieData);
+                    alert("New Movie Published!");
+                }
                 this.renderAdmin();
             };
         }
@@ -219,15 +232,16 @@ class App {
                 e.preventDefault();
                 state.config.appearance.siteName = new FormData(iForm).get('name');
                 state.save();
-                alert("Identity Updated!");
+                alert("Site Updated!");
                 this.renderAdmin();
             };
         }
     }
 
     deleteTitle(id) {
-        if (confirm("Permanently delete this title?")) {
+        if (confirm("Permanently delete this?")) {
             state.deleteMovie(id);
+            if (this.editingMovieId == id) this.editingMovieId = null;
             this.renderAdmin();
         }
     }
@@ -238,7 +252,7 @@ class App {
         this.viewport.innerHTML = `
             <div class="pt-20 bg-black min-h-screen">
                 <div class="max-w-[1920px] mx-auto px-4 lg:px-12">
-                    <div class="aspect-video w-full bg-sf-card rounded-2xl overflow-hidden shadow-2xl border border-white/5">
+                    <div class="aspect-video w-full bg-sf-card rounded-2xl overflow-hidden shadow-2xl">
                         <iframe src="${m.embedUrl}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="py-12">
@@ -251,11 +265,8 @@ class App {
 
     renderFooter() {
         document.getElementById('footer').innerHTML = `
-            <footer class="border-t border-white/5 p-12 text-center">
-                <div class="opacity-30 flex flex-col gap-2">
-                    <span class="text-xl font-bold tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
-                    <p class="text-[10px]">© 2024 Premium Streaming Platform</p>
-                </div>
+            <footer class="p-12 text-center border-t border-white/5 opacity-20">
+                <span class="text-xl font-bold">Stream<span class="text-sf-red">Flix</span></span>
             </footer>`;
     }
 }
