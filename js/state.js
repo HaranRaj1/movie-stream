@@ -21,7 +21,7 @@ class State {
         this.movies = JSON.parse(localStorage.getItem('vela_movies')) || DEFAULT_MOVIES;
         this.continueWatching = JSON.parse(localStorage.getItem('vela_history')) || [];
         this.searchQuery = '';
-        this.adminPassword = 'admin123'; // 🔑 CHANGE YOUR PASSWORD HERE
+        this.adminPassword = 'webadmin2008'; // 🔑 CHANGE YOUR PASSWORD HERE
     }
 
     saveMovies() {
