@@ -4,6 +4,7 @@ class App {
     constructor() {
         this.mainContent = document.getElementById('main-content');
         this.navbar = document.getElementById('navbar');
+        this.isAdminAuthenticated = false;
         this.init();
     }
 
@@ -15,16 +16,33 @@ class App {
 
     handleRoute() {
         const hash = window.location.hash || '#/';
-        if (hash.startsWith('#/watch')) {
+        
+        if (hash === '#/portal') {
+            this.checkAdminAuth();
+        } else if (hash.startsWith('#/watch')) {
             const params = new URLSearchParams(hash.split('?')[1]);
             this.renderWatch(params.get('id'));
-        } else if (hash === '#/portal') {
-            this.renderAdmin();
         } else {
             this.renderHome();
         }
+        
         this.renderFooter();
         lucide.createIcons();
+    }
+
+    checkAdminAuth() {
+        if (!this.isAdminAuthenticated) {
+            const pass = prompt("Please enter the Admin Password:");
+            if (pass === state.adminPassword) {
+                this.isAdminAuthenticated = true;
+                this.renderAdmin();
+            } else {
+                alert("Incorrect Password!");
+                window.location.hash = "#/";
+            }
+        } else {
+            this.renderAdmin();
+        }
     }
 
     renderNavbar() {
@@ -34,7 +52,6 @@ class App {
                 <div class="nav-links">
                     <a href="#/">Home</a>
                     <a href="#/movies">Movies</a>
-                    <a href="#/tv-shows">TV Shows</a>
                 </div>
                 <div class="nav-actions">
                     <div class="search-bar">
@@ -51,7 +68,6 @@ class App {
                 this.renderSearchResults();
             };
         }
-        lucide.createIcons();
     }
 
     renderFooter() {
@@ -64,20 +80,18 @@ class App {
     }
 
     renderHome() {
-        const featured = state.movies.find(m => m.featured) || state.movies[0];
-        const categories = ['Trending', 'Anime', 'Tamil Movies'];
+        const featured = state.getFeatured();
+        const categories = ['Trending', 'Anime', 'Tamil Movies', 'Action'];
 
         this.mainContent.innerHTML = `
             <section class="hero" style="background-image: linear-gradient(to top, var(--bg-deep), transparent), url('${featured.banner}')">
                 <div class="hero-overlay"></div>
                 <div class="container hero-content fade-in">
-                    <div class="featured-badge">FEATURED</div>
+                    <div class="featured-badge">SPOTLIGHT</div>
                     <h1>${featured.title}</h1>
                     <p>${featured.description}</p>
                     <div class="actions">
-                        <a href="#/watch?id=${featured.id}" class="btn btn-primary">
-                            <i data-lucide="play"></i> Watch Now
-                        </a>
+                        <a href="#/watch?id=${featured.id}" class="btn btn-primary">Watch Now</a>
                     </div>
                 </div>
             </section>
@@ -86,10 +100,10 @@ class App {
                     const movies = state.getMoviesByCategory(cat);
                     if (movies.length === 0) return '';
                     return `
-                    <section class="carousel-section" style="margin-top: 3rem;">
+                    <section style="margin-top: 3rem;">
                         <h2>${cat}</h2>
                         <div class="movie-grid">
-                            ${movies.map(m => this.createMovieCard(m)).join('')}
+                            ${movies.map(m => this.createCard(m)).join('')}
                         </div>
                     </section>
                     `;
@@ -98,17 +112,12 @@ class App {
         `;
     }
 
-    createMovieCard(movie) {
+    createCard(m) {
         return `
-            <div class="movie-card" onclick="window.location.hash = '#/watch?id=${movie.id}'">
+            <div class="movie-card" onclick="window.location.hash = '#/watch?id=${m.id}'">
                 <div class="poster">
-                    <img src="${movie.thumbnail}" alt="${movie.title}">
-                    <div class="overlay">
-                        <div class="play-btn-small"><i data-lucide="play"></i></div>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <h3>${movie.title}</h3>
+                    <img src="${m.thumbnail}" alt="${m.title}">
+                    <div class="overlay"><h3>${m.title}</h3></div>
                 </div>
             </div>
         `;
@@ -116,13 +125,12 @@ class App {
 
     renderWatch(id) {
         const movie = state.movies.find(m => m.id === id);
-        if (!movie) return this.renderHome();
         this.mainContent.innerHTML = `
             <div class="watch-container">
                 <div class="player-wrapper">
                     <iframe src="${movie.embedUrl}" frameborder="0" allowfullscreen></iframe>
                 </div>
-                <div class="container movie-details" style="padding-top: 2rem;">
+                <div class="container" style="padding-top: 2rem;">
                     <h1>${movie.title}</h1>
                     <p>${movie.description}</p>
                 </div>
@@ -133,48 +141,61 @@ class App {
     renderAdmin() {
         this.mainContent.innerHTML = `
             <div class="container admin-page">
-                <h1>Admin Portal</h1>
+                <h1 style="margin-bottom:2rem;">Premium Admin Dashboard</h1>
                 <div class="admin-grid">
-                    <div class="admin-card">
-                        <h2>Add Movie</h2>
-                        <form id="add-movie-form" class="admin-form">
-                            <input name="title" placeholder="Title" required>
-                            <textarea name="desc" placeholder="Description" required></textarea>
-                            <input name="thumb" placeholder="Poster URL" required>
-                            <input name="banner" placeholder="Banner URL" required>
-                            <input name="genre" placeholder="Genre (e.g. Anime)" required>
-                            <input name="url" placeholder="Abyss.to Link" required>
-                            <button type="submit" class="btn btn-primary">Publish</button>
+                    <div class="admin-card glass">
+                        <h2>Add New Movie</h2>
+                        <form id="add-form" class="admin-form">
+                            <input name="title" placeholder="Movie Title" required>
+                            <textarea name="desc" placeholder="Synopsis/Description" required></textarea>
+                            <input name="thumb" placeholder="Poster URL (Vertical)" required>
+                            <input name="banner" placeholder="Banner URL (Horizontal/Featured)" required>
+                            <input name="genre" placeholder="Row/Category (e.g. Anime, Tamil Movies)" required>
+                            <input name="url" placeholder="Abyss.to Embed Link" required>
+                            <div style="margin-bottom:1rem; display:flex; align-items:center; gap:10px;">
+                                <input type="checkbox" name="featured" style="width:auto; margin:0;">
+                                <label>Feature on Homepage spotlight?</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Publish to Site</button>
                         </form>
                     </div>
-                    <div class="admin-card">
-                        <h2>Manage Library</h2>
-                        ${state.movies.map(m => `
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                                <span>${m.title}</span>
-                                <button onclick="window.app.deleteMovie('${m.id}')" style="color:red; background:none; border:none; cursor:pointer;">Delete</button>
-                            </div>
-                        `).join('')}
+                    <div class="admin-card glass">
+                        <h2>Manage Your Library</h2>
+                        <div style="max-height:500px; overflow-y:auto;">
+                            ${state.movies.map(m => `
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(255,255,255,0.05); margin-bottom:5px; border-radius:5px;">
+                                    <span>${m.title} ${m.featured ? '⭐' : ''}</span>
+                                    <button onclick="window.app.deleteMovie('${m.id}')" style="color:#ff4444; background:none; border:none; cursor:pointer;">Delete</button>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             </div>
         `;
-        document.getElementById('add-movie-form').onsubmit = (e) => {
+
+        document.getElementById('add-form').onsubmit = (e) => {
             e.preventDefault();
             const f = new FormData(e.target);
             state.addMovie({
-                title: f.get('title'), description: f.get('desc'),
-                thumbnail: f.get('thumb'), banner: f.get('banner'),
-                genre: [f.get('genre')], type: f.get('genre'),
-                embedUrl: f.get('url')
+                title: f.get('title'),
+                description: f.get('desc'),
+                thumbnail: f.get('thumb'),
+                banner: f.get('banner'),
+                genre: [f.get('genre')],
+                type: f.get('genre'),
+                embedUrl: f.get('url'),
+                featured: f.get('featured') === 'on'
             });
             this.renderAdmin();
         };
     }
 
     deleteMovie(id) {
-        state.deleteMovie(id);
-        this.renderAdmin();
+        if(confirm("Are you sure you want to delete this movie?")) {
+            state.deleteMovie(id);
+            this.renderAdmin();
+        }
     }
 }
 
