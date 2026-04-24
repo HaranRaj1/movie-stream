@@ -3,45 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamFlix | Premium Streaming</title>
+    <title>StreamFlix | Master OTT Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        'sf-red': '#E50914',
-                        'sf-dark': '#0a0a0f',
-                        'sf-surface': '#12121a',
-                        'sf-card': '#16161f',
-                        'sf-border': '#1e1e2a',
-                        'sf-muted': '#6b6b80',
-                    },
+                    colors: { 'sf-red': '#E50914', 'sf-dark': '#0a0a0f', 'sf-surface': '#12121a', 'sf-border': '#1e1e2a', 'sf-muted': '#6b6b80' },
                     fontFamily: { 'inter': ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background: #0a0a0f; color: #fff; font-family: 'Inter', sans-serif; }
+        .hero-gradient { background: linear-gradient(to top, #0a0a0f 10%, transparent 80%), linear-gradient(to right, #0a0a0f 20%, transparent); }
+        .row-scroll::-webkit-scrollbar { display: none; }
+        .card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .card-hover:hover { transform: scale(1.1) translateY(-10px); z-index: 50; }
+        .film-grain::after {
+            content: ''; position: fixed; inset: -50%; width: 200%; height: 200%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 9999;
+        }
+    </style>
 </head>
-<body class="font-inter film-grain bg-sf-dark text-white overflow-x-hidden">
-    <div id="toast-container" class="fixed top-24 right-6 z-[200] flex flex-col gap-3"></div>
-    
-    <nav id="navbar" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-700"></nav>
-    <main id="app-viewport" class="relative z-10"></main>
+<body class="film-grain">
+
+    <nav id="navbar" class="fixed top-0 w-full z-[100] transition-all duration-500"></nav>
+    <div id="app-viewport"></div>
     <footer id="footer"></footer>
 
-    <!-- Master Modal -->
-    <div id="modal" class="fixed inset-0 z-[150] hidden">
-        <div class="modal-backdrop absolute inset-0 bg-black/75" onclick="window.app.closeModal()"></div>
-        <div class="relative z-10 max-w-3xl mx-auto mt-6 sm:mt-10 max-h-[92vh] overflow-y-auto rounded-2xl animate-scale-in shadow-2xl">
-            <div id="modal-content"></div>
-        </div>
-    </div>
+    <script>
+        // --- DATA ENGINE ---
+        const state = {
+            movies: JSON.parse(localStorage.getItem('sf_movies')) || [
+                { id: 1, title: 'Welcome to StreamFlix', desc: 'Go to Admin to add your first movie.', banner: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2070&auto=format&fit=crop', type: 'Trending Now', url: '', featured: true }
+            ],
+            config: JSON.parse(localStorage.getItem('sf_config')) || {
+                siteName: 'StreamFlix',
+                primaryColor: '#E50914',
+                rows: ['Trending Now', 'Action', 'Anime', 'Tamil Movies'],
+                admin: { user: 'admin', pass: 'Haran@stream2026!' }
+            },
+            save() {
+                localStorage.setItem('sf_movies', JSON.stringify(this.movies));
+                localStorage.setItem('sf_config', JSON.stringify(this.config));
+            }
+        };
 
-    <script src="js/state.js" type="module"></script>
-    <script src="js/app.js" type="module"></script>
+        // --- APP ENGINE ---
+        const app = {
+            isAuth: false,
+            adminTab: 'content',
+
+            init() {
+                window.addEventListener('hashchange', () => this.router());
+                window.addEventListener('scroll', () => {
+                    document.getElementById('navbar').classList.toggle('bg-sf-dark/90', window.scrollY > 50);
+                    document.getElementById('navbar').classList.toggle('backdrop-blur-xl', window.scrollY > 50);
+                });
+                this.router();
+            },
+
+            router() {
+                const hash = window.location.hash || '#/';
+                this.renderNav();
+                if (hash === '#/portal') this.handleAuth();
+                else if (hash.startsWith('#/watch')) this.renderWatch(new URLSearchParams(hash.split('?')[1]).get('id'));
+                else this.renderHome();
+                this.renderFooter();
+                if (window.lucide) lucide.createIcons();
+            },
+
+            handleAuth() {
+                if (!this.isAuth) {
+                    const u = prompt("Admin User:");
+                    const p = prompt("Admin Pass:");
+                    if (u === state.config.admin.user && p === state.config.admin.pass) {
+                        this.isAuth = true; this.renderAdmin();
+                    } else { window.location.hash = "#/"; }
+                } else { this.renderAdmin(); }
+            },
+
+            renderNav() {
+                document.getElementById('navbar').innerHTML = `
+                    <div class="max-w-[1920px] mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
+                        <a href="#/" class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-white fill-white"></i></div>
+                            <span class="text-xl font-black italic tracking-tighter">${state.config.siteName}</span>
+                        </a>
+                        <div class="flex items-center gap-6 text-xs font-bold text-sf-muted">
+                            <a href="#/" class="text-white">HOME</a>
+                            <a href="#/portal" class="hover:text-white transition-colors">ADMIN</a>
+                        </div>
+                    </div>`;
+            },
+
+            renderHome() {
+                const feat = state.movies.find(m => m.featured) || state.movies[0];
+                const viewport = document.getElementById('app-viewport');
+                viewport.innerHTML = `
+                    <section class="relative h-[85vh] flex items-end pb-32 px-6 lg:px-12 overflow-hidden">
+                        <img src="${feat.banner}" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="hero-gradient absolute inset-0"></div>
+                        <div class="relative z-10 max-w-2xl">
+                            <h1 class="text-6xl lg:text-8xl font-black mb-4 leading-none uppercase tracking-tighter">${feat.title}</h1>
+                            <p class="text-sf-muted text-lg mb-8 line-clamp-3">${feat.desc}</p>
+                            <a href="#/watch?id=${feat.id}" class="bg-sf-red text-white px-10 py-4 rounded-xl font-bold inline-flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-sf-red/20"><i data-lucide="play" fill="white"></i> WATCH NOW</a>
+                        </div>
+                    </section>
+                    <div class="px-6 lg:px-12 -mt-20 relative z-20 pb-20">
+                        ${state.config.rows.map(row => {
+                            const rowMovies = state.movies.filter(m => m.type === row);
+                            if (rowMovies.length === 0) return '';
+                            return `
+                                <div class="mb-12">
+                                    <h2 class="text-xl font-black mb-6 flex items-center gap-2">${row} <i data-lucide="chevron-right" class="text-sf-red w-5 h-5"></i></h2>
+                                    <div class="row-scroll flex gap-5 overflow-x-auto pb-4">
+                                        ${rowMovies.map(m => `
+                                            <div class="card-hover w-[260px] flex-shrink-0 cursor-pointer" onclick="window.location.hash='#/watch?id=${m.id}'">
+                                                <div class="aspect-video bg-sf-card rounded-2xl overflow-hidden border border-white/5"><img src="${m.banner}" class="w-full h-full object-cover"></div>
+                                                <h3 class="mt-3 text-sm font-bold text-slate-200">${m.title}</h3>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>`;
+                        }).join('')}
+                    </div>`;
+            },
+
+            renderAdmin() {
+                const viewport = document.getElementById('app-viewport');
+                viewport.innerHTML = `
+                    <div class="flex min-h-screen pt-20">
+                        <aside class="w-72 bg-sf-surface p-10 border-r border-sf-border">
+                            <h3 class="text-sf-red font-black text-2xl mb-12 tracking-tighter italic">MASTER DASH</h3>
+                            <nav class="flex flex-col gap-3">
+                                <button onclick="app.setTab('content')" class="text-left px-5 py-3 rounded-xl ${this.adminTab==='content'?'bg-sf-red':'text-sf-muted'}">Library</button>
+                                <button onclick="app.setTab('appearance')" class="text-left px-5 py-3 rounded-xl ${this.adminTab==='appearance'?'bg-sf-red':'text-sf-muted'}">Settings</button>
+                                <button onclick="window.location.hash='#/'" class="text-left px-5 py-3 text-sf-muted mt-10">Exit</button>
+                            </nav>
+                        </aside>
+                        <main class="flex-1 p-12">
+                            ${this.adminTab === 'content' ? this.renderContentTab() : this.renderAppearanceTab()}
+                        </main>
+                    </div>`;
+                this.attachListeners();
+            },
+
+            setTab(t) { this.adminTab = t; this.renderAdmin(); },
+
+            renderContentTab() {
+                return `
+                    <h1 class="text-4xl font-black mb-10">Manage Library</h1>
+                    <div class="grid lg:grid-cols-2 gap-10">
+                        <form id="add-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border flex flex-col gap-4">
+                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="title" placeholder="Title" required>
+                            <textarea class="bg-sf-dark border border-sf-border p-4 rounded-xl h-32" name="desc" placeholder="Synopsis" required></textarea>
+                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="banner" placeholder="Banner URL" required>
+                            <select class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="type">${state.config.rows.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
+                            <input class="bg-sf-dark border border-sf-border p-4 rounded-xl" name="url" placeholder="Abyss Link" required>
+                            <button type="submit" class="bg-sf-red p-4 rounded-xl font-bold">PUBLISH NOW</button>
+                        </form>
+                        <div>
+                            <h3 class="font-bold mb-4">Inventory</h3>
+                            <div class="flex flex-col gap-2">${state.movies.map(m=>`<div class="p-4 bg-sf-surface border border-sf-border rounded-xl flex justify-between"><span>${m.title}</span><button onclick="app.delMovie(${m.id})" class="text-sf-red font-bold">DEL</button></div>`).reverse().join('')}</div>
+                        </div>
+                    </div>`;
+            },
+
+            renderAppearanceTab() {
+                return `
+                    <h1 class="text-4xl font-black mb-10">Settings</h1>
+                    <form id="app-form" class="bg-sf-surface p-8 rounded-2xl border border-sf-border max-w-xl">
+                        <label class="text-xs font-bold text-sf-muted">Site Name</label>
+                        <input class="bg-sf-dark border border-sf-border w-full p-4 rounded-xl mt-2 mb-6" name="name" value="${state.config.siteName}">
+                        <button type="submit" class="bg-sf-red w-full p-4 rounded-xl font-bold">SAVE SETTINGS</button>
+                    </form>`;
+            },
+
+            attachListeners() {
+                const f = document.getElementById('add-form');
+                if (f) f.onsubmit = (e) => {
+                    e.preventDefault(); const d = new FormData(f);
+                    state.movies.push({ id: Date.now(), title: d.get('title'), desc: d.get('desc'), banner: d.get('banner'), type: d.get('type'), url: d.get('url'), featured: false });
+                    state.save(); alert("Published!"); this.renderAdmin();
+                };
+                const af = document.getElementById('app-form');
+                if (af) af.onsubmit = (e) => {
+                    e.preventDefault(); state.config.siteName = new FormData(af).get('name');
+                    state.save(); alert("Updated!"); this.renderAdmin();
+                };
+            },
+
+            delMovie(id) { if(confirm("Delete?")) { state.movies = state.movies.filter(m=>m.id!==id); state.save(); this.renderAdmin(); } },
+
+            renderWatch(id) {
+                const m = state.movies.find(m=>m.id==id);
+                document.getElementById('app-viewport').innerHTML = `
+                    <div class="pt-20 bg-black min-h-screen">
+                        <div class="max-w-[1920px] mx-auto px-6 lg:px-12">
+                            <iframe src="${m.url}" class="w-full aspect-video rounded-2xl shadow-2xl border border-white/5" allowfullscreen></iframe>
+                            <div class="py-12"><h1 class="text-6xl font-black mb-4 uppercase tracking-tighter">${m.title}</h1><p class="text-sf-muted text-xl max-w-4xl">${m.desc}</p></div>
+                        </div>
+                    </div>`;
+            },
+
+            renderFooter() { document.getElementById('footer').innerHTML = `<div class="p-20 text-center opacity-10 font-black italic tracking-tighter text-2xl">${state.config.siteName}</div>`; }
+        };
+
+        window.app = app;
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
 </body>
 </html>
