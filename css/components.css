@@ -1,7 +1,24 @@
-/* [css/components.css] - Essential UI */
-.movie-grid::-webkit-scrollbar { display: none; }
-.movie-card:hover { transform: scale(1.05); }
-.hero-content h1 { font-family: 'Outfit', sans-serif; font-weight: 900; }
-.btn { cursor: pointer; transition: 0.3s; padding: 10px 20px; border: none; border-radius: 5px; }
-.btn-primary { background: var(--accent-primary); color: white; }
-.btn-primary:hover { opacity: 0.8; }
+nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 0; }
+.nav-container { display: flex; justify-content: space-between; align-items: center; }
+.logo { text-decoration: none; color: white; font-size: 1.8rem; font-weight: 900; font-family: var(--font-heading); }
+
+.hero { height: 85vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #000, transparent), linear-gradient(to right, #000 20%, transparent); }
+.hero-content { position: relative; z-index: 2; max-width: 800px; }
+.hero h1 { font-size: 5rem; font-family: var(--font-heading); margin-bottom: 1rem; line-height: 1; }
+
+.movie-grid { display: flex; gap: 20px; overflow-x: auto; padding: 2rem 0; scrollbar-width: none; }
+.movie-card { min-width: 300px; cursor: pointer; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.movie-card:hover { transform: scale(1.1) translateY(-10px); z-index: 5; }
+.poster { aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #111; border: 1px solid var(--glass-border); position: relative; }
+.poster img { width: 100%; height: 100%; object-fit: cover; }
+
+.watch-container { padding-top: 80px; }
+.player-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; }
+.player-wrapper iframe { width: 100%; height: 100%; }
+
+/* Admin Sidebar */
+.cms-wrapper { display: flex; padding-top: 80px; min-height: 100vh; }
+.cms-sidebar { width: 260px; background: #0a0a0a; border-right: 1px solid #222; padding: 2rem; position: fixed; height: 100%; }
+.cms-main { margin-left: 260px; padding: 3rem; flex: 1; }
+.admin-form input, .admin-form textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; margin-bottom: 1rem; border-radius: 6px; }
