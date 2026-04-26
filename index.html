@@ -100,10 +100,35 @@
         .admin-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#6b6b80;border-bottom:1px solid #1e1e2a}
         .admin-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid #14141c;vertical-align:middle}
         .admin-table tr:hover td{background:rgba(255,255,255,0.02)}
+        .admin-tab.active{background:#1e1e2a!important;color:#fff!important}
         select.admin-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
         select.admin-input option{background:#12121a;color:#fff}
         textarea.admin-input{resize:none}
         .url-preview{font-size:11px;color:#6b6b80;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;display:inline-block;vertical-align:middle}
+        /* Toggle Switch */
+        .toggle{position:relative;width:40px;height:22px;flex-shrink:0;display:inline-block}
+        .toggle input{opacity:0;width:0;height:0;position:absolute}
+        .toggle-track{position:absolute;inset:0;background:#1e1e2a;border:1px solid #2a2a3a;border-radius:11px;cursor:pointer;transition:all 300ms}
+        .toggle-track::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#6b6b80;border-radius:50%;transition:all 300ms cubic-bezier(0.16,1,0.3,1)}
+        .toggle input:checked+.toggle-track{background:rgba(229,9,20,0.2);border-color:rgba(229,9,20,0.4)}
+        .toggle input:checked+.toggle-track::before{transform:translateX(18px);background:#E50914}
+        /* Color Picker */
+        .color-pick{width:44px;height:44px;border:2px solid #1e1e2a;border-radius:12px;cursor:pointer;padding:0;-webkit-appearance:none;appearance:none;background:none}
+        .color-pick::-webkit-color-swatch-wrapper{padding:2px}
+        .color-pick::-webkit-color-swatch{border:none;border-radius:8px}
+        .color-pick::-moz-color-swatch{border:none;border-radius:8px}
+        /* Section Label */
+        .section-label{font-size:12px;font-weight:600;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .section-label .sl-dot{width:6px;height:6px;border-radius:50%;background:#E50914;flex-shrink:0}
+        .setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);gap:12px}
+        .setting-row:last-child{border-bottom:none}
+        .setting-label{font-size:13px;color:#ccc;font-weight:400}
+        .setting-label small{display:block;font-size:11px;color:#6b6b80;font-weight:300;margin-top:2px}
+        .nav-link-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:6px;transition:all 200ms}
+        .nav-link-item:hover{border-color:rgba(255,255,255,0.08)}
+        .nav-link-item input{background:transparent;border:1px solid transparent;color:#ccc;font-size:13px;padding:4px 8px;border-radius:6px;flex:1;transition:all 200ms;font-family:'Inter',sans-serif}
+        .nav-link-item input:focus{outline:none;border-color:#2a2a3a;background:rgba(255,255,255,0.03);color:#fff}
+        .admin-section{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:16px;margin-bottom:12px}
         @media(max-width:768px){
             .top10-number{font-size:5.5rem;-webkit-text-stroke:2px rgba(229,9,20,0.2)}
             .card-hover:hover{transform:scale(1.04) translateY(-4px)}
@@ -111,6 +136,7 @@
             .card-overlay{opacity:1}
         }
     </style>
+    <style id="dynamic-theme"></style>
 </head>
 <body class="font-inter film-grain">
 
@@ -179,7 +205,7 @@
                 <div><h1 class="text-base font-bold">Admin Panel</h1><p class="text-[11px] text-sf-muted">Full site editor</p></div>
             </div>
             <div class="flex items-center gap-3 flex-wrap">
-                <button onclick="resetData()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset</button>
+                <button onclick="resetAllSettings()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All</button>
                 <button onclick="saveAll()" class="admin-btn text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save & Apply</button>
                 <button onclick="closeAdmin()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button>
                 <button onclick="closeAdmin()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="x" class="w-3.5 h-3.5"></i> Close</button>
@@ -189,10 +215,16 @@
             <div class="flex items-center gap-1 mb-6 border-b border-white/5 pb-3 overflow-x-auto row-scroll">
                 <button onclick="switchAdminTab('movies')" class="admin-tab active px-4 py-2 text-xs font-medium rounded-lg transition-all whitespace-nowrap" data-tab="movies">Movies</button>
                 <button onclick="switchAdminTab('rows')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="rows">Content Rows</button>
-                <button onclick="switchAdminTab('hero')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="hero">Hero Slider</button>
+                <button onclick="switchAdminTab('hero')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="hero">Hero & Banners</button>
                 <button onclick="switchAdminTab('top10')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="top10">Top 10</button>
                 <button onclick="switchAdminTab('genres')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="genres">Genre Tiles</button>
+                <button onclick="switchAdminTab('logo')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="logo">Logo & Branding</button>
+                <button onclick="switchAdminTab('theme')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="theme">Theme Colors</button>
+                <button onclick="switchAdminTab('homepage')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="homepage">Homepage Sections</button>
+                <button onclick="switchAdminTab('headerfooter')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="headerfooter">Header & Footer</button>
             </div>
+
+            <!-- Movies Tab -->
             <div id="tab-movies" class="admin-tab-content">
                 <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
                     <p class="text-sm text-sf-muted">Manage all movies — <span class="text-sf-red">Embed URL</span> enables streaming</p>
@@ -200,10 +232,116 @@
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-white/5"><table class="admin-table" id="movies-table"></table></div>
             </div>
+
+            <!-- Rows Tab -->
             <div id="tab-rows" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Edit row titles and which movies appear in each</p><div id="rows-editor" class="space-y-4"></div></div>
-            <div id="tab-hero" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Choose which movies rotate in the hero banner (max 6)</p><div class="admin-card"><label class="text-xs text-sf-muted block mb-2">Hero Movies</label><div id="hero-selector" class="flex flex-wrap gap-2"></div></div></div>
+
+            <!-- Hero Tab -->
+            <div id="tab-hero" class="admin-tab-content hidden">
+                <p class="text-sm text-sf-muted mb-4">Choose which movies rotate in the hero banner (max 6) and override banner images</p>
+                <div class="admin-card mb-4"><label class="text-xs text-sf-muted block mb-2">Hero Movies</label><div id="hero-selector" class="flex flex-wrap gap-2"></div></div>
+                <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Custom Banner Images</div><p class="text-xs text-sf-muted mb-4">Override the default banner image for each hero movie with a custom URL</p><div id="hero-banner-overrides" class="space-y-3"></div></div>
+            </div>
+
+            <!-- Top 10 Tab -->
             <div id="tab-top10" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Reorder or remove movies from Top 10</p><div class="admin-card"><div id="top10-editor" class="space-y-2"></div><div class="mt-4 pt-4 border-t border-white/5"><label class="text-xs text-sf-muted block mb-2">Add movie to Top 10</label><div class="flex gap-2"><select id="top10-add-select" class="admin-input flex-1"></select><button onclick="addToTop10()" class="admin-btn text-xs py-2 px-4">Add</button></div></div></div></div>
+
+            <!-- Genres Tab -->
             <div id="tab-genres" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Edit genre display names</p><div id="genres-editor" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div></div>
+
+            <!-- Logo & Branding Tab -->
+            <div id="tab-logo" class="admin-tab-content hidden">
+                <div class="admin-card mb-4">
+                    <div class="section-label"><span class="sl-dot"></span>Logo Configuration</div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs text-sf-muted block mb-1.5">Logo Text</label><input id="set-logo-text" class="admin-input" placeholder="Stream"></div>
+                            <div><label class="text-xs text-sf-muted block mb-1.5">Accent Text</label><input id="set-logo-accent" class="admin-input" placeholder="Flix"></div>
+                        </div>
+                        <div><label class="text-xs text-sf-muted block mb-1.5">Logo Icon</label>
+                            <select id="set-logo-icon" class="admin-input"><option value="play">Play</option><option value="film">Film</option><option value="tv">TV</option><option value="clapperboard">Clapperboard</option><option value="star">Star</option><option value="zap">Zap</option><option value="monitor-play">Monitor Play</option><option value="radio">Radio</option></select>
+                        </div>
+                        <div><label class="text-xs text-sf-muted block mb-1.5">Custom Logo Image URL</label><input id="set-logo-image" class="admin-input url-input" placeholder="https://your-logo.png"><p class="text-[11px] text-sf-muted mt-1.5 flex items-start gap-1.5"><i data-lucide="info" class="w-3 h-3 mt-0.5 flex-shrink-0 text-sf-muted/60"></i>Replaces icon + text entirely. Leave empty for default icon + text logo.</p></div>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="section-label"><span class="sl-dot"></span>Live Preview</div>
+                    <div id="logo-preview" class="bg-black/40 rounded-xl p-6 flex items-center justify-center min-h-[80px]"></div>
+                </div>
+            </div>
+
+            <!-- Theme Colors Tab -->
+            <div id="tab-theme" class="admin-tab-content hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Accent Color</div><p class="text-[11px] text-sf-muted mb-3">Primary brand color used for buttons, badges, highlights</p><div class="flex items-center gap-3"><input type="color" id="set-theme-accent" value="#E50914" class="color-pick" oninput="syncColorHex(this,'set-theme-accent-hex')"><input id="set-theme-accent-hex" class="admin-input font-mono text-xs flex-1" value="#E50914" oninput="syncColorPicker(this,'set-theme-accent')"></div></div>
+                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Background</div><p class="text-[11px] text-sf-muted mb-3">Main page background color</p><div class="flex items-center gap-3"><input type="color" id="set-theme-bg" value="#0a0a0f" class="color-pick" oninput="syncColorHex(this,'set-theme-bg-hex')"><input id="set-theme-bg-hex" class="admin-input font-mono text-xs flex-1" value="#0a0a0f" oninput="syncColorPicker(this,'set-theme-bg')"></div></div>
+                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Surface</div><p class="text-[11px] text-sf-muted mb-3">Cards, modals, elevated elements</p><div class="flex items-center gap-3"><input type="color" id="set-theme-surface" value="#12121a" class="color-pick" oninput="syncColorHex(this,'set-theme-surface-hex')"><input id="set-theme-surface-hex" class="admin-input font-mono text-xs flex-1" value="#12121a" oninput="syncColorPicker(this,'set-theme-surface')"></div></div>
+                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Card Background</div><p class="text-[11px] text-sf-muted mb-3">Individual card & tile backgrounds</p><div class="flex items-center gap-3"><input type="color" id="set-theme-card" value="#16161f" class="color-pick" oninput="syncColorHex(this,'set-theme-card-hex')"><input id="set-theme-card-hex" class="admin-input font-mono text-xs flex-1" value="#16161f" oninput="syncColorPicker(this,'set-theme-card')"></div></div>
+                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Border Color</div><p class="text-[11px] text-sf-muted mb-3">Subtle borders and dividers</p><div class="flex items-center gap-3"><input type="color" id="set-theme-border" value="#1e1e2a" class="color-pick" oninput="syncColorHex(this,'set-theme-border-hex')"><input id="set-theme-border-hex" class="admin-input font-mono text-xs flex-1" value="#1e1e2a" oninput="syncColorPicker(this,'set-theme-border')"></div></div>
+                    <div class="admin-card flex flex-col justify-between"><div class="section-label"><span class="sl-dot"></span>Presets</div><p class="text-[11px] text-sf-muted mb-3">Quick color scheme presets</p><div class="flex flex-wrap gap-2">
+                        <button onclick="applyPreset('default')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Default Red</button>
+                        <button onclick="applyPreset('ocean')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Ocean Blue</button>
+                        <button onclick="applyPreset('forest')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Forest Green</button>
+                        <button onclick="applyPreset('purple')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Royal Purple</button>
+                        <button onclick="applyPreset('gold')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Gold Premium</button>
+                        <button onclick="applyPreset('midnight')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Midnight</button>
+                    </div></div>
+                </div>
+                <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Color Preview</div><div id="theme-preview" class="flex flex-wrap gap-3"></div></div>
+            </div>
+
+            <!-- Homepage Sections Tab -->
+            <div id="tab-homepage" class="admin-tab-content hidden">
+                <div class="admin-section">
+                    <div class="section-label"><span class="sl-dot"></span>Section Visibility</div>
+                    <div class="setting-row"><span class="setting-label">Genre Filter Bar<small>The horizontal genre chips below the hero</small></span><label class="toggle"><input type="checkbox" id="set-hp-genrefilter" checked><span class="toggle-track"></span></label></div>
+                    <div class="setting-row"><span class="setting-label">Top 10 Section<small>The ranked Top 10 movies row</small></span><label class="toggle"><input type="checkbox" id="set-hp-top10" checked><span class="toggle-track"></span></label></div>
+                    <div class="setting-row"><span class="setting-label">Browse by Genre Grid<small>The genre image tiles at the bottom</small></span><label class="toggle"><input type="checkbox" id="set-hp-genregrid" checked><span class="toggle-track"></span></label></div>
+                </div>
+                <div class="admin-section">
+                    <div class="section-label"><span class="sl-dot"></span>Custom Headings</div>
+                    <div class="mb-3"><label class="text-xs text-sf-muted block mb-1.5">Top 10 Heading <span class="text-sf-muted/50">(leave empty for default)</span></label><input id="set-hp-top10heading" class="admin-input" placeholder="TOP 10 in Your Country Today"></div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre Grid Heading <span class="text-sf-muted/50">(leave empty for default)</span></label><input id="set-hp-genreheading" class="admin-input" placeholder="Browse by Genre"></div>
+                </div>
+                <div class="admin-section">
+                    <div class="section-label"><span class="sl-dot"></span>Content Row Visibility</div>
+                    <p class="text-xs text-sf-muted mb-3">Toggle individual content rows on or off</p>
+                    <div id="hp-rows-toggles" class="space-y-1"></div>
+                </div>
+            </div>
+
+            <!-- Header & Footer Tab -->
+            <div id="tab-headerfooter" class="admin-tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <div class="admin-section">
+                            <div class="section-label"><span class="sl-dot"></span>Header Controls</div>
+                            <div class="setting-row"><span class="setting-label">Navigation Links</span><label class="toggle"><input type="checkbox" id="set-hf-nav" checked><span class="toggle-track"></span></label></div>
+                            <div class="setting-row"><span class="setting-label">Search Icon</span><label class="toggle"><input type="checkbox" id="set-hf-search" checked><span class="toggle-track"></span></label></div>
+                            <div class="setting-row"><span class="setting-label">Profile Avatar</span><label class="toggle"><input type="checkbox" id="set-hf-profile" checked><span class="toggle-track"></span></label></div>
+                        </div>
+                        <div class="admin-section">
+                            <div class="section-label"><span class="sl-dot"></span>Navigation Links</div>
+                            <p class="text-xs text-sf-muted mb-3">Edit text and set the active page</p>
+                            <div id="hf-nav-links-editor"></div>
+                            <button onclick="addNavLink()" class="admin-btn-secondary text-[11px] py-1.5 px-3 mt-2 flex items-center gap-1.5"><i data-lucide="plus" class="w-3 h-3"></i> Add Link</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="admin-section">
+                            <div class="section-label"><span class="sl-dot"></span>Footer Controls</div>
+                            <div class="setting-row"><span class="setting-label">Show Footer Entirely</span><label class="toggle"><input type="checkbox" id="set-hf-footer" checked><span class="toggle-track"></span></label></div>
+                            <div class="setting-row"><span class="setting-label">Social Media Icons</span><label class="toggle"><input type="checkbox" id="set-hf-social" checked><span class="toggle-track"></span></label></div>
+                            <div class="setting-row"><span class="setting-label">Footer Link Columns</span><label class="toggle"><input type="checkbox" id="set-hf-footerlinks" checked><span class="toggle-track"></span></label></div>
+                            <div class="setting-row"><span class="setting-label">Service Code Button</span><label class="toggle"><input type="checkbox" id="set-hf-servicecode" checked><span class="toggle-track"></span></label></div>
+                        </div>
+                        <div class="admin-section">
+                            <div class="section-label"><span class="sl-dot"></span>Footer Text</div>
+                            <div class="mb-3"><label class="text-xs text-sf-muted block mb-1.5">Copyright Text</label><input id="set-hf-copyright" class="admin-input" placeholder="© 2024 StreamFlix. All rights reserved."></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -218,38 +356,20 @@
                 <button onclick="closeMovieEditor()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="space-y-4">
-                <!-- Embed URL — Required, Prominent -->
                 <div>
-                    <label class="text-xs font-semibold text-sf-red flex items-center gap-1.5 mb-1.5">
-                        <i data-lucide="link" class="w-3.5 h-3.5"></i>
-                        Streaming Embed URL <span class="text-[9px] bg-sf-red/20 px-1.5 py-0.5 rounded font-bold tracking-wider">REQUIRED</span>
-                    </label>
-                    <div class="relative">
-                        <input id="ed-embed" type="url" class="admin-input url-input" placeholder="https://abyss.to/embed/...">
-                        <button onclick="testEmbed()" class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-sf-muted hover:text-green-400 bg-white/5 hover:bg-green-500/10 px-2 py-1.5 rounded-lg transition-all border border-white/5" title="Test embed in new tab">
-                            <i data-lucide="external-link" class="w-3 h-3"></i>
-                            <span class="hidden sm:inline">Test</span>
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-sf-muted mt-1.5 flex items-start gap-1.5">
-                        <i data-lucide="info" class="w-3 h-3 mt-0.5 flex-shrink-0 text-sf-muted/60"></i>
-                        Paste the full Abyss.to embed URL. Movies without a URL will show as unavailable.
-                    </p>
+                    <label class="text-xs font-semibold text-sf-red flex items-center gap-1.5 mb-1.5"><i data-lucide="link" class="w-3.5 h-3.5"></i>Streaming Embed URL <span class="text-[9px] bg-sf-red/20 px-1.5 py-0.5 rounded font-bold tracking-wider">REQUIRED</span></label>
+                    <div class="relative"><input id="ed-embed" type="url" class="admin-input url-input" placeholder="https://abyss.to/embed/..."><button onclick="testEmbed()" class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-sf-muted hover:text-green-400 bg-white/5 hover:bg-green-500/10 px-2 py-1.5 rounded-lg transition-all border border-white/5" title="Test embed in new tab"><i data-lucide="external-link" class="w-3 h-3"></i><span class="hidden sm:inline">Test</span></button></div>
+                    <p class="text-[11px] text-sf-muted mt-1.5 flex items-start gap-1.5"><i data-lucide="info" class="w-3 h-3 mt-0.5 flex-shrink-0 text-sf-muted/60"></i>Paste the full Abyss.to embed URL. Movies without a URL will show as unavailable.</p>
                     <div id="embed-status" class="hidden mt-2"></div>
                 </div>
-
                 <div><label class="text-xs text-sf-muted block mb-1.5">Title</label><input id="ed-title" class="admin-input" placeholder="Movie title"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre</label>
-                        <select id="ed-genre" class="admin-input"><option value="action">Action</option><option value="thriller">Thriller</option><option value="scifi">Sci-Fi</option><option value="drama">Drama</option><option value="comedy">Comedy</option><option value="horror">Horror</option><option value="romance">Romance</option><option value="documentary">Documentary</option></select>
-                    </div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre</label><select id="ed-genre" class="admin-input"><option value="action">Action</option><option value="thriller">Thriller</option><option value="scifi">Sci-Fi</option><option value="drama">Drama</option><option value="comedy">Comedy</option><option value="horror">Horror</option><option value="romance">Romance</option><option value="documentary">Documentary</option></select></div>
                     <div><label class="text-xs text-sf-muted block mb-1.5">Year</label><input id="ed-year" type="number" class="admin-input" placeholder="2024"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-xs text-sf-muted block mb-1.5">Duration</label><input id="ed-duration" class="admin-input" placeholder="2h 15m"></div>
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Maturity</label>
-                        <select id="ed-maturity" class="admin-input"><option value="TV-G">TV-G</option><option value="TV-PG">TV-PG</option><option value="PG">PG</option><option value="PG-13">PG-13</option><option value="TV-14">TV-14</option><option value="TV-MA">TV-MA</option><option value="R">R</option></select>
-                    </div>
+                    <div><label class="text-xs text-sf-muted block mb-1.5">Maturity</label><select id="ed-maturity" class="admin-input"><option value="TV-G">TV-G</option><option value="TV-PG">TV-PG</option><option value="PG">PG</option><option value="PG-13">PG-13</option><option value="TV-14">TV-14</option><option value="TV-MA">TV-MA</option><option value="R">R</option></select></div>
                 </div>
                 <div><label class="text-xs text-sf-muted block mb-1.5">Description</label><textarea id="ed-desc" rows="3" class="admin-input" placeholder="Movie description..."></textarea></div>
                 <div><label class="text-xs text-sf-muted block mb-1.5">Cast</label><input id="ed-cast" class="admin-input" placeholder="Actor 1, Actor 2, Actor 3"></div>
@@ -257,10 +377,7 @@
                     <div><label class="text-xs text-sf-muted block mb-1.5">Image Seed</label><input id="ed-img" class="admin-input" placeholder="my-movie-poster"><p class="text-[10px] text-sf-muted mt-1">For poster images</p></div>
                     <div><label class="text-xs text-sf-muted block mb-1.5">Banner Seed</label><input id="ed-banner" class="admin-input" placeholder="my-movie-banner"><p class="text-[10px] text-sf-muted mt-1">For hero & modal bg</p></div>
                 </div>
-                <div class="flex items-center gap-3 pt-2">
-                    <button onclick="saveMovieEdits()" class="admin-btn flex-1">Save Movie</button>
-                    <button onclick="closeMovieEditor()" class="admin-btn-secondary">Cancel</button>
-                </div>
+                <div class="flex items-center gap-3 pt-2"><button onclick="saveMovieEdits()" class="admin-btn flex-1">Save Movie</button><button onclick="closeMovieEditor()" class="admin-btn-secondary">Cancel</button></div>
             </div>
         </div>
     </div>
@@ -271,11 +388,11 @@
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
         <div class="flex items-center justify-between h-16 lg:h-20">
             <div class="flex items-center gap-6 lg:gap-10">
-                <a href="#" class="flex items-center gap-2.5 group" onclick="logoClick(event)">
+                <a href="#" id="navbar-logo" class="flex items-center gap-2.5 group" onclick="logoClick(event)">
                     <div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500"><i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i></div>
                     <span class="text-xl font-bold tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
                 </a>
-                <div class="hidden lg:flex items-center gap-0.5">
+                <div id="nav-links" class="hidden lg:flex items-center gap-0.5">
                     <a href="#" class="px-3.5 py-2 text-[13px] font-medium text-white relative">Home<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span></a>
                     <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">TV Shows</a>
                     <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">Movies</a>
@@ -293,7 +410,7 @@
                         <button onclick="closeSearch()" class="absolute right-3 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>
                 </div>
-                <div class="avatar-ring cursor-pointer hover:shadow-lg hover:shadow-sf-red/20 transition-shadow duration-500">
+                <div id="profile-avatar" class="avatar-ring cursor-pointer hover:shadow-lg hover:shadow-sf-red/20 transition-shadow duration-500">
                     <div class="w-8 h-8 rounded-[8px] overflow-hidden bg-sf-surface"><img src="https://picsum.photos/seed/avatar-user-stream/80/80.jpg" alt="Profile" class="w-full h-full object-cover"></div>
                 </div>
             </div>
@@ -308,8 +425,8 @@
 <div id="mobile-menu" class="fixed inset-0 z-[90] hidden">
     <div class="absolute inset-0 bg-black/85" onclick="closeMobileMenu()"></div>
     <div class="absolute left-0 top-0 bottom-0 w-72 bg-sf-dark/98 border-r border-white/5 p-6 animate-slide-up backdrop-blur-xl">
-        <div class="flex items-center justify-between mb-8"><span class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span><button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-        <div class="flex flex-col gap-1">
+        <div class="flex items-center justify-between mb-8"><span id="mobile-logo-text" class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span><button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+        <div id="mobile-nav-links" class="flex flex-col gap-1">
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-white bg-white/5 rounded-xl"><i data-lucide="home" class="w-5 h-5 text-sf-red"></i> Home</a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="tv" class="w-5 h-5"></i> TV Shows</a>
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="film" class="w-5 h-5"></i> Movies</a>
@@ -334,7 +451,7 @@
 
 <!-- Main Content -->
 <main class="relative z-10 -mt-12 sm:-mt-16">
-    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10">
+    <section id="genre-filter-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10">
         <div class="flex items-center gap-2 overflow-x-auto pb-2 row-scroll">
             <button class="genre-chip active whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] font-medium" onclick="filterGenre(this,'all')">All</button>
             <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'action')">Action</button>
@@ -348,34 +465,34 @@
         </div>
     </section>
     <div id="content-rows"></div>
-    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
-        <h2 class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2>
+    <section id="top10-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
+        <h2 id="top10-heading" class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2>
         <div class="row-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4"><div id="top10-container" class="flex gap-3 sm:gap-4"></div></div>
     </section>
-    <section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-20">
-        <h2 class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2>
+    <section id="genre-grid-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-20">
+        <h2 id="genre-grid-heading" class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="genre-grid"></div>
     </section>
 </main>
 
 <!-- Footer -->
-<footer class="border-t border-white/5 relative overflow-hidden">
+<footer id="footer-el" class="border-t border-white/5 relative overflow-hidden">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-sf-red/3 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-14 relative z-10">
-        <div class="flex items-center gap-5 mb-10">
+        <div id="footer-social" class="flex items-center gap-5 mb-10">
             <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="facebook" class="w-4 h-4"></i></a>
             <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="instagram" class="w-4 h-4"></i></a>
             <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="twitter" class="w-4 h-4"></i></a>
             <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="youtube" class="w-4 h-4"></i></a>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+        <div id="footer-links" class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
             <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Audio Description</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Investor Relations</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Legal Notices</a></div>
             <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Help Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Jobs</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Cookie Preferences</a></div>
             <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Gift Cards</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Terms of Use</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Corporate Information</a></div>
             <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Media Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Privacy</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Contact Us</a></div>
         </div>
-        <button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300 mb-5">Service Code</button>
-        <p class="text-[11px] text-white/20">&copy; 2024 StreamFlix. All rights reserved.</p>
+        <div id="footer-service-code"><button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300 mb-5">Service Code</button></div>
+        <p id="footer-copyright" class="text-[11px] text-white/20">&copy; 2024 StreamFlix. All rights reserved.</p>
     </div>
 </footer>
 
@@ -396,6 +513,118 @@ var myList = new Set();
 var currentHero = 0;
 var heroInterval = null;
 
+/* ============================================================
+   SETTINGS SYSTEM
+   ============================================================ */
+var ST;
+function getDefaultSettings(){
+    return {
+        logo:{text:"Stream",accent:"Flix",icon:"play",imageUrl:""},
+        theme:{accent:"#E50914",bg:"#0a0a0f",surface:"#12121a",card:"#16161f",border:"#1e1e2a"},
+        hero:{customBanners:{}},
+        homepage:{showGenreFilter:true,showTop10:true,showGenreGrid:true,top10Heading:"",genreGridHeading:"",hiddenRows:[]},
+        header:{showNav:true,showSearch:true,showProfile:true,links:[
+            {text:"Home",active:true},{text:"TV Shows",active:false},{text:"Movies",active:false},{text:"New & Popular",active:false},{text:"My List",active:false}
+        ]},
+        footer:{show:true,showSocial:true,showLinks:true,copyright:"© 2024 StreamFlix. All rights reserved.",showServiceCode:true}
+    };
+}
+function loadSettings(){try{var s=localStorage.getItem('streamflix_settings');if(s){ST=JSON.parse(s);var d=getDefaultSettings();Object.keys(d).forEach(function(k){if(!ST[k])ST[k]=d[k];});if(!ST.homepage)ST.homepage=d.homepage;if(!ST.homepage.hiddenRows)ST.homepage.hiddenRows=[];return;}}catch(e){}ST=getDefaultSettings();}
+function saveSettings(){localStorage.setItem('streamflix_settings',JSON.stringify(ST));}
+function hexToRgb(h){h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];var r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return r+', '+g+', '+b;}
+
+var navIconMap={"home":"home","tv shows":"tv","movies":"film","new & popular":"trending-up","my list":"heart","trending":"trending-up","new":"trending-up","popular":"trending-up","list":"heart","settings":"settings","profile":"user","help":"help-circle"};
+
+function applyTheme(){
+    var t=ST.theme,a=t.accent,ar=hexToRgb(a),bg=t.bg,sf=t.surface,cd=t.card,bd=t.border;
+    var ds=document.getElementById('dynamic-theme');
+    ds.textContent=
+    ':root{--accent:'+a+';--accent-rgb:'+ar+';--bg:'+bg+';--surface:'+sf+';--card:'+cd+';--border-c:'+bd+';}'+
+    'body{background:'+bg+'!important;}'+
+    '.bg-sf-red{background-color:'+a+'!important;}'+
+    '.bg-sf-red\\/90{background-color:rgba('+ar+',0.9)!important;}'+
+    '.bg-sf-red\\/20{background-color:rgba('+ar+',0.2)!important;}'+
+    '.bg-sf-red\\/15{background-color:rgba('+ar+',0.15)!important;}'+
+    '.bg-sf-red\\/5{background-color:rgba('+ar+',0.05)!important;}'+
+    '.bg-sf-red\\/3{background-color:rgba('+ar+',0.03)!important;}'+
+    '.text-sf-red{color:'+a+'!important;}'+
+    '.bg-sf-dark{background-color:'+bg+'!important;}'+
+    '.bg-sf-surface{background-color:'+sf+'!important;}'+
+    '.bg-sf-card{background-color:'+cd+'!important;}'+
+    '.border-sf-border{border-color:'+bd+'!important;}'+
+    '.border-sf-red\\/40{border-color:rgba('+ar+',0.4)!important;}'+
+    '.shadow-sf-red\\/20{--tw-shadow-color:rgba('+ar+',0.2)!important;}'+
+    '.shadow-sf-red\\/25{--tw-shadow-color:rgba('+ar+',0.25)!important;}'+
+    '.shadow-sf-red\\/30{--tw-shadow-color:rgba('+ar+',0.3)!important;}'+
+    '.shadow-sf-red\\/40{--tw-shadow-color:rgba('+ar+',0.4)!important;}'+
+    '.play-btn-glow{box-shadow:0 0 30px rgba('+ar+',0.3),0 0 60px rgba('+ar+',0.1)!important;}'+
+    '.play-btn-glow:hover{box-shadow:0 0 40px rgba('+ar+',0.5),0 0 80px rgba('+ar+',0.2)!important;}'+
+    '.genre-chip:hover,.genre-chip.active{background:'+a+'!important;border-color:'+a+'!important;box-shadow:0 2px 16px rgba('+ar+',0.25)!important;}'+
+    '.genre-chip:hover{box-shadow:0 4px 20px rgba('+ar+',0.3)!important;}'+
+    '.scroll-arrow:hover{background:rgba('+ar+',0.95)!important;box-shadow:0 4px 24px rgba('+ar+',0.4)!important;}'+
+    '.row-title::after{background:'+a+'!important;}'+
+    '.avatar-ring{background:conic-gradient(from 0deg,'+a+',#ff6b6b,'+a+')!important;}'+
+    '.admin-btn{background:'+a+'!important;}'+
+    '.admin-btn:hover{box-shadow:0 4px 20px rgba('+ar+',0.3)!important;}'+
+    '.toggle input:checked+.toggle-track{background:rgba('+ar+',0.2)!important;border-color:rgba('+ar+',0.4)!important;}'+
+    '.toggle input:checked+.toggle-track::before{background:'+a+'!important;}'+
+    '.section-label .sl-dot{background:'+a+'!important;}'+
+    '.top10-number{-webkit-text-stroke-color:rgba('+ar+',0.25)!important;filter:drop-shadow(0 0 30px rgba('+ar+',0.1))!important;}'+
+    '#footer-el .absolute{background:rgba('+ar+',0.03)!important;}'+
+    '.search-input:focus{border-color:rgba('+ar+',0.4)!important;}';
+}
+
+function applyLayoutSettings(){
+    var gf=document.getElementById('genre-filter-section');if(gf)gf.style.display=ST.homepage.showGenreFilter?'':'none';
+    var t10=document.getElementById('top10-section');if(t10)t10.style.display=ST.homepage.showTop10?'':'none';
+    var gg=document.getElementById('genre-grid-section');if(gg)gg.style.display=ST.homepage.showGenreGrid?'':'none';
+    var secs=document.querySelectorAll('#content-rows > section');
+    secs.forEach(function(s,i){s.style.display=ST.homepage.hiddenRows.indexOf(i)!==-1?'none':'';});
+    var nl=document.getElementById('nav-links');if(nl)nl.style.display=ST.header.showNav?'':'none';
+    var sw=document.getElementById('search-wrapper');if(sw)sw.style.display=ST.header.showSearch?'':'none';
+    var pa=document.getElementById('profile-avatar');if(pa)pa.style.display=ST.header.showProfile?'':'none';
+    var ft=document.getElementById('footer-el');if(ft)ft.style.display=ST.footer.show?'':'none';
+    var fs=document.getElementById('footer-social');if(fs)fs.style.display=ST.footer.showSocial?'':'none';
+    var fl=document.getElementById('footer-links');if(fl)fl.style.display=ST.footer.showLinks?'':'none';
+    var fsc=document.getElementById('footer-service-code');if(fsc)fsc.style.display=ST.footer.showServiceCode?'':'none';
+    var fc=document.getElementById('footer-copyright');if(fc)fc.textContent=ST.footer.copyright;
+}
+
+function renderLogo(){
+    var el=document.getElementById('navbar-logo');
+    if(ST.logo.imageUrl){
+        el.innerHTML='<img src="'+esc(ST.logo.imageUrl)+'" class="h-9 w-auto object-contain rounded-lg" alt="Logo">';
+    } else {
+        el.innerHTML='<div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500"><i data-lucide="'+ST.logo.icon+'" class="w-4 h-4 text-white fill-white ml-0.5"></i></div><span class="text-xl font-bold tracking-tight">'+esc(ST.logo.text)+'<span class="text-sf-red">'+esc(ST.logo.accent)+'</span></span>';
+    }
+    var mt=document.getElementById('mobile-logo-text');
+    if(mt)mt.innerHTML=esc(ST.logo.text)+'<span class="text-sf-red">'+esc(ST.logo.accent)+'</span>';
+}
+
+function getNavIcon(text){var t=text.toLowerCase().trim();for(var k in navIconMap){if(t.indexOf(k)!==-1)return navIconMap[k];}return'link';}
+
+function renderNav(){
+    var nl=document.getElementById('nav-links');
+    nl.innerHTML=ST.header.links.map(function(l,i){
+        return '<a href="#" class="px-3.5 py-2 text-[13px] '+(l.active?'font-medium text-white relative':'font-light text-sf-muted hover:text-white')+' transition-colors duration-300">'+esc(l.text)+(l.active?'<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span>':'')+'</a>';
+    }).join('');
+    var mnl=document.getElementById('mobile-nav-links');
+    mnl.innerHTML=ST.header.links.map(function(l){
+        var ic=getNavIcon(l.text);
+        return '<a href="#" class="flex items-center gap-3 px-4 py-3 text-sm '+(l.active?'font-medium text-white bg-white/5':'text-sf-muted hover:text-white hover:bg-white/5')+' rounded-xl transition-colors"><i data-lucide="'+ic+'" class="w-5 h-5'+(l.active?' text-sf-red':'')+'"></i> '+esc(l.text)+'</a>';
+    }).join('');
+}
+
+function renderHeadings(){
+    var th=document.getElementById('top10-heading');
+    if(ST.homepage.top10Heading){th.innerHTML='<span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>'+esc(ST.homepage.top10Heading);}
+    var gh=document.getElementById('genre-grid-heading');
+    if(ST.homepage.genreGridHeading)gh.textContent=ST.homepage.genreGridHeading;
+}
+
+/* ============================================================
+   DATA
+   ============================================================ */
 function getDefaultData() {
     return {
         movies:[
@@ -446,207 +675,53 @@ var SD;
 function loadSiteData(){try{var s=localStorage.getItem('streamflix_data');if(s){SD=JSON.parse(s);SD.movies.forEach(function(m){if(m.embedUrl===undefined)m.embedUrl='';});return}}catch(e){}SD=getDefaultData();}
 function saveSiteData(){localStorage.setItem('streamflix_data',JSON.stringify(SD));}
 function getMovie(id){return SD.movies.find(function(m){return m.id===id});}
-function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function hasStream(m){return m&&m.embedUrl&&m.embedUrl.trim().length>0;}
 
 /* ============================================================
-   STREAMING
+   STREAMING (UNCHANGED)
    ============================================================ */
 function playStream(id){
-    var m=getMovie(id);if(!m)return;
-    currentStreamId=id;
+    var m=getMovie(id);if(!m)return;currentStreamId=id;
     var sm=document.getElementById('stream-modal');sm.classList.remove('hidden');document.body.style.overflow='hidden';
     document.getElementById('stream-title').textContent=m.title;
     document.getElementById('stream-loading').classList.remove('hidden');document.getElementById('stream-loading').style.display='';
     document.getElementById('stream-error').classList.add('hidden');document.getElementById('stream-error').style.display='none';
     document.getElementById('stream-iframe').src='';
-
-    if(!hasStream(m)){
-        document.getElementById('stream-loading').style.display='none';
-        document.getElementById('stream-error').classList.remove('hidden');document.getElementById('stream-error').style.display='';
-        lucide.createIcons();return;
-    }
-    setTimeout(function(){
-        var iframe=document.getElementById('stream-iframe');iframe.src=m.embedUrl.trim();
-        if(streamLoadTimeout)clearTimeout(streamLoadTimeout);
-        streamLoadTimeout=setTimeout(function(){document.getElementById('stream-loading').style.display='none';},3000);
-        iframe.onload=function(){if(streamLoadTimeout)clearTimeout(streamLoadTimeout);document.getElementById('stream-loading').style.display='none';};
-    },400);
+    if(!hasStream(m)){document.getElementById('stream-loading').style.display='none';document.getElementById('stream-error').classList.remove('hidden');document.getElementById('stream-error').style.display='';lucide.createIcons();return;}
+    setTimeout(function(){var iframe=document.getElementById('stream-iframe');iframe.src=m.embedUrl.trim();if(streamLoadTimeout)clearTimeout(streamLoadTimeout);streamLoadTimeout=setTimeout(function(){document.getElementById('stream-loading').style.display='none';},3000);iframe.onload=function(){if(streamLoadTimeout)clearTimeout(streamLoadTimeout);document.getElementById('stream-loading').style.display='none';};},400);
     lucide.createIcons();
 }
-
-function closeStream(){
-    document.getElementById('stream-modal').classList.add('hidden');document.getElementById('stream-iframe').src='';
-    if(streamLoadTimeout)clearTimeout(streamLoadTimeout);
-    if(document.getElementById('modal').classList.contains('hidden')&&document.getElementById('admin-panel').classList.contains('hidden')&&document.getElementById('movie-editor').classList.contains('hidden'))document.body.style.overflow='';
-}
-
-function testEmbed(){
-    var url=document.getElementById('ed-embed').value.trim();
-    if(!url){showToast('Enter a URL first');return;}
-    window.open(url,'_blank');
-}
+function closeStream(){document.getElementById('stream-modal').classList.add('hidden');document.getElementById('stream-iframe').src='';if(streamLoadTimeout)clearTimeout(streamLoadTimeout);if(document.getElementById('modal').classList.contains('hidden')&&document.getElementById('admin-panel').classList.contains('hidden')&&document.getElementById('movie-editor').classList.contains('hidden'))document.body.style.overflow='';}
+function testEmbed(){var url=document.getElementById('ed-embed').value.trim();if(!url){showToast('Enter a URL first');return;}window.open(url,'_blank');}
 
 /* ============================================================
-   EMBED URL VALIDATION (live feedback)
+   EMBED VALIDATION (UNCHANGED)
    ============================================================ */
-document.addEventListener('input',function(e){
-    if(e.target.id!=='ed-embed')return;
-    var val=e.target.value.trim();
-    var st=document.getElementById('embed-status');
-    if(!val){st.classList.add('hidden');e.target.style.borderColor='#1e1e2a';return;}
-    try{new URL(val);st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-green-400"><i data-lucide="check-circle" class="w-3 h-3"></i>Valid URL format</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(34,197,94,0.4)';lucide.createIcons();}
-    catch(err){st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-red-400"><i data-lucide="x-circle" class="w-3 h-3"></i>Invalid URL format</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(239,68,68,0.4)';lucide.createIcons();}
-});
+document.addEventListener('input',function(e){if(e.target.id!=='ed-embed')return;var val=e.target.value.trim(),st=document.getElementById('embed-status');if(!val){st.classList.add('hidden');e.target.style.borderColor='#1e1e2a';return;}try{new URL(val);st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-green-400"><i data-lucide="check-circle" class="w-3 h-3"></i>Valid URL format</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(34,197,94,0.4)';lucide.createIcons();}catch(err){st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-red-400"><i data-lucide="x-circle" class="w-3 h-3"></i>Invalid URL format</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(239,68,68,0.4)';lucide.createIcons();}});
 
 /* ============================================================
-   CARD RENDERING
+   CARD RENDERING (UNCHANGED)
    ============================================================ */
-function createCard(m){
-    var hs=hasStream(m);
-    return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer rounded-xl overflow-hidden relative" onclick="openModal('+m.id+')"><div class="relative aspect-[2/3] bg-sf-card rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy">'+
-    (hs?'<div class="absolute top-2 right-2 w-5 h-5 bg-sf-red/90 rounded-md flex items-center justify-center z-10 shadow-md"><i data-lucide="play" class="w-2.5 h-2.5 text-white fill-white ml-0.5"></i></div>':'')+
-    '<div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5">'+
-    '<button onclick="event.stopPropagation();'+(hs?'playStream('+m.id+')':'showToast(\'No stream URL set\')')+'" class="w-7 h-7 '+(hs?'bg-white':'bg-white/30')+' rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button>'+
-    '<button onclick="event.stopPropagation();toggleMyList('+m.id+')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(m.id)?'check':'plus')+'" class="w-3 h-3"></i></button>'+
-    '<button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div>'+
-    '<p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+m.title+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span><span class="text-[9px] text-slate-500">'+m.duration+'</span></div></div></div></div>';
-}
-
+function createCard(m){var hs=hasStream(m);return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer rounded-xl overflow-hidden relative" onclick="openModal('+m.id+')"><div class="relative aspect-[2/3] bg-sf-card rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy">'+(hs?'<div class="absolute top-2 right-2 w-5 h-5 bg-sf-red/90 rounded-md flex items-center justify-center z-10 shadow-md"><i data-lucide="play" class="w-2.5 h-2.5 text-white fill-white ml-0.5"></i></div>':'')+'<div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5"><button onclick="event.stopPropagation();'+(hs?'playStream('+m.id+')':'showToast(\'No stream URL set\')')+'" class="w-7 h-7 '+(hs?'bg-white':'bg-white/30')+' rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button><button onclick="event.stopPropagation();toggleMyList('+m.id+')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(m.id)?'check':'plus')+'" class="w-3 h-3"></i></button><button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div><p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+m.title+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span><span class="text-[9px] text-slate-500">'+m.duration+'</span></div></div></div></div>';}
 function createTop10Card(m,r){return '<div class="flex-shrink-0 flex items-end cursor-pointer group" onclick="openModal('+m.id+')"><span class="top10-number mr-[-14px] relative z-10 select-none">'+r+'</span><div class="w-[110px] sm:w-[135px] lg:w-[155px] rounded-xl overflow-hidden relative card-hover"><div class="aspect-[2/3] bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy"></div></div></div>';}
 
 /* ============================================================
    RENDER FUNCTIONS
    ============================================================ */
-function renderAll(){renderHero();renderRows();renderTop10();renderGenreGrid();lucide.createIcons();}
+function renderAll(){applyTheme();renderLogo();renderNav();renderHeadings();renderHero();renderRows();renderTop10();renderGenreGrid();applyLayoutSettings();lucide.createIcons();}
 
 function renderHero(){
     var hm=SD.heroIds.map(getMovie).filter(Boolean);if(!hm.length)return;if(currentHero>=hm.length)currentHero=0;
     var m=hm[currentHero],hs=hasStream(m);
-    document.getElementById('hero-bg').innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';
+    var bannerSrc=ST.hero.customBanners[m.id]||('https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg');
+    document.getElementById('hero-bg').innerHTML='<img src="'+esc(bannerSrc)+'" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';
     var tH=m.title;if(m.title.length>16){var w=m.title.split(' '),mid=Math.ceil(w.length/2);tH=w.slice(0,mid).join(' ')+'<br>'+w.slice(mid).join(' ');}
-    document.getElementById('hero-content').innerHTML=
-    '<div class="flex items-center gap-3 mb-5"><span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg shadow-sf-red/25">StreamFlix Original</span><span class="text-sf-muted text-sm font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-sm font-light">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</span>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Streaming</span>':'')+'</div>'+
-    '<h1 class="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow:0 8px 60px rgba(0,0,0,0.6);">'+tH+'</h1>'+
-    '<div class="flex items-center gap-2.5 mb-5 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-xs font-medium tracking-wider">4K</span><span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HDR</span></div>'+
-    '<p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">'+m.desc+'</p>'+
-    '<div class="flex items-center gap-3 flex-wrap"><button onclick="'+(hs?'playStream('+m.id+')':'showToast(\'No stream available\')')+'" class="play-btn-glow flex items-center gap-2.5 '+(hs?'bg-sf-red text-white':'bg-white/30 text-white/50 cursor-not-allowed')+' font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"><i data-lucide="play" class="w-5 h-5 fill-white"></i> '+(hs?'Play Now':'Unavailable')+'</button><button onclick="openModal('+m.id+')" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5"><i data-lucide="info" class="w-5 h-5"></i> More Info</button><button onclick="toggleMyList('+m.id+')" class="p-3.5 rounded-xl border border-white/15 hover:border-white/40 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm"><i data-lucide="plus" class="w-5 h-5"></i></button></div>';
+    document.getElementById('hero-content').innerHTML='<div class="flex items-center gap-3 mb-5"><span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg shadow-sf-red/25">StreamFlix Original</span><span class="text-sf-muted text-sm font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-sm font-light">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</span>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Streaming</span>':'')+'</div><h1 class="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow:0 8px 60px rgba(0,0,0,0.6);">'+tH+'</h1><div class="flex items-center gap-2.5 mb-5 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-xs font-medium tracking-wider">4K</span><span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HDR</span></div><p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">'+m.desc+'</p><div class="flex items-center gap-3 flex-wrap"><button onclick="'+(hs?'playStream('+m.id+')':'showToast(\'No stream available\')')+'" class="play-btn-glow flex items-center gap-2.5 '+(hs?'bg-sf-red text-white':'bg-white/30 text-white/50 cursor-not-allowed')+' font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"><i data-lucide="play" class="w-5 h-5 fill-white"></i> '+(hs?'Play Now':'Unavailable')+'</button><button onclick="openModal('+m.id+')" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5"><i data-lucide="info" class="w-5 h-5"></i> More Info</button><button onclick="toggleMyList('+m.id+')" class="p-3.5 rounded-xl border border-white/15 hover:border-white/40 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm"><i data-lucide="plus" class="w-5 h-5"></i></button></div>';
     var dots='';for(var i=0;i<hm.length;i++)dots+='<button class="hero-dot '+(i===currentHero?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500" onclick="changeHero('+i+')"></button>';
     document.getElementById('hero-dots').innerHTML=dots;
 }
-
-function changeHero(i){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(i===currentHero||i>=hm.length)return;currentHero=i;var bg=document.getElementById('hero-bg');bg.style.opacity='0';setTimeout(function(){var m=hm[i];bg.innerHTML='<img src="https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity='1';},600);document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500';});}
+function changeHero(i){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(i===currentHero||i>=hm.length)return;currentHero=i;var bg=document.getElementById('hero-bg');bg.style.opacity='0';setTimeout(function(){var m=hm[i];var bannerSrc=ST.hero.customBanners[m.id]||('https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg');bg.innerHTML='<img src="'+esc(bannerSrc)+'" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity='1';},600);document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500';});}
 function startHeroAutoplay(){if(heroInterval)clearInterval(heroInterval);heroInterval=setInterval(function(){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(hm.length>1)changeHero((currentHero+1)%hm.length);},8000);}
-
 function renderRows(){document.getElementById('content-rows').innerHTML=SD.rows.map(function(r,ri){return '<section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-9 mb-3 row-container"><h2 class="row-title text-lg sm:text-xl font-semibold mb-5">'+r.title+'</h2><div class="relative group/row"><button onclick="scrollRow(\'row-'+ri+'\',-1)" class="scroll-arrow absolute left-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-r-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div id="row-'+ri+'" class="row-scroll flex gap-2.5 sm:gap-3 overflow-x-auto pb-4">'+r.ids.map(function(id){var m=getMovie(id);return m?createCard(m):'';}).join('')+'</div><button onclick="scrollRow(\'row-'+ri+'\',1)" class="scroll-arrow absolute right-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-l-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div></section>';}).join('');}
-function renderTop10(){document.getElementById('top10-container').innerHTML=SD.top10Ids.map(function(id,i){var m=getMovie(id);return m?createTop10Card(m,i+1):'';}).join('');}
-function renderGenreGrid(){document.getElementById('genre-grid').innerHTML=SD.genres.map(function(g,gi){return '<div class="genre-tile relative h-32 sm:h-36 rounded-2xl overflow-hidden cursor-pointer group" onclick="filterGenreByIndex('+(gi+1)+',\''+g.name.toLowerCase().replace(/[^a-z]/g,'')+'\')"><div class="genre-tile-img absolute inset-0"><img src="https://picsum.photos/seed/'+g.seed+'/600/300.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="absolute inset-0 bg-gradient-to-br '+g.gradient+'"></div><div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div><div class="absolute inset-0 flex items-center gap-3 px-5"><div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10"><i data-lucide="'+g.icon+'" class="w-5 h-5 text-white/80"></i></div><span class="text-base sm:text-lg font-semibold drop-shadow-lg">'+g.name+'</span></div><div class="absolute inset-0 border border-white/5 rounded-2xl group-hover:border-white/15 transition-colors duration-500"></div></div>';}).join('');}
-function scrollRow(id,d){var el=document.getElementById(id);if(el)el.scrollBy({left:d*el.clientWidth*0.75,behavior:'smooth'});}
-
-/* ============================================================
-   MOVIE DETAIL MODAL
-   ============================================================ */
-function openModal(id){
-    var m=getMovie(id);if(!m)return;var hs=hasStream(m);
-    var similar=SD.movies.filter(function(x){return x.genre===m.genre&&x.id!==id;}).slice(0,6);
-    document.getElementById('modal-content').innerHTML='<div class="relative"><div class="relative h-[280px] sm:h-[380px] lg:h-[420px]"><img src="https://picsum.photos/seed/'+m.banner+'/1200/600.jpg" alt="'+esc(m.title)+'" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-[#16161f] via-black/50 to-transparent"></div><button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-black/70 transition-colors border border-white/5"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute bottom-6 left-6 right-6"><h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5" style="text-shadow:0 4px 30px rgba(0,0,0,0.5);">'+m.title+'</h2><div class="flex items-center gap-3"><button onclick="'+(hs?'closeModal();playStream('+m.id+')':'showToast(\'No stream URL set\')')+'" class="play-btn-glow flex items-center gap-2 '+(hs?'bg-sf-red text-white':'bg-white/20 text-white/40 cursor-not-allowed')+' font-semibold text-sm px-7 py-3 rounded-xl transition-all shadow-xl '+(hs?'shadow-sf-red/20':'')+'"><i data-lucide="play" class="w-5 h-5 '+(hs?'fill-white':'')+'"></i> '+(hs?'Play':'Unavailable')+'</button><button onclick="toggleMyList('+id+');openModal('+id+')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="'+(myList.has(id)?'check':'plus')+'" class="w-5 h-5"></i></button><button onclick="showToast(\'Liked!\')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-5 h-5"></i></button></div></div></div><div class="bg-[#16161f] p-6 sm:p-8 rounded-b-2xl"><div class="flex flex-col sm:flex-row gap-6"><div class="flex-1"><div class="flex items-center gap-2.5 mb-4 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="border border-sf-muted/40 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HD</span>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Stream Ready</span>':'<span class="text-[10px] text-red-400/60 bg-red-500/5 border border-red-500/10 px-2 py-0.5 rounded-md">No Stream</span>')+'</div><p class="text-slate-400 text-sm font-light leading-[1.75] mb-4">'+m.desc+'</p>'+(hs?'<div class="flex items-center gap-2 text-[11px] text-sf-muted"><i data-lucide="link" class="w-3 h-3 flex-shrink-0"></i><span class="url-preview">'+esc(m.embedUrl)+'</span></div>':'')+'</div><div class="sm:w-52 space-y-3 text-sm border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6 pt-4 sm:pt-0"><div><span class="text-sf-muted text-xs">Cast</span><p class="text-slate-300 font-light mt-0.5">'+m.cast+'</p></div><div><span class="text-sf-muted text-xs">Genres</span><p class="text-slate-300 font-light mt-0.5">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</p></div></div></div>'+(similar.length>0?'<div class="mt-8 border-t border-white/5 pt-6"><h3 class="text-base font-semibold mb-4">More Like This</h3><div class="grid grid-cols-3 gap-2.5">'+similar.map(function(x){var xs=hasStream(x);return '<div class="rounded-xl overflow-hidden bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] hover:ring-1 hover:ring-white/10 transition-all duration-300" onclick="event.stopPropagation();openModal('+x.id+')"><div class="aspect-video relative"><img src="https://picsum.photos/seed/'+x.img+'/400/225.jpg" class="w-full h-full object-cover" loading="lazy">'+(xs?'<div class="absolute top-1.5 right-1.5 w-4 h-4 bg-sf-red/90 rounded flex items-center justify-center"><i data-lucide="play" class="w-2 h-2 text-white fill-white ml-px"></i></div>':'')+'</div><div class="p-2.5"><div class="flex items-center gap-1.5 mb-1"><span class="text-[9px] text-sf-muted">'+x.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+x.maturity+'</span></div><p class="text-[11px] font-medium line-clamp-1">'+x.title+'</p></div></div>';}).join('')+'</div></div>':'')+'</div></div>';
-    document.getElementById('modal').classList.remove('hidden');document.body.style.overflow='hidden';lucide.createIcons();
-}
-function closeModal(){document.getElementById('modal').classList.add('hidden');if(document.getElementById('stream-modal').classList.contains('hidden')&&document.getElementById('admin-panel').classList.contains('hidden')&&document.getElementById('movie-editor').classList.contains('hidden'))document.body.style.overflow='';}
-
-/* ============================================================
-   MY LIST, SEARCH, GENRE FILTER
-   ============================================================ */
-function toggleMyList(id){if(myList.has(id)){myList.delete(id);showToast('Removed from My List')}else{myList.add(id);showToast('Added to My List')}renderRows();renderTop10();lucide.createIcons();}
-function openSearch(){document.getElementById('search-closed').classList.add('hidden');var o=document.getElementById('search-open');o.classList.remove('hidden');o.classList.add('flex');document.getElementById('search-input').focus();}
-function closeSearch(){document.getElementById('search-closed').classList.remove('hidden');var o=document.getElementById('search-open');o.classList.add('hidden');o.classList.remove('flex');document.getElementById('search-input').value='';document.getElementById('search-results').classList.add('hidden');}
-function handleSearch(q){var res=document.getElementById('search-results'),ct=document.getElementById('search-results-content');if(q.length<2){res.classList.add('hidden');return;}var ql=q.toLowerCase();var f=SD.movies.filter(function(m){return m.title.toLowerCase().includes(ql)||m.genre.toLowerCase().includes(ql)||m.cast.toLowerCase().includes(ql);});ct.innerHTML=f.length===0?'<p class="text-sm text-sf-muted text-center py-6">No results for "'+q+'"</p>':f.map(function(m){var hs=hasStream(m);return '<div class="flex items-center gap-4 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors" onclick="closeSearch();openModal('+m.id+')"><div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-sf-card relative"><img src="https://picsum.photos/seed/'+m.img+'/160/240.jpg" class="w-full h-full object-cover" loading="lazy">'+(hs?'<div class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-sf-red/90 rounded flex items-center justify-center"><i data-lucide="play" class="w-1.5 h-1.5 text-white fill-white ml-px"></i></div>':'')+'</div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">'+m.title+'</p><div class="flex items-center gap-2 mt-1"><span class="text-xs text-sf-muted">'+m.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+m.maturity+'</span>'+(hs?'<span class="flex items-center gap-1 text-[9px] text-green-400"><span class="w-1 h-1 bg-green-400 rounded-full"></span>Stream</span>':'')+'</div><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+m.desc+'</p></div></div>';}).join('');res.classList.remove('hidden');}
-function filterGenre(btn,genre){document.querySelectorAll('.genre-chip').forEach(function(c){c.classList.remove('active')});btn.classList.add('active');var secs=document.querySelectorAll('#content-rows section');if(genre==='all'){secs.forEach(function(s){s.style.opacity='1'});}else{secs.forEach(function(s){var cards=s.querySelectorAll('.card-hover'),hit=false;cards.forEach(function(c){var on=c.getAttribute('onclick')||'',match=on.match(/openModal\((\d+)\)/);if(match){var mid=parseInt(match[1]),m=getMovie(mid);if(m&&m.genre===genre){c.style.opacity='1';c.style.display='';hit=true;}else{c.style.opacity='0';c.style.display='none';}}});s.style.opacity=hit?'1':'0.15';});}window.scrollTo({top:400,behavior:'smooth'});}
-function filterGenreByIndex(ci,genre){var chips=document.querySelectorAll('.genre-chip');if(chips[ci])filterGenre(chips[ci],genre);}
-
-/* ============================================================
-   TOASTS
-   ============================================================ */
-function showToast(msg){var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='animate-toast-in flex items-center gap-3 bg-sf-surface/95 border border-white/8 px-5 py-3.5 rounded-2xl shadow-2xl shadow-black/40 min-w-[240px] backdrop-blur-xl';t.innerHTML='<div class="w-7 h-7 bg-sf-red/15 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-sf-red"></i></div><span class="text-[13px] text-slate-300 font-light">'+msg+'</span>';c.appendChild(t);lucide.createIcons();setTimeout(function(){t.classList.remove('animate-toast-in');t.classList.add('animate-toast-out');setTimeout(function(){t.remove();},400);},2500);}
-
-/* ============================================================
-   MOBILE MENU & NAV
-   ============================================================ */
-document.getElementById('mobile-menu-btn').addEventListener('click',function(){document.getElementById('mobile-menu').classList.remove('hidden');});
-function closeMobileMenu(){document.getElementById('mobile-menu').classList.add('hidden');}
-window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>40)n.classList.add('nav-blur','bg-sf-dark/80','border-b','border-white/5');else n.classList.remove('nav-blur','bg-sf-dark/80','border-b','border-white/5');});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeStream();closeModal();closeSearch();closeMobileMenu();closeAdminLogin();closeMovieEditor();}if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();openSearch();}});
-
-/* ============================================================
-   ADMIN SYSTEM
-   ============================================================ */
-function logoClick(e){e.preventDefault();logoClicks++;clearTimeout(logoTimer);logoTimer=setTimeout(function(){logoClicks=0;},1500);if(logoClicks>=5){logoClicks=0;document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-pass').value='';document.getElementById('login-error').classList.add('hidden');setTimeout(function(){document.getElementById('admin-pass').focus();},100);}}
-function closeAdminLogin(){document.getElementById('admin-login').classList.add('hidden');}
-function attemptAdminLogin(){var p=document.getElementById('admin-pass').value;if(p===ADMIN_PASS){closeAdminLogin();openAdmin();}else{var err=document.getElementById('login-error');err.classList.remove('hidden');err.textContent='Incorrect password. Access denied.';document.getElementById('admin-pass').value='';document.getElementById('admin-pass').focus();}}
-
-function openAdmin(){document.getElementById('admin-panel').classList.remove('hidden');document.body.style.overflow='hidden';renderMoviesTable();renderRowsEditor();renderHeroSelector();renderTop10Editor();renderGenresEditor();switchAdminTab('movies');lucide.createIcons();}
-function closeAdmin(){document.getElementById('admin-panel').classList.add('hidden');document.body.style.overflow='';renderAll();}
-function switchAdminTab(t){document.querySelectorAll('.admin-tab').forEach(function(b){b.classList.remove('active');b.style.background='transparent';b.style.color='#6b6b80';});var ab=document.querySelector('.admin-tab[data-tab="'+t+'"]');if(ab){ab.classList.add('active');ab.style.background='#1e1e2a';ab.style.color='#fff';}document.querySelectorAll('.admin-tab-content').forEach(function(c){c.classList.add('hidden');});var tab=document.getElementById('tab-'+t);if(tab)tab.classList.remove('hidden');}
-function resetData(){if(confirm('Reset all data to defaults?')){localStorage.removeItem('streamflix_data');SD=getDefaultData();saveSiteData();renderMoviesTable();renderRowsEditor();renderHeroSelector();renderTop10Editor();renderGenresEditor();showToast('Data reset');lucide.createIcons();}}
-
-/* --- Movies Tab --- */
-function renderMoviesTable(){
-    var h='<thead><tr><th>ID</th><th>Title</th><th>Embed URL</th><th>Genre</th><th>Year</th><th>Stream</th><th>Actions</th></tr></thead><tbody>';
-    SD.movies.forEach(function(m){
-        var hs=hasStream(m);
-        var urlPreview=hs?'<span class="url-preview">'+esc(m.embedUrl)+'</span>':'<span class="text-[11px] text-sf-muted/40">—</span>';
-        h+='<tr><td class="text-sf-muted">'+m.id+'</td><td class="font-medium max-w-[140px] truncate">'+m.title+'</td><td class="max-w-[220px]">'+urlPreview+'</td><td><span class="text-xs px-2 py-0.5 rounded bg-white/5 text-sf-muted">'+m.genre+'</span></td><td class="text-sf-muted">'+m.year+'</td><td>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Active</span>':'<span class="text-[10px] text-red-400/60">No URL</span>')+'</td><td class="flex gap-2"><button onclick="openMovieEditor('+m.id+')" class="admin-btn-secondary text-[11px] py-1 px-3">Edit</button><button onclick="deleteMovie('+m.id+')" class="admin-btn-danger text-[11px] py-1 px-3">Del</button></td></tr>';
-    });
-    h+='</tbody>';document.getElementById('movies-table').innerHTML=h;
-}
-
-function openMovieEditor(id){
-    editingMovieId=id;document.getElementById('movie-editor').classList.remove('hidden');
-    var st=document.getElementById('embed-status');st.classList.add('hidden');st.innerHTML='';
-    document.getElementById('ed-embed').style.borderColor='#1e1e2a';
-    if(id===-1){document.getElementById('editor-title').textContent='Add Movie';document.getElementById('ed-embed').value='';document.getElementById('ed-title').value='';document.getElementById('ed-genre').value='action';document.getElementById('ed-year').value='2024';document.getElementById('ed-duration').value='';document.getElementById('ed-maturity').value='R';document.getElementById('ed-desc').value='';document.getElementById('ed-cast').value='';document.getElementById('ed-img').value='';document.getElementById('ed-banner').value='';}
-    else{var m=getMovie(id);if(!m)return;document.getElementById('editor-title').textContent='Edit Movie';document.getElementById('ed-embed').value=m.embedUrl||'';document.getElementById('ed-title').value=m.title;document.getElementById('ed-genre').value=m.genre;document.getElementById('ed-year').value=m.year;document.getElementById('ed-duration').value=m.duration;document.getElementById('ed-maturity').value=m.maturity;document.getElementById('ed-desc').value=m.desc;document.getElementById('ed-cast').value=m.cast;document.getElementById('ed-img').value=m.img;document.getElementById('ed-banner').value=m.banner;if(m.embedUrl&&m.embedUrl.trim()){document.getElementById('ed-embed').style.borderColor='rgba(34,197,94,0.4)';}}
-    lucide.createIcons();
-}
-function closeMovieEditor(){document.getElementById('movie-editor').classList.add('hidden');}
-
-function saveMovieEdits(){
-    var t=document.getElementById('ed-title').value.trim();if(!t){showToast('Title is required');return;}
-    var embedVal=document.getElementById('ed-embed').value.trim();
-    var obj={title:t,embedUrl:embedVal,genre:document.getElementById('ed-genre').value,year:parseInt(document.getElementById('ed-year').value)||2024,duration:document.getElementById('ed-duration').value.trim()||'1h 30m',maturity:document.getElementById('ed-maturity').value,desc:document.getElementById('ed-desc').value.trim()||'No description available.',cast:document.getElementById('ed-cast').value.trim()||'Unknown',img:document.getElementById('ed-img').value.trim()||('movie-'+Date.now()),banner:document.getElementById('ed-banner').value.trim()||('movie-'+Date.now())};
-    if(editingMovieId===-1){obj.id=SD.movies.length>0?Math.max.apply(null,SD.movies.map(function(m){return m.id;}))+1:0;SD.movies.push(obj);showToast('Movie added'+(embedVal?' — stream ready':''));}
-    else{var m=getMovie(editingMovieId);if(m)Object.assign(m,obj);showToast('Movie updated');}
-    saveSiteData();closeMovieEditor();renderMoviesTable();lucide.createIcons();
-}
-
-function deleteMovie(id){SD.movies=SD.movies.filter(function(m){return m.id!==id;});SD.rows.forEach(function(r){r.ids=r.ids.filter(function(i){return i!==id;});});SD.heroIds=SD.heroIds.filter(function(i){return i!==id;});SD.top10Ids=SD.top10Ids.filter(function(i){return i!==id;});saveSiteData();renderMoviesTable();renderRowsEditor();renderHeroSelector();renderTop10Editor();showToast('Movie deleted');}
-
-/* --- Rows Tab --- */
-function renderRowsEditor(){var h='';SD.rows.forEach(function(r,ri){h+='<div class="admin-card"><div class="flex items-center justify-between mb-3 gap-3 flex-wrap"><input value="'+esc(r.title)+'" onchange="SD.rows['+ri+'].title=this.value" class="admin-input max-w-xs" placeholder="Row title"><button onclick="deleteRow('+ri+')" class="admin-btn-danger text-[11px] py-1 px-3">Remove</button></div><div class="flex flex-wrap gap-1.5">';r.ids.forEach(function(mid,mi){var m=getMovie(mid);h+='<span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5">'+(m?m.title:'#'+mid)+(m&&hasStream(m)?' <span class="text-green-400">&#10003;</span>':'')+'<button onclick="removeFromRow('+ri+','+mi+')" class="text-sf-muted hover:text-red-400 transition-colors ml-1">&times;</button></span>';});h+='</div><div class="mt-3 pt-3 border-t border-white/5 flex gap-2 flex-wrap"><select id="row-add-'+ri+'" class="admin-input text-xs py-1.5 max-w-xs"><option value="">Add movie...</option>'+SD.movies.map(function(m){return '<option value="'+m.id+'">'+m.title+(hasStream(m)?' ✓':'')+'</option>';}).join('')+'</select><button onclick="addToRow('+ri+')" class="admin-btn text-[11px] py-1.5 px-3">Add</button></div></div>';});h+='<button onclick="addNewRow()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2 mt-4"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add New Row</button>';document.getElementById('rows-editor').innerHTML=h;lucide.createIcons();}
-function removeFromRow(ri,mi){SD.rows[ri].ids.splice(mi,1);saveSiteData();renderRowsEditor();}
-function addToRow(ri){var s=document.getElementById('row-add-'+ri);if(s&&s.value){SD.rows[ri].ids.push(parseInt(s.value));saveSiteData();renderRowsEditor();}}
-function deleteRow(i){SD.rows.splice(i,1);saveSiteData();renderRowsEditor();}
-function addNewRow(){SD.rows.push({title:'New Row',ids:[]});saveSiteData();renderRowsEditor();}
-
-/* --- Hero Tab --- */
-function renderHeroSelector(){document.getElementById('hero-selector').innerHTML=SD.movies.map(function(m){var sel=SD.heroIds.indexOf(m.id)!==-1;return '<button onclick="toggleHeroMovie('+m.id+')" class="text-xs px-3 py-2 rounded-lg border transition-all '+(sel?'bg-sf-red/20 border-sf-red/40 text-white':'bg-white/3 border-white/5 text-sf-muted hover:border-white/20')+'">'+m.title+(hasStream(m)?' ✓':'')+'</button>';}).join('');}
-function toggleHeroMovie(id){var i=SD.heroIds.indexOf(id);if(i===-1){if(SD.heroIds.length>=6){showToast('Max 6');return;}SD.heroIds.push(id);}else{SD.heroIds.splice(i,1);}saveSiteData();renderHeroSelector();}
-
-/* --- Top 10 Tab --- */
-function renderTop10Editor(){var h='';SD.top10Ids.forEach(function(mid,i){var m=getMovie(mid);h+='<div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]"><span class="text-sf-muted text-xs font-bold w-6 text-center">'+(i+1)+'</span><span class="flex-1 text-sm truncate">'+(m?m.title:'#'+mid)+(m&&hasStream(m)?' <span class="text-green-400 text-[10px]">✓</span>':'')+'</span><div class="flex gap-1 flex-shrink-0">'+(i>0?'<button onclick="moveTop10('+i+',-1)" class="text-sf-muted hover:text-white text-xs px-1.5 py-1 rounded hover:bg-white/5">&uarr;</button>':'')+(i<SD.top10Ids.length-1?'<button onclick="moveTop10('+i+',1)" class="text-sf-muted hover:text-white text-xs px-1.5 py-1 rounded hover:bg-white/5">&darr;</button>':'')+'<button onclick="removeTop10('+i+')" class="text-sf-muted hover:text-red-400 text-xs px-1.5 py-1 rounded hover:bg-white/5">&times;</button></div></div>';});document.getElementById('top10-editor').innerHTML=h;document.getElementById('top10-add-select').innerHTML='<option value="">Select...</option>'+SD.movies.filter(function(m){return SD.top10Ids.indexOf(m.id)===-1;}).map(function(m){return '<option value="'+m.id+'">'+m.title+(hasStream(m)?' ✓':'')+'</option>';}).join('');}
-function moveTop10(i,d){var j=i+d;if(j<0||j>=SD.top10Ids.length)return;var t=SD.top10Ids[i];SD.top10Ids[i]=SD.top10Ids[j];SD.top10Ids[j]=t;saveSiteData();renderTop10Editor();}
-function removeTop10(i){SD.top10Ids.splice(i,1);saveSiteData();renderTop10Editor();}
-function addToTop10(){var s=document.getElementById('top10-add-select');if(!s.value)return;if(SD.top10Ids.length>=10){showToast('Max 10');return;}SD.top10Ids.push(parseInt(s.value));saveSiteData();renderTop10Editor();}
-
-/* --- Genres Tab --- */
-function renderGenresEditor(){document.getElementById('genres-editor').innerHTML=SD.genres.map(function(g,i){return '<div class="admin-card flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"><i data-lucide="'+g.icon+'" class="w-4 h-4 text-sf-muted"></i></div><input value="'+g.name+'" onchange="SD.genres['+i+'].name=this.value" class="admin-input text-sm"></div>';}).join('');lucide.createIcons();}
-
-function saveAll(){saveSiteData();showToast('All changes saved!');renderAll();setTimeout(closeAdmin,800);}
-
-/* ============================================================
-   INIT
-   ============================================================ */
-document.addEventListener('DOMContentLoaded',function(){loadSiteData();renderAll();startHeroAutoplay();switchAdminTab('movies');});
-</script>
-</body>
-</html>
+function renderTop10(){document.getElementById('top10-container').innerHTML=SD.top10Ids.map(function(id,i){var m=getMovie(id);return m?createTop10Card(m,i+1):''
