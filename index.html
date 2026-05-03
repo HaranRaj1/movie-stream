@@ -1,663 +1,680 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamFlix — Premium Streaming</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'sf-red': '#E50914',
-                        'sf-dark': '#0a0a0f',
-                        'sf-surface': '#12121a',
-                        'sf-card': '#16161f',
-                        'sf-border': '#1e1e2a',
-                        'sf-muted': '#6b6b80',
-                    },
-                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreamFlix - Premium Streaming</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sf: {
+              red: "#E50914",
+              dark: "#07070b",
+              surface: "#111119",
+              card: "#171722",
+              border: "#272735",
+              muted: "#85859a"
             }
+          },
+          fontFamily: { inter: ["Inter", "sans-serif"] }
         }
-    </script>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#fff;overflow-x:hidden}
-        ::-webkit-scrollbar{height:3px;width:5px}
-        ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:10px}
-        ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
-        .row-scroll{scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none}
-        .row-scroll::-webkit-scrollbar{display:none}
-        .line-clamp-1{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-        .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-        .line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-        .card-hover{transition:transform 500ms cubic-bezier(0.16,1,0.3,1),box-shadow 500ms ease}
-        .card-hover:hover{transform:scale(1.12) translateY(-8px);z-index:30;box-shadow:0 30px 80px -20px rgba(0,0,0,0.9),0 0 60px -10px rgba(229,9,20,0.12)}
-        .card-hover:hover .card-info{opacity:1;transform:translateY(0)}
-        .card-hover:hover .card-overlay{opacity:1}
-        .card-hover:hover .card-img{transform:scale(1.05)}
-        .card-info{opacity:0;transform:translateY(12px);transition:all 400ms cubic-bezier(0.16,1,0.3,1) 80ms}
-        .card-overlay{opacity:0;transition:opacity 400ms ease}
-        .card-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
-        .hero-gradient{background:linear-gradient(135deg,rgba(10,10,15,0.97) 0%,rgba(10,10,15,0.8) 30%,rgba(10,10,15,0.3) 55%,transparent 80%),linear-gradient(to top,#0a0a0f 0%,rgba(10,10,15,0.85) 25%,rgba(10,10,15,0.2) 55%,transparent 75%)}
-        .nav-blur{backdrop-filter:blur(24px) saturate(120%);-webkit-backdrop-filter:blur(24px) saturate(120%)}
-        .modal-backdrop{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-        @keyframes slideUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes scaleIn{from{opacity:0;transform:scale(0.92) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-        @keyframes toastIn{from{opacity:0;transform:translateX(100%) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
-        @keyframes toastOut{from{opacity:1;transform:translateX(0) scale(1)}to{opacity:0;transform:translateX(100%) scale(0.9)}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-        @keyframes glow-pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
-        @keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-2%)}30%{transform:translate(1%,2%)}50%{transform:translate(-1%,1%)}70%{transform:translate(2%,-1%)}90%{transform:translate(-2%,1%)}}
-        @keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        .animate-slide-up{animation:slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards}
-        .animate-slide-down{animation:slideDown 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
-        .animate-scale-in{animation:scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
-        .animate-toast-in{animation:toastIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
-        .animate-toast-out{animation:toastOut 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
-        .film-grain::after{content:'';position:fixed;inset:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");animation:grain 6s steps(8) infinite;pointer-events:none;z-index:9999}
-        .genre-chip{transition:all 300ms cubic-bezier(0.16,1,0.3,1)}
-        .genre-chip:hover{background:#E50914;color:white;border-color:#E50914;transform:translateY(-2px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}
-        .genre-chip.active{background:#E50914;color:white;border-color:#E50914;box-shadow:0 2px 16px rgba(229,9,20,0.25)}
-        .scroll-arrow{transition:all 300ms cubic-bezier(0.16,1,0.3,1);opacity:0;transform:scale(0.8)}
-        .row-container:hover .scroll-arrow{opacity:1;transform:scale(1)}
-        .scroll-arrow:hover{background:rgba(229,9,20,0.95);transform:scale(1.1)!important;box-shadow:0 4px 24px rgba(229,9,20,0.4)}
-        .top10-number{font-size:9rem;font-weight:900;-webkit-text-stroke:3px rgba(229,9,20,0.25);color:transparent;line-height:0.85;font-style:italic;filter:drop-shadow(0 0 30px rgba(229,9,20,0.1))}
-        .search-input:focus{outline:none}
-        .maturity-badge{border:1px solid rgba(255,255,255,0.3);padding:0 5px;font-size:10px;font-weight:600;letter-spacing:0.5px}
-        .genre-tile{transition:all 400ms cubic-bezier(0.16,1,0.3,1)}
-        .genre-tile:hover{transform:translateY(-4px) scale(1.02)}
-        .genre-tile:hover .genre-tile-img{transform:scale(1.1)}
-        .genre-tile-img{transition:transform 600ms cubic-bezier(0.16,1,0.3,1)}
-        .row-title{position:relative;display:inline-block}
-        .row-title::after{content:'';position:absolute;bottom:-4px;left:0;width:32px;height:3px;background:#E50914;border-radius:2px;transition:width 300ms ease}
-        .row-container:hover .row-title::after{width:100%}
-        .avatar-ring{background:conic-gradient(from 0deg,#E50914,#ff6b6b,#E50914);padding:2px;border-radius:10px}
-        .play-btn-glow{box-shadow:0 0 30px rgba(229,9,20,0.3),0 0 60px rgba(229,9,20,0.1)}
-        .play-btn-glow:hover{box-shadow:0 0 40px rgba(229,9,20,0.5),0 0 80px rgba(229,9,20,0.2)}
-        .stream-iframe{border:none;width:100%;height:100%;position:absolute;inset:0;top:0;left:0}
-        .stream-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a0f;z-index:5}
-        .stream-loading .spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,0.08);border-top-color:#E50914;border-radius:50%;animation:spin-slow 0.8s linear infinite}
-        .admin-input{background:#0a0a0f;border:1px solid #1e1e2a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;width:100%;transition:border-color 300ms;font-family:'Inter',sans-serif}
-        .admin-input:focus{outline:none;border-color:#E50914}
-        .admin-input::placeholder{color:#4a4a5a}
-        .admin-input.url-input{font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:12px;letter-spacing:-0.01em;padding-right:80px}
-        .admin-btn{background:#E50914;color:white;font-weight:600;font-size:13px;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;transition:all 300ms;font-family:'Inter',sans-serif}
-        .admin-btn:hover{background:#F40612;transform:translateY(-1px);box-shadow:0 4px 20px rgba(229,9,20,0.3)}
-        .admin-btn-secondary{background:#1e1e2a;color:#ccc;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #2a2a3a;cursor:pointer;transition:all 300ms;font-family:'Inter',sans-serif}
-        .admin-btn-secondary:hover{background:#2a2a3a;color:#fff}
-        .admin-btn-danger{background:transparent;color:#f87171;font-weight:500;font-size:13px;padding:10px 20px;border-radius:10px;border:1px solid #7f1d1d;cursor:pointer;transition:all 300ms;font-family:'Inter',sans-serif}
-        .admin-btn-danger:hover{background:#7f1d1d;color:#fff}
-        .admin-card{background:#12121a;border:1px solid #1e1e2a;border-radius:16px;padding:20px;transition:all 300ms}
-        .admin-card:hover{border-color:#2a2a3a}
-        .admin-table{width:100%;border-collapse:separate;border-spacing:0}
-        .admin-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#6b6b80;border-bottom:1px solid #1e1e2a}
-        .admin-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid #14141c;vertical-align:middle}
-        .admin-table tr:hover td{background:rgba(255,255,255,0.02)}
-        .admin-tab.active{background:#1e1e2a!important;color:#fff!important}
-        select.admin-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-        select.admin-input option{background:#12121a;color:#fff}
-        textarea.admin-input{resize:none}
-        .url-preview{font-size:11px;color:#6b6b80;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;display:inline-block;vertical-align:middle}
-        .toggle{position:relative;width:40px;height:22px;flex-shrink:0;display:inline-block}
-        .toggle input{opacity:0;width:0;height:0;position:absolute}
-        .toggle-track{position:absolute;inset:0;background:#1e1e2a;border:1px solid #2a2a3a;border-radius:11px;cursor:pointer;transition:all 300ms}
-        .toggle-track::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#6b6b80;border-radius:50%;transition:all 300ms cubic-bezier(0.16,1,0.3,1)}
-        .toggle input:checked+.toggle-track{background:rgba(229,9,20,0.2);border-color:rgba(229,9,20,0.4)}
-        .toggle input:checked+.toggle-track::before{transform:translateX(18px);background:#E50914}
-        .color-pick{width:44px;height:44px;border:2px solid #1e1e2a;border-radius:12px;cursor:pointer;padding:0;-webkit-appearance:none;appearance:none;background:none;flex-shrink:0}
-        .color-pick::-webkit-color-swatch-wrapper{padding:2px}
-        .color-pick::-webkit-color-swatch{border:none;border-radius:8px}
-        .color-pick::-moz-color-swatch{border:none;border-radius:8px}
-        .section-label{font-size:12px;font-weight:600;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-        .section-label .sl-dot{width:6px;height:6px;border-radius:50%;background:#E50914;flex-shrink:0}
-        .setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);gap:12px}
-        .setting-row:last-child{border-bottom:none}
-        .setting-label{font-size:13px;color:#ccc;font-weight:400}
-        .setting-label small{display:block;font-size:11px;color:#6b6b80;font-weight:300;margin-top:2px}
-        .nav-link-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:6px;transition:all 200ms}
-        .nav-link-item:hover{border-color:rgba(255,255,255,0.08)}
-        .nav-link-item input{background:transparent;border:1px solid transparent;color:#ccc;font-size:13px;padding:4px 8px;border-radius:6px;flex:1;transition:all 200ms;font-family:'Inter',sans-serif}
-        .nav-link-item input:focus{outline:none;border-color:#2a2a3a;background:rgba(255,255,255,0.03);color:#fff}
-        .admin-section{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:16px;margin-bottom:12px}
-        @media(max-width:768px){.top10-number{font-size:5.5rem;-webkit-text-stroke:2px rgba(229,9,20,0.2)}.card-hover:hover{transform:scale(1.04) translateY(-4px)}.card-info{opacity:1;transform:translateY(0)}.card-overlay{opacity:1}}
-    </style>
-    <style id="dynamic-theme"></style>
+      }
+    };
+  </script>
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#07070b;color:white;font-family:Inter,sans-serif;overflow-x:hidden}
+    ::-webkit-scrollbar{height:4px;width:5px}::-webkit-scrollbar-thumb{background:#ffffff22;border-radius:20px}
+    .row-scroll{scrollbar-width:none}.row-scroll::-webkit-scrollbar{display:none}
+    .hero-fade{background:linear-gradient(90deg,#07070b 0%,#07070bdd 34%,#07070b55 64%,transparent 100%),linear-gradient(0deg,#07070b 0%,transparent 35%)}
+    .nav-glass{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+    .card{transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s}.card:hover{transform:translateY(-8px) scale(1.04);box-shadow:0 28px 80px #000c;z-index:20}
+    .poster-overlay{opacity:0;transition:opacity .25s}.card:hover .poster-overlay{opacity:1}
+    .tab.active,.chip.active{background:#E50914;color:#fff;border-color:#E50914}
+    .admin-tab.active{background:#272735;color:white}
+    .modal-backdrop{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .line-1,.line-2{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}.line-1{-webkit-line-clamp:1}.line-2{-webkit-line-clamp:2}
+    .spinner{width:42px;height:42px;border:3px solid #ffffff18;border-top-color:#E50914;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}} @keyframes in{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+    .animate-in{animation:in .35s cubic-bezier(.16,1,.3,1)}
+    input,select,textarea{font-family:Inter,sans-serif}
+    .admin-input{width:100%;background:#07070b;border:1px solid #272735;border-radius:10px;color:white;padding:10px 12px;font-size:13px}
+    .admin-input:focus{outline:none;border-color:#E50914}.admin-btn{background:#E50914;border:0;border-radius:10px;color:white;font-weight:700;padding:10px 14px;font-size:13px}
+    .admin-btn.secondary{background:#242432;color:#e5e5ef}.admin-btn.ghost{background:transparent;border:1px solid #3a3a4b;color:#c8c8d6}.admin-btn.danger{background:#3a1013;color:#ffb4ba;border:1px solid #7a1f26}
+    .episode.active{border-color:#E50914;background:#E5091420}.toggle{width:42px;height:24px;position:relative;display:inline-block}.toggle input{display:none}
+    .track{position:absolute;inset:0;border-radius:999px;background:#2a2a39;border:1px solid #3a3a4b}.track:after{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#88889a;transition:.25s}
+    .toggle input:checked+.track{background:#E5091430;border-color:#E5091480}.toggle input:checked+.track:after{transform:translateX(18px);background:#E50914}
+    .premium-blur{backdrop-filter:blur(28px) saturate(125%);-webkit-backdrop-filter:blur(28px) saturate(125%)}
+    .admin-shell{background:linear-gradient(145deg,#14141fcc,#08080de8);box-shadow:0 30px 120px #000c, inset 0 1px 0 #ffffff10}
+    .admin-sidebar{background:linear-gradient(180deg,#ffffff08,#ffffff03)}
+    .ad-slot{display:none;border:1px solid #ffffff12;background:linear-gradient(135deg,#ffffff08,#ffffff03);border-radius:16px;overflow:hidden}
+    .ad-slot.active{display:block}.ad-shell{min-height:86px;display:flex;align-items:center;justify-content:center;color:#85859a;font-size:12px;text-align:center}
+    .sticky-promo{position:fixed;left:50%;bottom:18px;z-index:80;width:min(720px,calc(100vw - 28px));transform:translateX(-50%);display:none}
+    .sticky-promo.active{display:block}
+  </style>
 </head>
-<body class="font-inter film-grain">
+<body class="font-inter">
+  <div id="toast" class="fixed right-5 top-24 z-[999] flex flex-col gap-3"></div>
 
-<div id="toast-container" class="fixed top-24 right-6 z-[200] flex flex-col gap-3"></div>
-
-<div id="stream-modal" class="fixed inset-0 z-[500] hidden">
-    <div class="absolute inset-0 bg-black/98" onclick="closeStream()"></div>
-    <div class="relative z-10 h-full flex flex-col">
-        <div class="flex items-center justify-between px-4 sm:px-6 py-3 bg-black/80 border-b border-white/5 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-7 h-7 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="play" class="w-3 h-3 text-white fill-white ml-0.5"></i></div>
-                <span id="stream-title" class="text-sm font-semibold truncate max-w-[300px] sm:max-w-[500px]">Loading...</span>
-                <span class="hidden sm:inline-flex items-center gap-1.5 text-[10px] text-sf-muted bg-white/5 px-2 py-1 rounded-md"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Streaming</span>
-            </div>
-            <button onclick="closeStream()" class="p-2 text-sf-muted hover:text-white hover:bg-white/5 rounded-lg transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+  <nav id="nav" class="fixed inset-x-0 top-0 z-50 transition-all">
+    <div class="mx-auto flex h-16 max-w-[1920px] items-center justify-between px-4 sm:px-6 lg:h-20 lg:px-10">
+      <div class="flex items-center gap-7">
+        <button onclick="secretAdmin(event)" class="flex items-center gap-2.5">
+          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-sf-red shadow-lg shadow-red-950"><i data-lucide="play" class="ml-0.5 h-4 w-4 fill-white"></i></span>
+          <span class="text-xl font-black tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
+        </button>
+        <div class="hidden items-center gap-1 lg:flex">
+          <button onclick="setView('home')" class="nav-item px-3 py-2 text-sm font-medium text-white">Home</button>
+          <button onclick="setView('series')" class="nav-item px-3 py-2 text-sm text-sf-muted hover:text-white">TV Series</button>
+          <button onclick="setView('movies')" class="nav-item px-3 py-2 text-sm text-sf-muted hover:text-white">Movies</button>
+          <button onclick="setView('continue')" class="nav-item px-3 py-2 text-sm text-sf-muted hover:text-white">Continue Watching</button>
+          <button onclick="setView('list')" class="nav-item px-3 py-2 text-sm text-sf-muted hover:text-white">My List</button>
         </div>
-        <div class="flex-1 relative bg-black">
-            <div id="stream-loading" class="stream-loading"><div class="spinner mb-4"></div><p class="text-sm text-sf-muted">Loading stream...</p></div>
-            <iframe id="stream-iframe" class="stream-iframe" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>
-            <div id="stream-error" class="hidden stream-loading">
-                <div class="w-14 h-14 rounded-2xl bg-red-950/50 border border-red-900/30 flex items-center justify-center mb-4"><i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i></div>
-                <p class="text-sm font-medium mb-1">Unable to load stream</p>
-                <p class="text-xs text-sf-muted mb-4 max-w-xs text-center">No Bunny Stream embed URL has been set for this movie.</p>
-                <button onclick="closeStream()" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-sm px-4 py-2 rounded-lg transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Go Back</button>
-            </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-sf-muted"></i>
+          <input id="search" oninput="renderLibrary()" placeholder="Search titles, cast, genres..." class="hidden w-80 rounded-xl border border-white/10 bg-sf-surface/95 py-2.5 pl-10 pr-3 text-sm outline-none focus:border-sf-red/60 sm:block">
         </div>
-        <div class="flex items-center justify-between px-4 sm:px-6 py-2.5 bg-black/80 border-t border-white/5 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <button onclick="closeStream();openModal(currentStreamId)" class="flex items-center gap-1.5 text-xs text-sf-muted hover:text-white transition-colors"><i data-lucide="info" class="w-3.5 h-3.5"></i> Details</button>
-            </div>
-            <span class="text-[10px] text-sf-muted">Press ESC to close</span>
-        </div>
+        <button onclick="requestAdminLogin()" class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-sf-muted hover:text-white">Admin</button>
+        <div class="h-9 w-9 overflow-hidden rounded-xl border border-sf-red/70 bg-sf-card"><img class="h-full w-full object-cover" src="https://picsum.photos/seed/stream-avatar/80/80.jpg" alt="Profile"></div>
+      </div>
     </div>
-</div>
+  </nav>
 
-<div id="admin-login" class="fixed inset-0 z-[300] hidden">
-    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeAdminLogin()"></div>
-    <div class="relative z-10 max-w-md mx-auto mt-[15vh] animate-scale-in">
-        <div class="admin-card p-8">
-            <div class="flex items-center justify-between mb-6">
-                <div><div class="flex items-center gap-2 mb-1"><div class="w-6 h-6 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-3 h-3 text-white"></i></div><span class="text-sm font-bold">Admin Access</span></div><p class="text-xs text-sf-muted">Enter password to continue</p></div>
-                <button onclick="closeAdminLogin()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div id="login-error" class="hidden mb-4 p-3 rounded-xl bg-red-950/50 border border-red-900/50 text-red-400 text-xs"></div>
-            <input id="admin-pass" type="password" placeholder="Password" class="admin-input mb-4" onkeydown="if(event.key==='Enter')attemptAdminLogin()">
-            <button onclick="attemptAdminLogin()" class="admin-btn w-full">Authenticate</button>
-        </div>
+  <section id="hero" class="relative min-h-[86vh] overflow-hidden">
+    <div id="hero-bg" class="absolute inset-0"></div>
+    <div class="hero-fade absolute inset-0"></div>
+    <div class="relative z-10 mx-auto flex min-h-[86vh] max-w-[1920px] items-end px-4 pb-24 pt-28 sm:px-6 lg:px-10">
+      <div id="hero-copy" class="max-w-2xl animate-in"></div>
     </div>
-</div>
+  </section>
 
-<div id="admin-panel" class="fixed inset-0 z-[250] hidden">
-    <div class="absolute inset-0 bg-sf-dark/98 backdrop-blur-xl"></div>
-    <div class="relative z-10 h-full flex flex-col max-w-[1400px] mx-auto">
-        <header class="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0 flex-wrap gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-sf-red rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-white"></i></div>
-                <div><h1 class="text-base font-bold">Admin Panel</h1><p class="text-[11px] text-sf-muted">Full site editor</p></div>
-            </div>
-            <div class="flex items-center gap-3 flex-wrap">
-                <button onclick="resetAllSettings()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All</button>
-                <button onclick="saveAll()" class="admin-btn text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save & Apply</button>
-                <button onclick="closeAdmin()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="eye" class="w-3.5 h-3.5"></i> Preview</button>
-                <button onclick="closeAdmin()" class="admin-btn-danger text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="x" class="w-3.5 h-3.5"></i> Close</button>
-            </div>
-        </header>
-        <div class="flex-1 overflow-y-auto p-6">
-            <div class="flex items-center gap-1 mb-6 border-b border-white/5 pb-3 overflow-x-auto row-scroll">
-                <button onclick="switchAdminTab('movies')" class="admin-tab active px-4 py-2 text-xs font-medium rounded-lg transition-all whitespace-nowrap" data-tab="movies">Movies</button>
-                <button onclick="switchAdminTab('rows')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="rows">Content Rows</button>
-                <button onclick="switchAdminTab('hero')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="hero">Hero & Banners</button>
-                <button onclick="switchAdminTab('top10')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="top10">Top 10</button>
-                <button onclick="switchAdminTab('genres')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="genres">Genre Tiles</button>
-                <button onclick="switchAdminTab('logo')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="logo">Logo & Branding</button>
-                <button onclick="switchAdminTab('theme')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="theme">Theme Colors</button>
-                <button onclick="switchAdminTab('homepage')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="homepage">Homepage Sections</button>
-                <button onclick="switchAdminTab('headerfooter')" class="admin-tab px-4 py-2 text-xs font-medium rounded-lg transition-all text-sf-muted hover:text-white whitespace-nowrap" data-tab="headerfooter">Header & Footer</button>
-            </div>
-
-            <div id="tab-movies" class="admin-tab-content">
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-                    <p class="text-sm text-sf-muted">Manage all movies — <span class="text-sf-red">Bunny Stream Embed URL</span> enables streaming</p>
-                    <button onclick="openMovieEditor(-1)" class="admin-btn text-xs py-2 px-4 flex items-center gap-2"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Movie</button>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-white/5"><table class="admin-table" id="movies-table"></table></div>
-            </div>
-
-            <div id="tab-rows" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Edit row titles and which movies appear in each</p><div id="rows-editor" class="space-y-4"></div></div>
-
-            <div id="tab-hero" class="admin-tab-content hidden">
-                <p class="text-sm text-sf-muted mb-4">Choose hero movies (max 6) and override banner images</p>
-                <div class="admin-card mb-4"><label class="text-xs text-sf-muted block mb-2">Hero Movies</label><div id="hero-selector" class="flex flex-wrap gap-2"></div></div>
-                <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Custom Banner Images</div><p class="text-xs text-sf-muted mb-4">Override default banner for each hero movie with a custom URL</p><div id="hero-banner-overrides" class="space-y-3"></div></div>
-            </div>
-
-            <div id="tab-top10" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Reorder or remove movies from Top 10</p><div class="admin-card"><div id="top10-editor" class="space-y-2"></div><div class="mt-4 pt-4 border-t border-white/5"><label class="text-xs text-sf-muted block mb-2">Add movie to Top 10</label><div class="flex gap-2"><select id="top10-add-select" class="admin-input flex-1"></select><button onclick="addToTop10()" class="admin-btn text-xs py-2 px-4">Add</button></div></div></div></div>
-
-            <div id="tab-genres" class="admin-tab-content hidden"><p class="text-sm text-sf-muted mb-4">Edit genre display names</p><div id="genres-editor" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div></div>
-
-            <div id="tab-logo" class="admin-tab-content hidden">
-                <div class="admin-card mb-4">
-                    <div class="section-label"><span class="sl-dot"></span>Logo Configuration</div>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="text-xs text-sf-muted block mb-1.5">Logo Text</label><input id="set-logo-text" class="admin-input" placeholder="Stream"></div>
-                            <div><label class="text-xs text-sf-muted block mb-1.5">Accent Text</label><input id="set-logo-accent" class="admin-input" placeholder="Flix"></div>
-                        </div>
-                        <div><label class="text-xs text-sf-muted block mb-1.5">Logo Icon</label>
-                            <select id="set-logo-icon" class="admin-input"><option value="play">Play</option><option value="film">Film</option><option value="tv">TV</option><option value="clapperboard">Clapperboard</option><option value="star">Star</option><option value="zap">Zap</option><option value="monitor-play">Monitor Play</option><option value="radio">Radio</option></select>
-                        </div>
-                        <div><label class="text-xs text-sf-muted block mb-1.5">Custom Logo Image URL</label><input id="set-logo-image" class="admin-input url-input" placeholder="https://your-logo.png"><p class="text-[11px] text-sf-muted mt-1.5">Replaces icon + text entirely. Leave empty for default.</p></div>
-                    </div>
-                </div>
-                <div class="admin-card">
-                    <div class="section-label"><span class="sl-dot"></span>Live Preview</div>
-                    <div id="logo-preview" class="bg-black/40 rounded-xl p-6 flex items-center justify-center min-h-[80px]"></div>
-                </div>
-            </div>
-
-            <div id="tab-theme" class="admin-tab-content hidden">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Accent Color</div><p class="text-[11px] text-sf-muted mb-3">Buttons, badges, highlights</p><div class="flex items-center gap-3"><input type="color" id="set-theme-accent" value="#E50914" class="color-pick" oninput="syncHex(this,'set-theme-accent-hex')"><input id="set-theme-accent-hex" class="admin-input font-mono text-xs flex-1" value="#E50914" oninput="syncPick(this,'set-theme-accent')"></div></div>
-                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Background</div><p class="text-[11px] text-sf-muted mb-3">Main page background</p><div class="flex items-center gap-3"><input type="color" id="set-theme-bg" value="#0a0a0f" class="color-pick" oninput="syncHex(this,'set-theme-bg-hex')"><input id="set-theme-bg-hex" class="admin-input font-mono text-xs flex-1" value="#0a0a0f" oninput="syncPick(this,'set-theme-bg')"></div></div>
-                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Surface</div><p class="text-[11px] text-sf-muted mb-3">Cards, modals, elevated</p><div class="flex items-center gap-3"><input type="color" id="set-theme-surface" value="#12121a" class="color-pick" oninput="syncHex(this,'set-theme-surface-hex')"><input id="set-theme-surface-hex" class="admin-input font-mono text-xs flex-1" value="#12121a" oninput="syncPick(this,'set-theme-surface')"></div></div>
-                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Card BG</div><p class="text-[11px] text-sf-muted mb-3">Individual card backgrounds</p><div class="flex items-center gap-3"><input type="color" id="set-theme-card" value="#16161f" class="color-pick" oninput="syncHex(this,'set-theme-card-hex')"><input id="set-theme-card-hex" class="admin-input font-mono text-xs flex-1" value="#16161f" oninput="syncPick(this,'set-theme-card')"></div></div>
-                    <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Border</div><p class="text-[11px] text-sf-muted mb-3">Borders and dividers</p><div class="flex items-center gap-3"><input type="color" id="set-theme-border" value="#1e1e2a" class="color-pick" oninput="syncHex(this,'set-theme-border-hex')"><input id="set-theme-border-hex" class="admin-input font-mono text-xs flex-1" value="#1e1e2a" oninput="syncPick(this,'set-theme-border')"></div></div>
-                    <div class="admin-card flex flex-col justify-between"><div class="section-label"><span class="sl-dot"></span>Presets</div><p class="text-[11px] text-sf-muted mb-3">Quick color schemes</p><div class="flex flex-wrap gap-2">
-                        <button onclick="applyPreset('default')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Default</button>
-                        <button onclick="applyPreset('ocean')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Ocean</button>
-                        <button onclick="applyPreset('forest')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Forest</button>
-                        <button onclick="applyPreset('purple')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Purple</button>
-                        <button onclick="applyPreset('gold')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Gold</button>
-                        <button onclick="applyPreset('midnight')" class="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 text-sf-muted hover:text-white hover:border-white/20 transition-all">Midnight</button>
-                    </div></div>
-                </div>
-                <div class="admin-card"><div class="section-label"><span class="sl-dot"></span>Color Preview</div><div id="theme-preview" class="flex flex-wrap gap-3"></div></div>
-            </div>
-
-            <div id="tab-homepage" class="admin-tab-content hidden">
-                <div class="admin-section">
-                    <div class="section-label"><span class="sl-dot"></span>Section Visibility</div>
-                    <div class="setting-row"><span class="setting-label">Genre Filter Bar<small>Horizontal genre chips below hero</small></span><label class="toggle"><input type="checkbox" id="set-hp-genrefilter" checked><span class="toggle-track"></span></label></div>
-                    <div class="setting-row"><span class="setting-label">Top 10 Section<small>Ranked Top 10 movies row</small></span><label class="toggle"><input type="checkbox" id="set-hp-top10" checked><span class="toggle-track"></span></label></div>
-                    <div class="setting-row"><span class="setting-label">Browse by Genre Grid<small>Genre image tiles at bottom</small></span><label class="toggle"><input type="checkbox" id="set-hp-genregrid" checked><span class="toggle-track"></span></label></div>
-                </div>
-                <div class="admin-section">
-                    <div class="section-label"><span class="sl-dot"></span>Custom Headings</div>
-                    <div class="mb-3"><label class="text-xs text-sf-muted block mb-1.5">Top 10 Heading <span class="text-sf-muted/50">(empty = default)</span></label><input id="set-hp-top10heading" class="admin-input" placeholder="TOP 10 in Your Country Today"></div>
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre Grid Heading <span class="text-sf-muted/50">(empty = default)</span></label><input id="set-hp-genreheading" class="admin-input" placeholder="Browse by Genre"></div>
-                </div>
-                <div class="admin-section">
-                    <div class="section-label"><span class="sl-dot"></span>Content Row Visibility</div>
-                    <p class="text-xs text-sf-muted mb-3">Toggle individual content rows</p>
-                    <div id="hp-rows-toggles" class="space-y-1"></div>
-                </div>
-            </div>
-
-            <div id="tab-headerfooter" class="admin-tab-content hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <div class="admin-section">
-                            <div class="section-label"><span class="sl-dot"></span>Header Controls</div>
-                            <div class="setting-row"><span class="setting-label">Navigation Links</span><label class="toggle"><input type="checkbox" id="set-hf-nav" checked><span class="toggle-track"></span></label></div>
-                            <div class="setting-row"><span class="setting-label">Search Icon</span><label class="toggle"><input type="checkbox" id="set-hf-search" checked><span class="toggle-track"></span></label></div>
-                            <div class="setting-row"><span class="setting-label">Profile Avatar</span><label class="toggle"><input type="checkbox" id="set-hf-profile" checked><span class="toggle-track"></span></label></div>
-                        </div>
-                        <div class="admin-section">
-                            <div class="section-label"><span class="sl-dot"></span>Navigation Links</div>
-                            <p class="text-xs text-sf-muted mb-3">Edit text, set active page, reorder</p>
-                            <div id="hf-nav-links-editor"></div>
-                            <button onclick="addNavLink()" class="admin-btn-secondary text-[11px] py-1.5 px-3 mt-2 flex items-center gap-1.5"><i data-lucide="plus" class="w-3 h-3"></i> Add Link</button>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="admin-section">
-                            <div class="section-label"><span class="sl-dot"></span>Footer Controls</div>
-                            <div class="setting-row"><span class="setting-label">Show Footer Entirely</span><label class="toggle"><input type="checkbox" id="set-hf-footer" checked><span class="toggle-track"></span></label></div>
-                            <div class="setting-row"><span class="setting-label">Social Media Icons</span><label class="toggle"><input type="checkbox" id="set-hf-social" checked><span class="toggle-track"></span></label></div>
-                            <div class="setting-row"><span class="setting-label">Footer Link Columns</span><label class="toggle"><input type="checkbox" id="set-hf-footerlinks" checked><span class="toggle-track"></span></label></div>
-                            <div class="setting-row"><span class="setting-label">Service Code Button</span><label class="toggle"><input type="checkbox" id="set-hf-servicecode" checked><span class="toggle-track"></span></label></div>
-                        </div>
-                        <div class="admin-section">
-                            <div class="section-label"><span class="sl-dot"></span>Footer Text</div>
-                            <div><label class="text-xs text-sf-muted block mb-1.5">Copyright Text</label><input id="set-hf-copyright" class="admin-input" placeholder="© 2024 StreamFlix. All rights reserved."></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="movie-editor" class="fixed inset-0 z-[260] hidden">
-    <div class="absolute inset-0 bg-black/80" onclick="closeMovieEditor()"></div>
-    <div class="relative z-10 max-w-2xl mx-auto mt-[4vh] max-h-[92vh] overflow-y-auto animate-scale-in">
-        <div class="admin-card p-6 sm:p-8">
-            <div class="flex items-center justify-between mb-6">
-                <h2 id="editor-title" class="text-lg font-bold">Add Movie</h2>
-                <button onclick="closeMovieEditor()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-semibold text-sf-red flex items-center gap-1.5 mb-1.5"><i data-lucide="link" class="w-3.5 h-3.5"></i>Bunny Stream Embed URL <span class="text-[9px] bg-sf-red/20 px-1.5 py-0.5 rounded font-bold tracking-wider">REQUIRED</span></label>
-                    <div class="relative"><input id="ed-embed" type="url" class="admin-input url-input" placeholder="https://player.mediadelivery.net/embed/LIBRARY_ID/VIDEO_ID"><button onclick="testEmbed()" class="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-sf-muted hover:text-green-400 bg-white/5 hover:bg-green-500/10 px-2 py-1.5 rounded-lg transition-all border border-white/5" title="Test embed"><i data-lucide="external-link" class="w-3 h-3"></i><span class="hidden sm:inline">Test</span></button></div>
-                    <p class="text-[11px] text-sf-muted mt-1.5 flex items-start gap-1.5"><i data-lucide="info" class="w-3 h-3 mt-0.5 flex-shrink-0 text-sf-muted/60"></i>Paste full Bunny Stream embed URL. No URL = unavailable.</p>
-                    <div id="embed-status" class="hidden mt-2"></div>
-                </div>
-                <div><label class="text-xs text-sf-muted block mb-1.5">Title</label><input id="ed-title" class="admin-input" placeholder="Movie title"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Genre</label><select id="ed-genre" class="admin-input"><option value="action">Action</option><option value="thriller">Thriller</option><option value="scifi">Sci-Fi</option><option value="drama">Drama</option><option value="comedy">Comedy</option><option value="horror">Horror</option><option value="romance">Romance</option><option value="documentary">Documentary</option></select></div>
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Year</label><input id="ed-year" type="number" class="admin-input" placeholder="2024"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Duration</label><input id="ed-duration" class="admin-input" placeholder="2h 15m"></div>
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Maturity</label><select id="ed-maturity" class="admin-input"><option value="TV-G">TV-G</option><option value="TV-PG">TV-PG</option><option value="PG">PG</option><option value="PG-13">PG-13</option><option value="TV-14">TV-14</option><option value="TV-MA">TV-MA</option><option value="R">R</option></select></div>
-                </div>
-                <div><label class="text-xs text-sf-muted block mb-1.5">Description</label><textarea id="ed-desc" rows="3" class="admin-input" placeholder="Movie description..."></textarea></div>
-                <div><label class="text-xs text-sf-muted block mb-1.5">Cast</label><input id="ed-cast" class="admin-input" placeholder="Actor 1, Actor 2, Actor 3"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Image Seed</label><input id="ed-img" class="admin-input" placeholder="my-poster"><p class="text-[10px] text-sf-muted mt-1">Poster image</p></div>
-                    <div><label class="text-xs text-sf-muted block mb-1.5">Banner Seed</label><input id="ed-banner" class="admin-input" placeholder="my-banner"><p class="text-[10px] text-sf-muted mt-1">Hero background</p></div>
-                </div>
-                <div class="flex items-center gap-3 pt-2"><button onclick="saveMovieEdits()" class="admin-btn flex-1">Save Movie</button><button onclick="closeMovieEditor()" class="admin-btn-secondary">Cancel</button></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<nav id="navbar" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-700">
-    <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div class="flex items-center justify-between h-16 lg:h-20">
-            <div class="flex items-center gap-6 lg:gap-10">
-                <a href="#" id="navbar-logo" class="flex items-center gap-2.5 group" onclick="logoClick(event)">
-                    <div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500"><i data-lucide="play" class="w-4 h-4 text-white fill-white ml-0.5"></i></div>
-                    <span class="text-xl font-bold tracking-tight">Stream<span class="text-sf-red">Flix</span></span>
-                </a>
-                <div id="nav-links" class="hidden lg:flex items-center gap-0.5">
-                    <a href="#" class="px-3.5 py-2 text-[13px] font-medium text-white relative">Home<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span></a>
-                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">TV Shows</a>
-                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">Movies</a>
-                    <a href="#" class="px-3.5 py-2 text-[13px] font-light text-sf-muted hover:text-white transition-colors duration-300">New & Popular</a>
-                </div>
-                <button id="mobile-menu-btn" class="lg:hidden p-2 text-sf-muted hover:text-white transition-colors"><i data-lucide="menu" class="w-5 h-5"></i></button>
-            </div>
-            <div class="flex items-center gap-3">
-                <div id="search-wrapper" class="relative flex items-center">
-                    <div id="search-closed" class="cursor-pointer p-2 text-sf-muted hover:text-white transition-colors duration-300" onclick="openSearch()"><i data-lucide="search" class="w-[18px] h-[18px]"></i></div>
-                    <div id="search-open" class="hidden items-center animate-slide-down">
-                        <i data-lucide="search" class="w-4 h-4 text-sf-muted absolute left-3"></i>
-                        <input id="search-input" type="text" placeholder="Titles, people, genres..." class="search-input bg-sf-surface/95 border border-white/10 text-sm text-white pl-10 pr-10 py-2.5 w-60 lg:w-96 rounded-xl placeholder:text-sf-muted focus:border-sf-red/40 transition-all duration-300 shadow-xl" oninput="handleSearch(this.value)">
-                        <button onclick="closeSearch()" class="absolute right-3 text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
-                    </div>
-                </div>
-                <div id="profile-avatar" class="avatar-ring cursor-pointer hover:shadow-lg hover:shadow-sf-red/20 transition-shadow duration-500">
-                    <div class="w-8 h-8 rounded-[8px] overflow-hidden bg-sf-surface"><img src="https://picsum.photos/seed/avatar-user-stream/80/80.jpg" alt="Profile" class="w-full h-full object-cover"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="search-results" class="hidden max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 pb-4 animate-slide-down">
-        <div class="bg-sf-surface/98 border border-white/8 rounded-2xl max-h-96 overflow-y-auto shadow-2xl shadow-black/50"><div id="search-results-content" class="p-4"></div></div>
-    </div>
-</nav>
-
-<div id="mobile-menu" class="fixed inset-0 z-[90] hidden">
-    <div class="absolute inset-0 bg-black/85" onclick="closeMobileMenu()"></div>
-    <div class="absolute left-0 top-0 bottom-0 w-72 bg-sf-dark/98 border-r border-white/5 p-6 animate-slide-up backdrop-blur-xl">
-        <div class="flex items-center justify-between mb-8"><span id="mobile-logo-text" class="text-lg font-bold">Stream<span class="text-sf-red">Flix</span></span><button onclick="closeMobileMenu()" class="text-sf-muted hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-        <div id="mobile-nav-links" class="flex flex-col gap-1">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-white bg-white/5 rounded-xl"><i data-lucide="home" class="w-5 h-5 text-sf-red"></i> Home</a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="tv" class="w-5 h-5"></i> TV Shows</a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="film" class="w-5 h-5"></i> Movies</a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-sf-muted hover:text-white hover:bg-white/5 rounded-xl transition-colors"><i data-lucide="trending-up" class="w-5 h-5"></i> New & Popular</a>
-        </div>
-    </div>
-</div>
-
-<section id="hero" class="relative h-[90vh] sm:h-[92vh] lg:h-[96vh] overflow-hidden">
-    <div id="hero-bg" class="absolute inset-0 transition-opacity duration-1000"></div>
-    <div class="hero-gradient absolute inset-0"></div>
-    <div class="absolute bottom-0 left-0 w-[600px] h-[400px] bg-sf-red/5 rounded-full blur-[120px] pointer-events-none" style="animation:glow-pulse 6s ease-in-out infinite;"></div>
-    <div class="relative z-10 h-full flex items-end pb-28 sm:pb-32 lg:pb-36">
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 w-full">
-            <div id="hero-content" class="max-w-xl lg:max-w-2xl animate-slide-up" style="animation-delay:0.1s;"></div>
-        </div>
-    </div>
-    <div id="hero-dots" class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5"></div>
-</section>
-
-<main class="relative z-10 -mt-12 sm:-mt-16">
-    <section id="genre-filter-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mb-10">
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 row-scroll">
-            <button class="genre-chip active whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] font-medium" onclick="filterGenre(this,'all')">All</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'action')">Action</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'thriller')">Thriller</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'scifi')">Sci-Fi</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'drama')">Drama</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'comedy')">Comedy</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'horror')">Horror</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'romance')">Romance</button>
-            <button class="genre-chip whitespace-nowrap px-5 py-2 rounded-xl border border-white/10 text-[13px] text-sf-muted font-light" onclick="filterGenre(this,'documentary')">Documentary</button>
-        </div>
+  <main class="relative z-10 -mt-14 pb-20">
+    <section class="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-10">
+      <div id="ad-hero" class="ad-slot mb-6"></div>
+      <div id="continue-strip" class="mb-10 hidden"></div>
+      <div class="mb-7 flex gap-2 overflow-x-auto pb-2 row-scroll" id="chips"></div>
     </section>
-    <div id="content-rows"></div>
-    <section id="top10-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-12 mb-4">
-        <h2 id="top10-heading" class="row-title text-lg sm:text-xl font-semibold mb-6 flex items-center gap-3"><span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>in Your Country Today</h2>
-        <div class="row-scroll flex gap-3 sm:gap-4 overflow-x-auto pb-4"><div id="top10-container" class="flex gap-3 sm:gap-4"></div></div>
+    <section id="library" class="space-y-11"></section>
+    <section class="mx-auto mt-12 max-w-[1920px] px-4 sm:px-6 lg:px-10">
+      <div id="ad-footer" class="ad-slot"></div>
     </section>
-    <section id="genre-grid-section" class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-14 mb-20">
-        <h2 id="genre-grid-heading" class="row-title text-lg sm:text-xl font-semibold mb-6">Browse by Genre</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="genre-grid"></div>
-    </section>
-</main>
+  </main>
+  <div id="ad-sticky" class="sticky-promo"></div>
 
-<footer id="footer-el" class="border-t border-white/5 relative overflow-hidden">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-sf-red/3 rounded-full blur-[100px] pointer-events-none"></div>
-    <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 py-14 relative z-10">
-        <div id="footer-social" class="flex items-center gap-5 mb-10">
-            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="facebook" class="w-4 h-4"></i></a>
-            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="instagram" class="w-4 h-4"></i></a>
-            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="twitter" class="w-4 h-4"></i></a>
-            <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sf-muted hover:text-white hover:bg-white/10 transition-all duration-300"><i data-lucide="youtube" class="w-4 h-4"></i></a>
-        </div>
-        <div id="footer-links" class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
-            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Audio Description</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Investor Relations</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Legal Notices</a></div>
-            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Help Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Jobs</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Cookie Preferences</a></div>
-            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Gift Cards</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Terms of Use</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Corporate Information</a></div>
-            <div class="flex flex-col gap-2.5"><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Media Center</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Privacy</a><a href="#" class="text-xs text-sf-muted hover:text-slate-300 transition-colors">Contact Us</a></div>
-        </div>
-        <div id="footer-service-code"><button class="text-[11px] text-sf-muted border border-white/8 px-4 py-1.5 rounded-lg hover:text-white hover:border-white/20 transition-all duration-300 mb-5">Service Code</button></div>
-        <p id="footer-copyright" class="text-[11px] text-white/20">&copy; 2024 StreamFlix. All rights reserved.</p>
+  <footer class="border-t border-white/5 px-4 py-12 text-xs text-sf-muted sm:px-6 lg:px-10">
+    <div class="mx-auto flex max-w-[1920px] flex-col gap-7">
+      <div class="flex gap-4"><i data-lucide="facebook"></i><i data-lucide="instagram"></i><i data-lucide="twitter"></i><i data-lucide="youtube"></i></div>
+      <div class="grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <a>Audio Description</a><a>Help Center</a><a>Gift Cards</a><a>Media Center</a>
+        <a>Investor Relations</a><a>Jobs</a><a>Terms of Use</a><a>Privacy</a>
+      </div>
+      <p class="text-white/25">&copy; 2026 StreamFlix. Demo streaming portal.</p>
     </div>
-</footer>
+  </footer>
 
-<div id="modal" class="fixed inset-0 z-[150] hidden">
-    <div class="modal-backdrop absolute inset-0 bg-black/75" onclick="closeModal()"></div>
-    <div class="relative z-10 max-w-3xl mx-auto mt-6 sm:mt-10 max-h-[92vh] overflow-y-auto rounded-2xl animate-scale-in shadow-2xl shadow-black/50"><div id="modal-content"></div></div>
-</div>
+  <div id="details-modal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-backdrop absolute inset-0 bg-black/75" onclick="closeDetails()"></div>
+    <div class="relative z-10 mx-auto mt-5 max-h-[94vh] max-w-5xl overflow-y-auto rounded-2xl bg-sf-card shadow-2xl shadow-black animate-in">
+      <div id="details-content"></div>
+    </div>
+  </div>
 
-<script>
-var ADMIN_PASS='Haran!stream2026!';
-var editingMovieId=-1,logoClicks=0,logoTimer=null,currentStreamId=-1,streamLoadTimeout=null,currentHero=0,heroInterval=null;
+  <div id="player-modal" class="fixed inset-0 z-[150] hidden bg-black">
+    <div class="flex h-full flex-col">
+      <header class="flex items-center justify-between border-b border-white/10 bg-black/90 px-4 py-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <button onclick="closePlayer()" class="rounded-lg p-2 text-sf-muted hover:bg-white/10 hover:text-white"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
+          <div class="min-w-0">
+            <p id="player-title" class="truncate text-sm font-semibold">Loading</p>
+            <p id="player-subtitle" class="truncate text-xs text-sf-muted"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 text-xs text-sf-muted">
+          <label class="flex items-center gap-2">Autoplay <span class="toggle"><input id="autoplay" type="checkbox" checked><span class="track"></span></span></label>
+          <button onclick="nextEpisode()" class="rounded-lg border border-white/10 px-3 py-2 hover:text-white">Next</button>
+          <button onclick="closePlayer()" class="rounded-lg p-2 hover:bg-white/10 hover:text-white"><i data-lucide="x" class="h-5 w-5"></i></button>
+        </div>
+      </header>
+      <div class="relative flex-1 bg-black">
+        <div id="player-loader" class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black"><div class="spinner"></div><p class="text-sm text-sf-muted">Loading stream...</p></div>
+        <iframe id="player-frame" class="absolute inset-0 h-full w-full border-0" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-5">
+          <div class="mb-2 flex items-center justify-between text-xs text-sf-muted"><span id="progress-label">0% watched</span><span>Demo progress is saved automatically</span></div>
+          <div class="h-1.5 overflow-hidden rounded-full bg-white/15"><div id="watch-progress" class="h-full rounded-full bg-sf-red" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div id="ad-watch-below" class="ad-slot m-4"></div>
+    </div>
+  </div>
 
-var ST;
-function getDefaultSettings(){return{logo:{text:"Stream",accent:"Flix",icon:"play",imageUrl:""},theme:{accent:"#E50914",bg:"#0a0a0f",surface:"#12121a",card:"#16161f",border:"#1e1e2a"},hero:{customBanners:{}},homepage:{showGenreFilter:true,showTop10:true,showGenreGrid:true,top10Heading:"",genreGridHeading:"",hiddenRows:[]},header:{showNav:true,showSearch:true,showProfile:true,links:[{text:"Home",active:true},{text:"TV Shows",active:false},{text:"Movies",active:false},{text:"New & Popular",active:false}]},footer:{show:true,showSocial:true,showLinks:true,copyright:"\u00a9 2024 StreamFlix. All rights reserved.",showServiceCode:true}};}
-function loadSettings(){try{var s=localStorage.getItem('streamflix_settings');if(s){ST=JSON.parse(s);var d=getDefaultSettings();Object.keys(d).forEach(function(k){if(!ST[k])ST[k]=d[k];});if(!ST.homepage.hiddenRows)ST.homepage.hiddenRows=[];return;}}catch(e){}ST=getDefaultSettings();}
-function saveSettings(){localStorage.setItem('streamflix_settings',JSON.stringify(ST));}
-function hexRgb(h){h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return parseInt(h.substring(0,2),16)+', '+parseInt(h.substring(2,4),16)+', '+parseInt(h.substring(4,6),16);}
+  <div id="admin-login-modal" class="fixed inset-0 z-[130] hidden">
+    <div class="premium-blur absolute inset-0 bg-black/70" onclick="closeAdminLogin()"></div>
+    <div class="relative z-10 mx-auto mt-[15vh] w-[min(92vw,430px)] animate-in rounded-3xl border border-white/10 bg-sf-surface/90 p-7 shadow-2xl shadow-black/70">
+      <div class="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <div class="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-sf-red shadow-lg shadow-red-950/50"><i data-lucide="shield" class="h-5 w-5"></i></div>
+          <h2 class="text-xl font-black tracking-tight">Admin Access</h2>
+          <p class="mt-1 text-sm text-sf-muted">Enter the admin password to edit StreamFlix.</p>
+        </div>
+        <button onclick="closeAdminLogin()" class="rounded-xl p-2 text-sf-muted hover:bg-white/10 hover:text-white"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <div id="admin-login-error" class="mb-4 hidden rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs text-red-200"></div>
+      <label class="text-xs font-semibold uppercase tracking-wider text-sf-muted">Password</label>
+      <input id="admin-password" type="password" class="admin-input mt-2" placeholder="Enter password" onkeydown="if(event.key==='Enter')attemptAdminLogin()">
+      <button onclick="attemptAdminLogin()" class="admin-btn mt-4 w-full py-3">Unlock Admin Portal</button>
+      <p class="mt-4 text-center text-[11px] text-sf-muted">Tip: click the StreamFlix logo 5 times for the hidden admin gate.</p>
+    </div>
+  </div>
 
-function applyTheme(){
-    var t=ST.theme,a=t.accent,ar=hexRgb(a),bg=t.bg,sf=t.surface,cd=t.card,bd=t.border;
-    document.getElementById('dynamic-theme').textContent=
-    ':root{--accent:'+a+';--ar:'+ar+';--bg:'+bg+';--sf:'+sf+';--cd:'+cd+';--bd:'+bd+';}'+
-    'body{background:'+bg+'!important;}'+
-    '.bg-sf-red,.bg-sf-red\\/90{background-color:'+a+'!important;}'+
-    '.bg-sf-red\\/80{background-color:rgba('+ar+',0.8)!important;}'+
-    '.bg-sf-red\\/20{background-color:rgba('+ar+',0.2)!important;}'+
-    '.bg-sf-red\\/15{background-color:rgba('+ar+',0.15)!important;}'+
-    '.bg-sf-red\\/10{background-color:rgba('+ar+',0.1)!important;}'+
-    '.bg-sf-red\\/5{background-color:rgba('+ar+',0.05)!important;}'+
-    '.bg-sf-red\\/3{background-color:rgba('+ar+',0.03)!important;}'+
-    '.text-sf-red{color:'+a+'!important;}'+
-    '.bg-sf-dark{background-color:'+bg+'!important;}'+
-    '.bg-sf-surface{background-color:'+sf+'!important;}'+
-    '.bg-sf-card{background-color:'+cd+'!important;}'+
-    '.border-sf-border{border-color:'+bd+'!important;}'+
-    '.border-sf-red\\/40{border-color:rgba('+ar+',0.4)!important;}'+
-    '.shadow-sf-red\\/20,.shadow-sf-red\\/25,.shadow-sf-red\\/30{--tw-shadow-color:rgba('+ar+',0.25)!important;}'+
-    '.shadow-sf-red\\/40{--tw-shadow-color:rgba('+ar+',0.4)!important;}'+
-    '.play-btn-glow{box-shadow:0 0 30px rgba('+ar+',0.3),0 0 60px rgba('+ar+',0.1)!important;}'+
-    '.play-btn-glow:hover{box-shadow:0 0 40px rgba('+ar+',0.5),0 0 80px rgba('+ar+',0.2)!important;}'+
-    '.genre-chip:hover,.genre-chip.active{background:'+a+'!important;border-color:'+a+'!important;box-shadow:0 2px 16px rgba('+ar+',0.25)!important;}'+
-    '.genre-chip:hover{box-shadow:0 4px 20px rgba('+ar+',0.3)!important;}'+
-    '.scroll-arrow:hover{background:rgba('+ar+',0.95)!important;box-shadow:0 4px 24px rgba('+ar+',0.4)!important;}'+
-    '.row-title::after{background:'+a+'!important;}'+
-    '.avatar-ring{background:conic-gradient(from 0deg,'+a+',#ff6b6b,'+a+')!important;}'+
-    '.admin-btn{background:'+a+'!important;}'+
-    '.admin-btn:hover{box-shadow:0 4px 20px rgba('+ar+',0.3)!important;}'+
-    '.toggle input:checked+.toggle-track{background:rgba('+ar+',0.2)!important;border-color:rgba('+ar+',0.4)!important;}'+
-    '.toggle input:checked+.toggle-track::before{background:'+a+'!important;}'+
-    '.section-label .sl-dot{background:'+a+'!important;}'+
-    '.top10-number{-webkit-text-stroke-color:rgba('+ar+',0.25)!important;filter:drop-shadow(0 0 30px rgba('+ar+',0.1))!important;}'+
-    '#footer-el .absolute{background:rgba('+ar+',0.03)!important;}'+
-    '.search-input:focus{border-color:rgba('+ar+',0.4)!important;}';
-}
+  <div id="admin-modal" class="fixed inset-0 z-[120] hidden">
+    <div class="premium-blur absolute inset-0 bg-black/72"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,.16),transparent_28%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,.08),transparent_25%)]"></div>
+    <div class="admin-shell relative z-10 m-3 flex h-[calc(100vh-24px)] flex-col overflow-hidden rounded-3xl border border-white/10">
+      <header class="flex items-center justify-between border-b border-white/10 bg-white/[.03] px-5 py-4">
+        <div class="flex items-center gap-3"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-sf-red"><i data-lucide="shield" class="h-4 w-4"></i></span><div><h2 class="font-bold">Advanced Admin Portal</h2><p class="text-xs text-sf-muted">Movies, TV series, seasons, episodes, homepage, and playback controls</p></div></div>
+        <div class="flex gap-2"><button onclick="saveAll()" class="admin-btn">Save & Apply</button><button onclick="closeAdmin()" class="admin-btn ghost">Preview</button></div>
+      </header>
+      <div class="flex flex-1 overflow-hidden">
+        <aside class="admin-sidebar w-60 border-r border-white/10 p-4">
+          <button onclick="adminTab('content')" class="admin-tab active mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Movie Library</button>
+          <button onclick="adminTab('series')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Series & Episodes</button>
+          <button onclick="adminTab('homepage')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Homepage Rows</button>
+          <button onclick="adminTab('monetization')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Monetization</button>
+          <button onclick="adminTab('settings')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Playback Settings</button>
+        </aside>
+        <section class="flex-1 overflow-y-auto p-5">
+          <div id="admin-content" class="admin-page"></div>
+          <div id="admin-series" class="admin-page hidden"></div>
+          <div id="admin-homepage" class="admin-page hidden"></div>
+          <div id="admin-monetization" class="admin-page hidden"></div>
+          <div id="admin-settings" class="admin-page hidden"></div>
+        </section>
+      </div>
+    </div>
+  </div>
 
-function applyLayout(){
-    var hp=ST.homepage,hf=ST.header,ft=ST.footer;
-    var el=function(id){return document.getElementById(id);};
-    if(el('genre-filter-section'))el('genre-filter-section').style.display=hp.showGenreFilter?'':'none';
-    if(el('top10-section'))el('top10-section').style.display=hp.showTop10?'':'none';
-    if(el('genre-grid-section'))el('genre-grid-section').style.display=hp.showGenreGrid?'':'none';
-    document.querySelectorAll('#content-rows > section').forEach(function(s,i){s.style.display=hp.hiddenRows.indexOf(i)!==-1?'none':'';});
-    if(el('nav-links'))el('nav-links').style.display=hf.showNav?'':'none';
-    if(el('search-wrapper'))el('search-wrapper').style.display=hf.showSearch?'':'none';
-    if(el('profile-avatar'))el('profile-avatar').style.display=hf.showProfile?'':'none';
-    if(el('footer-el'))el('footer-el').style.display=ft.show?'':'none';
-    if(el('footer-social'))el('footer-social').style.display=ft.showSocial?'':'none';
-    if(el('footer-links'))el('footer-links').style.display=ft.showLinks?'':'none';
-    if(el('footer-service-code'))el('footer-service-code').style.display=ft.showServiceCode?'':'none';
-    if(el('footer-copyright'))el('footer-copyright').textContent=ft.copyright;
-}
+  <script>
+    const STORAGE = "streamflix_upgraded_v1";
+    const ADMIN_PASSWORD = "Haran!stream2026!";
+    const defaultData = {
+      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All" },
+      list: [],
+      progress: {},
+      monetization: {
+        adCodes: [
+          { id:"ad-demo-banner", name:"Demo Affiliate Banner", type:"Banner ads", enabled:true, code:"<div style='padding:22px;border-radius:14px;background:linear-gradient(90deg,#E50914,#7f1d1d);color:white;font-family:Inter,sans-serif'><b>Sponsored</b><br>Premium streaming gear sale - affiliate promo</div>" },
+          { id:"ad-demo-native", name:"Native Recommendation", type:"Native ads", enabled:true, code:"<div style='padding:18px;color:white'><b>Sponsored Pick</b><p style='margin:6px 0 0;color:#bbb'>Upgrade your home cinema setup.</p></div>" }
+        ],
+        placements: {
+          hero:{ label:"Hero banner ad", enabled:true, adCodeId:"ad-demo-banner", impressions:0, clicks:0 },
+          betweenRows:{ label:"Between movie rows", enabled:true, adCodeId:"ad-demo-native", impressions:0, clicks:0 },
+          sidebar:{ label:"Sidebar/banner areas", enabled:false, adCodeId:"ad-demo-banner", impressions:0, clicks:0 },
+          footer:{ label:"Footer ads", enabled:true, adCodeId:"ad-demo-banner", impressions:0, clicks:0 },
+          watchBelow:{ label:"Below video player", enabled:true, adCodeId:"ad-demo-native", impressions:0, clicks:0 },
+          recommended:{ label:"Recommended section ads", enabled:false, adCodeId:"ad-demo-native", impressions:0, clicks:0 },
+          sticky:{ label:"Sticky promo banner", enabled:false, adCodeId:"ad-demo-banner", impressions:0, clicks:0 },
+          episode:{ label:"Episode page ads", enabled:true, adCodeId:"ad-demo-native", impressions:0, clicks:0 },
+          episodeBetween:{ label:"Between episode lists", enabled:false, adCodeId:"ad-demo-banner", impressions:0, clicks:0 }
+        },
+        campaigns: [
+          { id:"camp-launch", name:"Launch Sponsor Campaign", start:"2026-05-01", end:"2026-06-30", active:true, placementIds:["hero","footer"] }
+        ],
+        promos: [
+          { id:"promo-featured", name:"Featured Sponsor", type:"Sponsored banner", enabled:true, title:"Featured Sponsor", text:"Promote affiliate offers, sponsors, or OTT bundles here.", cta:"Learn More", url:"#", placement:"hero" }
+        ],
+        videoAds: { preroll:false, midroll:false, postroll:false },
+        analytics: { revenuePlaceholder:"$0.00" }
+      },
+      rows: [
+        { title:"Trending Now", filter:"all", ids:["s-arcane-frontier","m-last-horizon","s-shadow-bureau","m-neon-streets","s-kitchen-line","m-deep-blue"] },
+        { title:"Binge-Worthy TV", filter:"series", ids:["s-arcane-frontier","s-shadow-bureau","s-kitchen-line","s-haunted-county"] },
+        { title:"Movies Night", filter:"movie", ids:["m-last-horizon","m-neon-streets","m-silent-patient","m-deep-blue","m-love-transit"] }
+      ],
+      titles: [
+        { id:"s-arcane-frontier", type:"series", title:"Arcane Frontier", genre:"Sci-Fi", year:2026, maturity:"TV-14", duration:"3 seasons", cast:"Maya Chen, Idris Vale, Sonal Rao", poster:"arcane-frontier-poster", banner:"arcane-frontier-space", desc:"A fugitive cartographer discovers a living star map that can rewrite the borders of known space.", seasons:[
+          { n:1, name:"Season 1", episodes:[
+            { n:1, title:"The Map Wakes", duration:"48m", desc:"Mira steals a forbidden chart and finds a signal hiding inside it.", embedUrl:"https://abyss.to/embed/823464" },
+            { n:2, title:"Cold Orbit", duration:"51m", desc:"The crew docks at a silent mining ring with one impossible survivor.", embedUrl:"https://abyss.to/embed/603" },
+            { n:3, title:"Ghost Coordinates", duration:"46m", desc:"A broken compass points toward a planet erased from every archive.", embedUrl:"https://abyss.to/embed/438631" }
+          ]},
+          { n:2, name:"Season 2", episodes:[
+            { n:1, title:"Border Fire", duration:"50m", desc:"A rescue mission turns into a declaration of war.", embedUrl:"https://abyss.to/embed/569094" },
+            { n:2, title:"The Green Sun", duration:"53m", desc:"The map reveals a civilization hidden inside a stellar storm.", embedUrl:"https://abyss.to/embed/157336" }
+          ]}
+        ]},
+        { id:"s-shadow-bureau", type:"series", title:"Shadow Bureau", genre:"Thriller", year:2025, maturity:"TV-MA", duration:"2 seasons", cast:"Nadia West, Theo Grant", poster:"shadow-bureau-poster", banner:"shadow-bureau-city", desc:"A retired analyst is pulled back into the agency after her old case files begin predicting assassinations.", seasons:[
+          { n:1, name:"Season 1", episodes:[
+            { n:1, title:"Dead Drop", duration:"44m", desc:"A coded envelope arrives ten years late.", embedUrl:"https://abyss.to/embed/278" },
+            { n:2, title:"Asset Unknown", duration:"47m", desc:"The bureau hunts a witness who may not exist.", embedUrl:"https://abyss.to/embed/680" }
+          ]}
+        ]},
+        { id:"s-kitchen-line", type:"series", title:"Kitchen Line", genre:"Drama", year:2026, maturity:"TV-MA", duration:"8 episodes", cast:"Rhea Morgan, Felix Hsu", poster:"kitchen-line-poster", banner:"chef-kitchen-fire", desc:"A young chef inherits a failing restaurant and a team too talented to quit.", seasons:[
+          { n:1, name:"Season 1", episodes:[
+            { n:1, title:"Family Meal", duration:"39m", desc:"The staff reopens for one chaotic dinner service.", embedUrl:"" },
+            { n:2, title:"Burn Rate", duration:"42m", desc:"A surprise critic forces the kitchen to choose speed or soul.", embedUrl:"" }
+          ]}
+        ]},
+        { id:"s-haunted-county", type:"series", title:"Haunted County", genre:"Horror", year:2025, maturity:"R", duration:"6 episodes", cast:"Jenna Hale, Peter Knox", poster:"haunted-county-poster", banner:"haunted-dark-house", desc:"An archivist catalogs rural disappearances and realizes the county itself is keeping score.", seasons:[
+          { n:1, name:"Season 1", episodes:[
+            { n:1, title:"The Orchard", duration:"45m", desc:"A field recording captures a voice under the soil.", embedUrl:"https://abyss.to/embed/539" },
+            { n:2, title:"Mile Marker 9", duration:"43m", desc:"A road appears only during thunderstorms.", embedUrl:"" }
+          ]}
+        ]},
+        { id:"m-last-horizon", type:"movie", title:"The Last Horizon", genre:"Sci-Fi", year:2026, maturity:"PG-13", duration:"2h 22m", cast:"Emma Stone, Dev Patel", poster:"hero-cinematic-dark", banner:"hero-cinematic-dark", desc:"A pilot carrying Earth's final archive crosses into a simulation that may be more real than home.", embedUrl:"https://abyss.to/embed/157336" },
+        { id:"m-neon-streets", type:"movie", title:"Neon Streets", genre:"Action", year:2025, maturity:"TV-MA", duration:"2h 11m", cast:"John Boyega, Ana de Armas", poster:"neon-city-night", banner:"neon-city-night", desc:"A courier in a cyberpunk city outruns gangs, police drones, and the truth in her own memory.", embedUrl:"https://abyss.to/embed/569094" },
+        { id:"m-silent-patient", type:"movie", title:"The Silent Patient", genre:"Thriller", year:2024, maturity:"TV-MA", duration:"1h 52m", cast:"Saoirse Ronan, Jake Gyllenhaal", poster:"dark-moody-portrait", banner:"dark-moody-portrait", desc:"A psychotherapist becomes obsessed with a patient who refuses to explain a brutal crime.", embedUrl:"https://abyss.to/embed/278" },
+        { id:"m-deep-blue", type:"movie", title:"Deep Blue", genre:"Documentary", year:2026, maturity:"TV-G", duration:"4 episodes", cast:"Cate Blanchett", poster:"underwater-ocean-deep", banner:"underwater-ocean-deep", desc:"A spectacular dive into the ocean's least explored worlds.", embedUrl:"https://abyss.to/embed/575264" },
+        { id:"m-love-transit", type:"movie", title:"Love in Transit", genre:"Romance", year:2024, maturity:"PG-13", duration:"1h 55m", cast:"Sydney Park, Glen Powell", poster:"romantic-train-sunset", banner:"romantic-train-sunset", desc:"Two strangers meet on a cross-country train and keep missing their stops.", embedUrl:"https://abyss.to/embed/155" }
+      ]
+    };
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+    let db = load();
+    let currentView = "home", currentTitleId = null, currentSeason = 0, currentEpisode = 0, progressTimer = null, adminTitleId = null;
 
-var navIconMap={"home":"home","tv shows":"tv","movies":"film","new":"trending-up","popular":"trending-up","trending":"trending-up","settings":"settings","profile":"user","help":"help-circle"};
-function getNavIcon(text){var t=text.toLowerCase();for(var k in navIconMap){if(t.indexOf(k)!==-1)return navIconMap[k];}return'link';}
+    function load(){ try { return JSON.parse(localStorage.getItem(STORAGE)) || structuredClone(defaultData); } catch { return structuredClone(defaultData); } }
+    function persist(){ localStorage.setItem(STORAGE, JSON.stringify(db)); }
+    function title(id){ return db.titles.find(t => t.id === id); }
+    function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+    function img(seed,w=700,h=1050){ return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${w}/${h}.jpg`; }
+    function firstEpisode(t){ return t.type === "series" ? t.seasons?.[0]?.episodes?.[0] : t; }
+    function progressKey(id,s=0,e=0){ return `${id}:${s}:${e}`; }
+    function itemProgress(id){ const keys = Object.keys(db.progress).filter(k => k.startsWith(id + ":")); return keys.reduce((m,k)=>Math.max(m,db.progress[k]?.pct||0),0); }
+    function hasStream(t){ const ep = firstEpisode(t); return !!(ep && ep.embedUrl && ep.embedUrl.trim()); }
+    function migrateMonetization(){
+      if(!db.monetization) db.monetization = structuredClone(defaultData.monetization);
+      if(!db.monetization.adCodes) db.monetization.adCodes = structuredClone(defaultData.monetization.adCodes);
+      if(!db.monetization.placements) db.monetization.placements = structuredClone(defaultData.monetization.placements);
+      if(!db.monetization.campaigns) db.monetization.campaigns = [];
+      if(!db.monetization.promos) db.monetization.promos = [];
+      if(!db.monetization.videoAds) db.monetization.videoAds = { preroll:false, midroll:false, postroll:false };
+      if(!db.monetization.analytics) db.monetization.analytics = { revenuePlaceholder:"$0.00" };
+      persist();
+    }
+    function adCode(id){ return db.monetization.adCodes.find(a => a.id === id && a.enabled); }
+    function campaignAllowsPlacement(key){
+      const today = new Date().toISOString().slice(0,10);
+      const active = db.monetization.campaigns.filter(c => c.active && (!c.start || c.start <= today) && (!c.end || c.end >= today));
+      if(!active.length) return true;
+      return active.some(c => (c.placementIds || []).includes(key));
+    }
+    function adMarkup(key){
+      const p = db.monetization.placements[key];
+      if(!p || !p.enabled || !campaignAllowsPlacement(key)) return "";
+      const code = adCode(p.adCodeId);
+      const promos = promoMarkup(key);
+      if(!code && !promos) return "";
+      p.impressions = (p.impressions || 0) + 1;
+      persist();
+      return `<div onclick="trackAdClick('${key}')" class="ad-shell">${code ? code.code : ""}${promos}</div>`;
+    }
+    function promoMarkup(key){
+      const promos = (db.monetization.promos || []).filter(p => p.enabled && (p.placement || "hero") === key);
+      return promos.map(p => `<a href="${esc(p.url || "#")}" class="block w-full p-5 text-left text-white no-underline">
+        <span class="mb-2 inline-flex rounded-lg bg-sf-red px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">${esc(p.type)}</span>
+        <b class="block text-base">${esc(p.title)}</b>
+        <span class="mt-1 block text-sm text-slate-300">${esc(p.text)}</span>
+        <span class="mt-3 inline-flex rounded-lg border border-white/15 px-3 py-2 text-xs font-bold">${esc(p.cta || "Open")}</span>
+      </a>`).join("");
+    }
+    function fillAd(id,key){
+      const el = document.getElementById(id);
+      if(!el) return;
+      const html = adMarkup(key);
+      el.innerHTML = html;
+      activateAdScripts(el);
+      el.classList.toggle("active", !!html);
+    }
+    function activateAdScripts(root){
+      root.querySelectorAll("script").forEach(oldScript => {
+        const s = document.createElement("script");
+        Array.from(oldScript.attributes).forEach(attr => s.setAttribute(attr.name, attr.value));
+        s.text = oldScript.textContent;
+        oldScript.replaceWith(s);
+      });
+    }
+    function renderAds(){
+      if(!db.monetization) return;
+      fillAd("ad-hero","hero");
+      fillAd("ad-footer","footer");
+      fillAd("ad-watch-below","watchBelow");
+      fillAd("ad-episode","episode");
+      document.querySelectorAll("[id^='ad-between-']").forEach(el => {
+        const html = adMarkup("betweenRows");
+        el.innerHTML = html;
+        activateAdScripts(el);
+        el.classList.toggle("active", !!html);
+      });
+      const sticky = document.getElementById("ad-sticky");
+      if(sticky){
+        const html = adMarkup("sticky");
+        sticky.innerHTML = html;
+        activateAdScripts(sticky);
+        sticky.classList.toggle("active", !!html);
+      }
+    }
+    function trackAdClick(key){
+      const p = db.monetization.placements[key];
+      if(p){ p.clicks = (p.clicks || 0) + 1; persist(); }
+    }
 
-function renderLogo(){
-    var el=document.getElementById('navbar-logo');
-    if(ST.logo.imageUrl){el.innerHTML='<img src="'+esc(ST.logo.imageUrl)+'" class="h-9 w-auto object-contain rounded-lg" alt="Logo">';}
-    else{el.innerHTML='<div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center shadow-lg shadow-sf-red/20 group-hover:shadow-sf-red/40 transition-shadow duration-500"><i data-lucide="'+ST.logo.icon+'" class="w-4 h-4 text-white fill-white ml-0.5"></i></div><span class="text-xl font-bold tracking-tight">'+esc(ST.logo.text)+'<span class="text-sf-red">'+esc(ST.logo.accent)+'</span></span>';}
-    var mt=document.getElementById('mobile-logo-text');if(mt)mt.innerHTML=esc(ST.logo.text)+'<span class="text-sf-red">'+esc(ST.logo.accent)+'</span>';
-}
+    function boot(){
+      migrateMonetization(); renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); renderAdmin(); lucide.createIcons();
+      window.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("nav-glass",scrollY>20));
+      document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDetails(); closePlayer(); closeAdmin(); closeAdminLogin(); } });
+    }
 
-function renderNav(){
-    var nl=document.getElementById('nav-links');
-    nl.innerHTML=ST.header.links.map(function(l){return '<a href="#" class="px-3.5 py-2 text-[13px] '+(l.active?'font-medium text-white relative':'font-light text-sf-muted hover:text-white')+' transition-colors duration-300">'+esc(l.text)+(l.active?'<span class="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-sf-red rounded-full"></span>':'')+'</a>';}).join('');
-    var mnl=document.getElementById('mobile-nav-links');
-    mnl.innerHTML=ST.header.links.map(function(l){var ic=getNavIcon(l.text);return '<a href="#" class="flex items-center gap-3 px-4 py-3 text-sm '+(l.active?'font-medium text-white bg-white/5':'text-sf-muted hover:text-white hover:bg-white/5')+' rounded-xl transition-colors"><i data-lucide="'+ic+'" class="w-5 h-5'+(l.active?' text-sf-red':'')+'"></i> '+esc(l.text)+'</a>';}).join('');
-}
+    function renderHero(){
+      const h = title(db.settings.heroId) || db.titles[0], ep = firstEpisode(h);
+      document.getElementById("hero-bg").innerHTML = `<img src="${img(h.banner,1920,1080)}" class="h-full w-full object-cover opacity-80" alt="">`;
+      document.getElementById("hero-copy").innerHTML = `
+        <div class="mb-5 flex flex-wrap items-center gap-3 text-xs text-sf-muted">
+          <span class="rounded-lg bg-sf-red px-3 py-1.5 font-black uppercase tracking-[0.18em] text-white">StreamFlix Original</span>
+          <span>${h.year}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${h.genre}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${h.type === "series" ? h.duration : h.maturity}</span>
+        </div>
+        <h1 class="mb-5 text-5xl font-black leading-[.9] tracking-tight sm:text-7xl lg:text-8xl">${esc(h.title)}</h1>
+        <p class="mb-7 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">${esc(h.desc)}</p>
+        <div class="flex flex-wrap gap-3">
+          <button onclick="play('${h.id}',0,0)" class="flex items-center gap-2 rounded-xl bg-sf-red px-7 py-4 text-sm font-black shadow-xl shadow-red-950/40"><i data-lucide="play" class="h-5 w-5 fill-white"></i>${ep?.embedUrl ? "Play Now" : "Unavailable"}</button>
+          <button onclick="openDetails('${h.id}')" class="flex items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-7 py-4 text-sm font-bold hover:bg-white/15"><i data-lucide="info" class="h-5 w-5"></i>More Info</button>
+          <button onclick="toggleList('${h.id}')" class="rounded-xl border border-white/15 px-4 py-4 hover:bg-white/10"><i data-lucide="${db.list.includes(h.id) ? "check" : "plus"}" class="h-5 w-5"></i></button>
+        </div>`;
+    }
 
-function renderHeadings(){
-    var th=document.getElementById('top10-heading');
-    if(ST.homepage.top10Heading)th.innerHTML='<span class="bg-sf-red text-white text-[10px] font-bold tracking-[0.15em] px-2.5 py-1 rounded-lg shadow-md shadow-sf-red/20">TOP 10</span>'+esc(ST.homepage.top10Heading);
-    var gh=document.getElementById('genre-grid-heading');
-    if(ST.homepage.genreGridHeading)gh.textContent=ST.homepage.genreGridHeading;
-}
+    function renderChips(){
+      const genres = ["All","Series","Movies",...Array.from(new Set(db.titles.map(t=>t.genre)))];
+      document.getElementById("chips").innerHTML = genres.map(g=>`<button onclick="setGenre('${g}')" class="chip ${db.settings.activeGenre===g?"active":""} whitespace-nowrap rounded-xl border border-white/10 px-5 py-2 text-sm text-sf-muted">${g}</button>`).join("");
+    }
+    function setGenre(g){ db.settings.activeGenre=g; persist(); renderChips(); renderLibrary(); }
+    function setView(v){ currentView=v; renderLibrary(); renderContinue(); scrollTo({top:620,behavior:"smooth"}); }
 
-function getDefaultData(){return{movies:[{id:0,title:"The Last Horizon",genre:"scifi",year:2024,duration:"2h 34m",maturity:"TV-MA",desc:"In a world where the boundaries between reality and simulation blur, one woman discovers she holds the key to humanity's survival.",cast:"Emma Stone, Oscar Isaac, Dev Patel",img:"hero-cinematic-dark",banner:"hero-cinematic-dark",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/823464"},{id:1,title:"Midnight Protocol",genre:"thriller",year:2024,duration:"1h 58m",maturity:"TV-14",desc:"A retired intelligence operative is pulled back into the shadows when a ghost from the past threatens global security.",cast:"Idris Elba, Cate Blanchett",img:"midnight-spy-dark",banner:"midnight-spy-dark",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/603"},{id:2,title:"Echoes of War",genre:"drama",year:2023,duration:"2h 47m",maturity:"R",desc:"Three generations of a family grapple with the lasting consequences of a conflict that shaped their nation.",cast:"Viola Davis, Daniel Kaluuya",img:"war-drama-scene",banner:"war-drama-scene",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/438631"},{id:3,title:"Neon Streets",genre:"action",year:2024,duration:"2h 11m",maturity:"TV-MA",desc:"In a cyberpunk metropolis, a street racer gets entangled in a deadly conspiracy that could topple the city's elite.",cast:"John Boyega, Ana de Armas",img:"neon-city-night",banner:"neon-city-night",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/569094"},{id:4,title:"The Silent Patient",genre:"thriller",year:2024,duration:"1h 52m",maturity:"TV-MA",desc:"A renowned psychotherapist becomes obsessed with treating a woman who shot her husband and hasn't spoken since.",cast:"Saoirse Ronan, Jake Gyllenhaal",img:"dark-moody-portrait",banner:"dark-moody-portrait",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/278"},{id:5,title:"Starfall",genre:"scifi",year:2024,duration:"2h 22m",maturity:"PG-13",desc:"When fragments of an alien civilization rain down on Earth, a team of scientists races to decode their message.",cast:"Zendaya, Timoth\u00e9e Chalamet",img:"space-stars-galaxy",banner:"space-stars-galaxy",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/157336"},{id:6,title:"Laugh Factory",genre:"comedy",year:2023,duration:"1h 38m",maturity:"PG-13",desc:"A struggling comedian accidentally becomes the face of a corporate brand and must choose between authenticity and wealth.",cast:"Ke Huy Quan, Awkwafina",img:"comedy-stage-lights",banner:"comedy-stage-lights",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/350"},{id:7,title:"Crimson Tide Rising",genre:"action",year:2024,duration:"2h 19m",maturity:"R",desc:"An elite Navy SEAL team undertakes an impossible rescue mission behind enemy lines as tensions escalate to war.",cast:"Michael B. Jordan, Florence Pugh",img:"ocean-military-ship",banner:"ocean-military-ship",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/299534"},{id:8,title:"Whispers in the Dark",genre:"horror",year:2024,duration:"1h 45m",maturity:"R",desc:"A family moves into a historic mansion only to discover that its walls hold secrets better left buried.",cast:"Jenna Ortega, Pedro Pascal",img:"haunted-dark-house",banner:"haunted-dark-house",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/539"},{id:9,title:"Love in Transit",genre:"romance",year:2023,duration:"1h 55m",maturity:"PG-13",desc:"Two strangers meet on a cross-country train journey and discover that sometimes the best destinations are unexpected.",cast:"Sydney Sweeney, Glen Powell",img:"romantic-train-sunset",banner:"romantic-train-sunset",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/155"},{id:10,title:"Planet Earth: Next Chapter",genre:"documentary",year:2024,duration:"6 episodes",maturity:"TV-G",desc:"A breathtaking exploration of how our planet's ecosystems are adapting to the challenges of the modern age.",cast:"David Attenborough (narrator)",img:"nature-landscape-green",banner:"nature-landscape-green",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/76479"},{id:11,title:"Shadow Empire",genre:"action",year:2024,duration:"2h 28m",maturity:"TV-MA",desc:"In a dystopian future, a rebel faction fights against a totalitarian regime that controls the world's resources.",cast:"Tom Hardy, Lupita Nyong'o",img:"dystopian-ruins-city",banner:"dystopian-ruins-city",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/49026"},{id:12,title:"The Mind's Eye",genre:"scifi",year:2023,duration:"2h 05m",maturity:"TV-14",desc:"A neuroscientist develops technology to enter other people's memories, but discovers some doors should stay closed.",cast:"Natalie Portman, Adam Driver",img:"brain-neural-lights",banner:"brain-neural-lights",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/137113"},{id:13,title:"Kitchen Confidential",genre:"drama",year:2024,duration:"8 episodes",maturity:"TV-MA",desc:"The intense, cutthroat world of high-end restaurant kitchens as seen through the eyes of a rising chef.",cast:"Jeremy Allen White, Ayo Edebiri",img:"chef-kitchen-fire",banner:"chef-kitchen-fire",embedUrl:""},{id:14,title:"Dead of Night",genre:"horror",year:2024,duration:"1h 40m",maturity:"R",desc:"A group of friends stranded in the wilderness discover that the local legends about creatures in the woods are terrifyingly real.",cast:"Megan Sweeney, Harris Dickinson",img:"dark-forest-night-fog",banner:"dark-forest-night-fog",embedUrl:""},{id:15,title:"The Grand Illusion",genre:"thriller",year:2023,duration:"2h 15m",maturity:"TV-14",desc:"A world-famous magician's latest trick goes horribly wrong, revealing a conspiracy that stretches back decades.",cast:"Benedict Cumberbatch, Margot Robbie",img:"magic-show-stage",banner:"magic-show-stage",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/680"},{id:16,title:"Wild Hearts",genre:"romance",year:2024,duration:"1h 50m",maturity:"PG-13",desc:"A wildlife photographer and a veterinarian find unexpected love while working to save an endangered species.",cast:"Florence Pugh, Andrew Garfield",img:"safari-animals-sunset",banner:"safari-animals-sunset",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/496243"},{id:17,title:"Code Zero",genre:"action",year:2024,duration:"2h 01m",maturity:"R",desc:"When a cyber attack threatens to disable the world's nuclear arsenals, a hacker and a soldier must work together.",cast:"John David Washington, Gal Gadot",img:"cyber-hack-screen",banner:"cyber-hack-screen",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/383498"},{id:18,title:"Breaking Point",genre:"drama",year:2024,duration:"2h 30m",maturity:"TV-MA",desc:"An athlete's journey from poverty to Olympic glory, and the personal cost of chasing perfection.",cast:"Jonathan Majors, Jodie Comer",img:"sports-stadium-crowd",banner:"sports-stadium-crowd",embedUrl:""},{id:19,title:"Deep Blue",genre:"documentary",year:2024,duration:"4 episodes",maturity:"TV-G",desc:"A mesmerizing deep-dive into the ocean's most mysterious and unexplored depths.",cast:"Cate Blanchett (narrator)",img:"underwater-ocean-deep",banner:"underwater-ocean-deep",embedUrl:"https://player.mediadelivery.net/embed/d1e8b7c2/575264"}],heroIds:[0,3,5,4],rows:[{title:"Trending Now",ids:[0,4,3,7,5,11,15,8]},{title:"Popular on StreamFlix",ids:[1,9,12,6,14,16,2,18]},{title:"Action & Adventure",ids:[3,7,11,17,0,15]},{title:"Critically Acclaimed",ids:[10,19,4,15,18,12]},{title:"Sci-Fi & Fantasy",ids:[5,12,0,3,11,8]}],top10Ids:[4,10,0,15,18,3,12,5,7,1],genres:[{name:"Action",icon:"swords",seed:"action-explosion-fire",gradient:"from-red-900/70 to-orange-950/80"},{name:"Thriller",icon:"eye",seed:"thriller-dark-alley",gradient:"from-purple-900/70 to-indigo-950/80"},{name:"Sci-Fi",icon:"rocket",seed:"scifi-space-rocket",gradient:"from-blue-900/70 to-cyan-950/80"},{name:"Drama",icon:"drama",seed:"drama-theater-stage",gradient:"from-amber-900/70 to-yellow-950/80"},{name:"Comedy",icon:"smile",seed:"comedy-fun-party",gradient:"from-yellow-900/70 to-lime-950/80"},{name:"Horror",icon:"skull",seed:"horror-dark-scary",gradient:"from-gray-900/70 to-slate-950/80"},{name:"Romance",icon:"heart",seed:"romance-sunset-love",gradient:"from-pink-900/70 to-rose-950/80"},{name:"Documentary",icon:"globe",seed:"documentary-nature-earth",gradient:"from-green-900/70 to-emerald-950/80"}]};}
-var SD;
-function loadSiteData(){try{var s=localStorage.getItem('streamflix_data');if(s){SD=JSON.parse(s);SD.movies.forEach(function(m){if(m.embedUrl===undefined)m.embedUrl='';});return;}}catch(e){}SD=getDefaultData();}
-function saveSiteData(){localStorage.setItem('streamflix_data',JSON.stringify(SD));}
-function getMovie(id){return SD.movies.find(function(m){return m.id===id;});}
-function hasStream(m){return m&&m.embedUrl&&m.embedUrl.trim().length>0;}
+    function filtered(ids=null){
+      const q = document.getElementById("search")?.value?.toLowerCase() || "";
+      let list = ids ? ids.map(title).filter(Boolean) : db.titles.slice();
+      if(currentView==="series") list = list.filter(t=>t.type==="series");
+      if(currentView==="movies") list = list.filter(t=>t.type==="movie");
+      if(currentView==="list") list = list.filter(t=>db.list.includes(t.id));
+      if(currentView==="continue") list = list.filter(t=>itemProgress(t.id)>0);
+      const g = db.settings.activeGenre;
+      if(g==="Series") list = list.filter(t=>t.type==="series");
+      else if(g==="Movies") list = list.filter(t=>t.type==="movie");
+      else if(g!=="All") list = list.filter(t=>t.genre===g);
+      if(q) list = list.filter(t => [t.title,t.genre,t.cast,t.desc].join(" ").toLowerCase().includes(q));
+      return list;
+    }
 
-function playStream(id){var m=getMovie(id);if(!m)return;currentStreamId=id;document.getElementById('stream-modal').classList.remove('hidden');document.body.style.overflow='hidden';document.getElementById('stream-title').textContent=m.title;document.getElementById('stream-loading').style.display='';document.getElementById('stream-error').style.display='none';document.getElementById('stream-iframe').src='';if(!hasStream(m)){document.getElementById('stream-loading').style.display='none';document.getElementById('stream-error').style.display='';lucide.createIcons();return;}setTimeout(function(){var f=document.getElementById('stream-iframe');f.src=m.embedUrl.trim();if(streamLoadTimeout)clearTimeout(streamLoadTimeout);streamLoadTimeout=setTimeout(function(){document.getElementById('stream-loading').style.display='none';},3000);f.onload=function(){if(streamLoadTimeout)clearTimeout(streamLoadTimeout);document.getElementById('stream-loading').style.display='none';};},400);lucide.createIcons();}
-function closeStream(){document.getElementById('stream-modal').classList.add('hidden');document.getElementById('stream-iframe').src='';if(streamLoadTimeout)clearTimeout(streamLoadTimeout);checkOverflow();}
-function testEmbed(){var u=document.getElementById('ed-embed').value.trim();if(!u){showToast('Enter a URL first');return;}window.open(u,'_blank');}
+    function renderLibrary(){
+      let rows = db.rows;
+      if(currentView !== "home") rows = [{ title: labelForView(), ids: db.titles.map(t=>t.id) }];
+      document.getElementById("library").innerHTML = rows.map((r,i)=>{
+        const items = filtered(r.ids);
+        if(!items.length) return "";
+        return `<section class="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-10">
+          <div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">${esc(r.title)}</h2><span class="text-xs text-sf-muted">${items.length} titles</span></div>
+          <div class="row-scroll flex gap-3 overflow-x-auto pb-5">${items.map(card).join("")}</div>
+          ${i < rows.length - 1 ? `<div id="ad-between-${i}" class="ad-slot mt-3"></div>` : ""}
+        </section>`;
+      }).join("") || `<section class="mx-auto max-w-[1920px] px-4 text-sf-muted sm:px-6 lg:px-10">No titles match this view.</section>`;
+      renderAds();
+      lucide.createIcons();
+    }
+    function labelForView(){ return ({series:"TV Series",movies:"Movies",continue:"Continue Watching",list:"My List"})[currentView] || "Browse"; }
+    function card(t){
+      const pct = itemProgress(t.id), badge = t.type === "series" ? `${t.seasons.length} season${t.seasons.length>1?"s":""}` : t.duration;
+      return `<article onclick="openDetails('${t.id}')" class="card relative w-[150px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-sf-card sm:w-[190px]">
+        <div class="relative aspect-[2/3]"><img src="${img(t.poster)}" alt="${esc(t.title)}" class="h-full w-full object-cover"><div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+          <div class="absolute right-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] font-bold">${t.type==="series"?"TV":"MOVIE"}</div>
+          <button onclick="event.stopPropagation();play('${t.id}',0,0)" class="poster-overlay absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-black"><i data-lucide="play" class="ml-0.5 h-4 w-4 fill-black"></i></button>
+        </div>
+        <div class="p-3"><p class="line-1 text-sm font-bold">${esc(t.title)}</p><p class="mt-1 text-xs text-sf-muted">${t.year} • ${esc(badge)}</p>${pct?`<div class="mt-3 h-1 rounded bg-white/10"><div class="h-full rounded bg-sf-red" style="width:${pct}%"></div></div>`:""}</div>
+      </article>`;
+    }
 
-document.addEventListener('input',function(e){if(e.target.id!=='ed-embed')return;var v=e.target.value.trim(),st=document.getElementById('embed-status');if(!v){st.classList.add('hidden');e.target.style.borderColor='#1e1e2a';return;}try{new URL(v);st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-green-400"><i data-lucide="check-circle" class="w-3 h-3"></i>Valid URL</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(34,197,94,0.4)';lucide.createIcons();}catch(err){st.innerHTML='<div class="flex items-center gap-1.5 text-[11px] text-red-400"><i data-lucide="x-circle" class="w-3 h-3"></i>Invalid URL</div>';st.classList.remove('hidden');e.target.style.borderColor='rgba(239,68,68,0.4)';lucide.createIcons();}});
+    function renderContinue(){
+      const wrap = document.getElementById("continue-strip");
+      const items = db.titles.filter(t=>itemProgress(t.id)>0);
+      if(!db.settings.showContinue || !items.length){ wrap.classList.add("hidden"); return; }
+      wrap.classList.remove("hidden");
+      wrap.innerHTML = `<div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">Continue Watching</h2><button onclick="setView('continue')" class="text-xs text-sf-red">View all</button></div>
+      <div class="row-scroll flex gap-3 overflow-x-auto pb-2">${items.map(t=>`<button onclick="resume('${t.id}')" class="flex w-80 flex-shrink-0 gap-3 rounded-xl border border-white/10 bg-white/[.03] p-2 text-left hover:bg-white/[.06]">
+        <img src="${img(t.banner,220,124)}" class="h-20 w-32 rounded-lg object-cover" alt=""><span class="min-w-0 flex-1 py-1"><b class="line-1 text-sm">${esc(t.title)}</b><small class="mt-1 block text-sf-muted">${itemProgress(t.id)}% watched</small><span class="mt-3 block h-1 rounded bg-white/10"><span class="block h-full rounded bg-sf-red" style="width:${itemProgress(t.id)}%"></span></span></span>
+      </button>`).join("")}</div>`;
+    }
 
-function createCard(m){var hs=hasStream(m);return '<div class="card-hover flex-shrink-0 w-[130px] sm:w-[175px] lg:w-[195px] cursor-pointer rounded-xl overflow-hidden relative" onclick="openModal('+m.id+')"><div class="relative aspect-[2/3] bg-sf-card rounded-xl overflow-hidden"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy">'+(hs?'<div class="absolute top-2 right-2 w-5 h-5 bg-sf-red/90 rounded-md flex items-center justify-center z-10 shadow-md"><i data-lucide="play" class="w-2.5 h-2.5 text-white fill-white ml-0.5"></i></div>':'')+'<div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div><div class="card-info absolute bottom-0 left-0 right-0 p-3"><div class="flex items-center gap-1.5 mb-2.5"><button onclick="event.stopPropagation();'+(hs?'playStream('+m.id+')':'showToast(\'No stream URL set\')')+'" class="w-7 h-7 '+(hs?'bg-white':'bg-white/30')+' rounded-lg flex items-center justify-center hover:bg-white/90 transition-colors shadow-lg shadow-black/30"><i data-lucide="play" class="w-3 h-3 text-black fill-black ml-0.5"></i></button><button onclick="event.stopPropagation();showToast(\'Liked!\')" class="w-7 h-7 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-3 h-3"></i></button></div><p class="text-[11px] font-semibold leading-tight line-clamp-2 mb-1.5">'+m.title+'</p><div class="flex items-center gap-1.5"><span class="text-[9px] text-slate-400">'+m.year+'</span><span class="maturity-badge text-[8px] text-slate-400 rounded">'+m.maturity+'</span><span class="text-[9px] text-slate-500">'+m.duration+'</span></div></div></div></div>';}
-function createTop10Card(m,r){return '<div class="flex-shrink-0 flex items-end cursor-pointer group" onclick="openModal('+m.id+')"><span class="top10-number mr-[-14px] relative z-10 select-none">'+r+'</span><div class="w-[110px] sm:w-[135px] lg:w-[155px] rounded-xl overflow-hidden relative card-hover"><div class="aspect-[2/3] bg-sf-card"><img src="https://picsum.photos/seed/'+m.img+'/400/600.jpg" alt="'+esc(m.title)+'" class="card-img w-full h-full object-cover" loading="lazy"></div></div></div>';}
+    function openDetails(id){
+      const t = title(id); if(!t) return;
+      const seasons = t.type === "series" ? renderEpisodes(t) : "";
+      document.getElementById("details-content").innerHTML = `<div class="relative">
+        <div class="relative h-80"><img src="${img(t.banner,1200,600)}" class="h-full w-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-sf-card via-black/50 to-transparent"></div><button onclick="closeDetails()" class="absolute right-4 top-4 rounded-xl bg-black/60 p-2"><i data-lucide="x"></i></button>
+          <div class="absolute bottom-6 left-6 right-6"><div class="mb-3 flex gap-2 text-xs text-sf-muted"><span>${t.year}</span><span>${t.maturity}</span><span>${t.genre}</span><span>${t.duration}</span></div><h2 class="text-4xl font-black">${esc(t.title)}</h2></div>
+        </div>
+        <div class="p-6"><div class="grid gap-6 lg:grid-cols-[1fr_260px]"><div><div class="mb-4 flex gap-3"><button onclick="play('${t.id}',0,0)" class="admin-btn flex items-center gap-2"><i data-lucide="play" class="h-4 w-4 fill-white"></i>Play</button><button onclick="toggleList('${t.id}')" class="admin-btn secondary">${db.list.includes(t.id)?"Remove from List":"Add to List"}</button></div><p class="leading-7 text-slate-300">${esc(t.desc)}</p></div><div class="text-sm text-sf-muted"><p><b class="text-white">Cast:</b> ${esc(t.cast)}</p><p class="mt-3"><b class="text-white">Type:</b> ${t.type}</p></div></div>${seasons}</div>
+      </div>`;
+      document.getElementById("details-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAds(); lucide.createIcons();
+    }
+    function closeDetails(){ document.getElementById("details-modal").classList.add("hidden"); document.body.style.overflow=""; }
+    function renderEpisodes(t){
+      return `<div class="mt-8 border-t border-white/10 pt-6"><div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h3 class="text-lg font-bold">Episodes</h3><select onchange="currentSeason=Number(this.value);openDetails('${t.id}')" class="admin-input max-w-xs">${t.seasons.map((s,i)=>`<option value="${i}" ${i===currentSeason?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div>
+      <div id="ad-episode" class="ad-slot mb-4"></div>
+      <div class="space-y-2">${(t.seasons[currentSeason]?.episodes||[]).map((e,i)=>`<button onclick="play('${t.id}',${currentSeason},${i})" class="episode flex w-full gap-4 rounded-xl border border-white/10 bg-white/[.03] p-3 text-left hover:bg-white/[.06]">
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-black/40 font-black text-sf-muted">${e.n}</span><span class="flex-1"><b>${esc(e.title)}</b><small class="ml-2 text-sf-muted">${e.duration}</small><span class="line-2 mt-1 block text-sm text-sf-muted">${esc(e.desc)}</span></span><i data-lucide="play" class="mt-3 h-5 w-5 text-sf-red"></i>
+      </button>`).join("")}</div></div>`;
+    }
 
-function renderAll(){applyTheme();renderLogo();renderNav();renderHeadings();renderHero();renderRows();renderTop10();renderGenreGrid();applyLayout();lucide.createIcons();}
+    function play(id,s=0,e=0){
+      const t = title(id); if(!t) return;
+      const ep = t.type === "series" ? t.seasons?.[s]?.episodes?.[e] : t;
+      if(!ep?.embedUrl){ toast("No stream URL set for this title"); return; }
+      currentTitleId=id; currentSeason=s; currentEpisode=e;
+      document.getElementById("player-title").textContent = t.title;
+      document.getElementById("player-subtitle").textContent = t.type==="series" ? `S${s+1}:E${e+1} ${ep.title}` : `${t.year} • ${t.duration}`;
+      document.getElementById("player-modal").classList.remove("hidden"); document.body.style.overflow="hidden";
+      document.getElementById("player-loader").style.display="flex"; document.getElementById("player-frame").src="";
+      setTimeout(()=>{ document.getElementById("player-frame").src=ep.embedUrl; setTimeout(()=>document.getElementById("player-loader").style.display="none",1800); },250);
+      startProgress(); renderAds(); lucide.createIcons();
+    }
+    function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
+    function startProgress(){
+      clearInterval(progressTimer);
+      const key = progressKey(currentTitleId,currentSeason,currentEpisode);
+      if(!db.progress[key]) db.progress[key] = { pct:0, updated:Date.now() };
+      updateProgressUI(db.progress[key].pct);
+      progressTimer=setInterval(()=>{
+        const p = db.progress[key]; p.pct = Math.min(100, (p.pct||0)+5); p.updated=Date.now(); persist(); updateProgressUI(p.pct);
+        if(p.pct>=100){ clearInterval(progressTimer); if(document.getElementById("autoplay").checked) setTimeout(nextEpisode,900); }
+      },1800);
+    }
+    function updateProgressUI(p){ document.getElementById("watch-progress").style.width=p+"%"; document.getElementById("progress-label").textContent=p+"% watched"; }
+    function nextEpisode(){
+      const t=title(currentTitleId); if(!t || t.type!=="series"){ closePlayer(); return; }
+      let s=currentSeason,e=currentEpisode+1;
+      if(e >= (t.seasons[s]?.episodes.length||0)){ s++; e=0; }
+      if(!t.seasons[s]?.episodes[e]){ toast("Series complete"); closePlayer(); return; }
+      play(t.id,s,e);
+    }
+    function resume(id){
+      const keys=Object.keys(db.progress).filter(k=>k.startsWith(id+":")).sort((a,b)=>(db.progress[b].updated||0)-(db.progress[a].updated||0));
+      const parts=(keys[0]||`${id}:0:0`).split(":"); play(id,Number(parts[1]),Number(parts[2]));
+    }
+    function toggleList(id){ db.list = db.list.includes(id) ? db.list.filter(x=>x!==id) : [...db.list,id]; persist(); toast(db.list.includes(id)?"Added to My List":"Removed from My List"); renderHero(); renderLibrary(); if(!document.getElementById("details-modal").classList.contains("hidden")) openDetails(id); }
+    function toast(msg){ const el=document.createElement("div"); el.className="animate-in rounded-2xl border border-white/10 bg-sf-surface px-5 py-3 text-sm shadow-2xl"; el.textContent=msg; document.getElementById("toast").appendChild(el); setTimeout(()=>el.remove(),2400); }
 
-function renderHero(){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(!hm.length)return;if(currentHero>=hm.length)currentHero=0;var m=hm[currentHero],hs=hasStream(m);var bs=ST.hero.customBanners[m.id]||('https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg');document.getElementById('hero-bg').innerHTML='<img src="'+esc(bs)+'" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';var tH=m.title;if(m.title.length>16){var w=m.title.split(' '),mid=Math.ceil(w.length/2);tH=w.slice(0,mid).join(' ')+'<br>'+w.slice(mid).join(' ');}document.getElementById('hero-content').innerHTML='<div class="flex items-center gap-3 mb-5"><span class="bg-sf-red text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg shadow-lg shadow-sf-red/25">StreamFlix Original</span><span class="text-sf-muted text-sm font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-sm font-light">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</span>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Streaming</span>':'')+'</div><h1 class="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.9] mb-5" style="text-shadow:0 8px 60px rgba(0,0,0,0.6);">'+tH+'</h1><div class="flex items-center gap-2.5 mb-5 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-sf-muted text-xs font-medium tracking-wider">4K</span><span class="border border-sf-muted/50 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HDR</span></div><p class="text-slate-400 text-sm sm:text-[15px] font-light leading-[1.7] mb-8 line-clamp-3 max-w-lg">'+m.desc+'</p><div class="flex items-center gap-3 flex-wrap"><button onclick="'+(hs?'playStream('+m.id+')':'showToast(\'No stream available\')')+'" class="play-btn-glow flex items-center gap-2.5 '+(hs?'bg-sf-red text-white':'bg-white/30 text-white/50 cursor-not-allowed')+' font-semibold text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"><i data-lucide="play" class="w-5 h-5 fill-white"></i> '+(hs?'Play Now':'Unavailable')+'</button><button onclick="openModal('+m.id+')" class="flex items-center gap-2.5 bg-white/10 text-white font-medium text-sm sm:text-[15px] px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-md border border-white/5"><i data-lucide="info" class="w-5 h-5"></i> More Info</button></div>';var dots='';for(var i=0;i<hm.length;i++)dots+='<button class="hero-dot '+(i===currentHero?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500" onclick="changeHero('+i+')"></button>';document.getElementById('hero-dots').innerHTML=dots;}
-function changeHero(i){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(i===currentHero||i>=hm.length)return;currentHero=i;var bg=document.getElementById('hero-bg');bg.style.opacity='0';setTimeout(function(){var m=hm[i];var bs=ST.hero.customBanners[m.id]||('https://picsum.photos/seed/'+m.banner+'/1920/1080.jpg');bg.innerHTML='<img src="'+esc(bs)+'" alt="Featured" class="w-full h-full object-cover scale-105" style="animation:float 12s ease-in-out infinite;">';bg.style.opacity='1';},600);document.querySelectorAll('.hero-dot').forEach(function(d,j){d.className='hero-dot '+(j===i?'w-8 bg-white':'w-3 bg-white/20 hover:bg-white/50')+' h-1 rounded-full transition-all duration-500';});}
-function startHeroAutoplay(){if(heroInterval)clearInterval(heroInterval);heroInterval=setInterval(function(){var hm=SD.heroIds.map(getMovie).filter(Boolean);if(hm.length>1)changeHero((currentHero+1)%hm.length);},8000);}
-function renderRows(){document.getElementById('content-rows').innerHTML=SD.rows.map(function(r,ri){return '<section class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 mt-9 mb-3 row-container"><h2 class="row-title text-lg sm:text-xl font-semibold mb-5">'+r.title+'</h2><div class="relative group/row"><button onclick="scrollRow(\'row-'+ri+'\',-1)" class="scroll-arrow absolute left-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-r-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><div id="row-'+ri+'" class="row-scroll flex gap-2.5 sm:gap-3 overflow-x-auto pb-4">'+r.ids.map(function(id){var m=getMovie(id);return m?createCard(m):'';}).join('')+'</div><button onclick="scrollRow(\'row-'+ri+'\',1)" class="scroll-arrow absolute right-0 top-0 bottom-4 z-20 w-10 bg-black/70 rounded-l-xl flex items-center justify-center border border-white/5"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div></section>';}).join('');}
-function renderTop10(){document.getElementById('top10-container').innerHTML=SD.top10Ids.map(function(id,i){var m=getMovie(id);return m?createTop10Card(m,i+1):'';}).join('');}
-function renderGenreGrid(){document.getElementById('genre-grid').innerHTML=SD.genres.map(function(g,gi){return '<div class="genre-tile relative h-32 sm:h-36 rounded-2xl overflow-hidden cursor-pointer group" onclick="filterGenreByIndex('+(gi+1)+',\''+g.name.toLowerCase().replace(/[^a-z]/g,'')+'\')"><div class="genre-tile-img absolute inset-0"><img src="https://picsum.photos/seed/'+g.seed+'/600/300.jpg" class="w-full h-full object-cover" loading="lazy"></div><div class="absolute inset-0 bg-gradient-to-br '+g.gradient+'"></div><div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div><div class="absolute inset-0 flex items-center gap-3 px-5"><div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10"><i data-lucide="'+g.icon+'" class="w-5 h-5 text-white/80"></i></div><span class="text-base sm:text-lg font-semibold drop-shadow-lg">'+g.name+'</span></div><div class="absolute inset-0 border border-white/5 rounded-2xl group-hover:border-white/15 transition-colors duration-500"></div></div>';}).join('');}
-function scrollRow(id,d){var el=document.getElementById(id);if(el)el.scrollBy({left:d*el.clientWidth*0.75,behavior:'smooth'});}
+    let logoClicks=0, logoTimer=null;
+    function secretAdmin(e){ e.preventDefault(); logoClicks++; clearTimeout(logoTimer); logoTimer=setTimeout(()=>logoClicks=0,1200); if(logoClicks>=5){ logoClicks=0; requestAdminLogin(); } }
+    function requestAdminLogin(){
+      document.getElementById("admin-login-modal").classList.remove("hidden");
+      document.getElementById("admin-login-error").classList.add("hidden");
+      document.getElementById("admin-password").value="";
+      document.body.style.overflow="hidden";
+      setTimeout(()=>document.getElementById("admin-password").focus(),80);
+      lucide.createIcons();
+    }
+    function closeAdminLogin(){
+      document.getElementById("admin-login-modal").classList.add("hidden");
+      if(document.getElementById("admin-modal").classList.contains("hidden")) document.body.style.overflow="";
+    }
+    function attemptAdminLogin(){
+      const pass = document.getElementById("admin-password").value;
+      if(pass === ADMIN_PASSWORD){
+        closeAdminLogin();
+        openAdmin();
+        return;
+      }
+      const err = document.getElementById("admin-login-error");
+      err.textContent = "Incorrect password. Please try again.";
+      err.classList.remove("hidden");
+      document.getElementById("admin-password").value = "";
+      document.getElementById("admin-password").focus();
+    }
+    function openAdmin(){ document.getElementById("admin-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAdmin(); lucide.createIcons(); }
+    function closeAdmin(){ document.getElementById("admin-modal").classList.add("hidden"); document.body.style.overflow=""; renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); }
+    function adminTab(name){ document.querySelectorAll(".admin-tab").forEach(b=>b.classList.remove("active")); event.target.classList.add("active"); document.querySelectorAll(".admin-page").forEach(p=>p.classList.add("hidden")); document.getElementById("admin-"+name).classList.remove("hidden"); }
+    function saveAll(){ persist(); renderAds(); toast("Admin changes saved"); closeAdmin(); }
+    function renderAdmin(){ migrateMonetization(); renderAdminContent(); renderAdminSeries(); renderAdminHomepage(); renderAdminMonetization(); renderAdminSettings(); }
+    function renderAdminContent(){
+      const movies = db.titles.filter(t => t.type === "movie");
+      document.getElementById("admin-content").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Movie Library</h3><p class="mt-1 text-sm text-sf-muted">Add, edit, delete movies and paste embed URLs for streaming.</p></div><button onclick="addMovie()" class="admin-btn">Add Movie</button></div>
+      <div class="overflow-x-auto rounded-2xl border border-white/10"><table class="w-full text-left text-sm"><thead class="bg-white/[.03] text-xs uppercase tracking-wider text-sf-muted"><tr><th class="p-3">Movie</th><th>Genre</th><th>Year</th><th>Duration</th><th>Embed URL</th><th>Stream</th><th>Actions</th></tr></thead><tbody>${movies.map(t=>`<tr class="border-t border-white/5"><td class="p-3 font-semibold">${esc(t.title)}</td><td>${t.genre}</td><td>${t.year}</td><td>${t.duration}</td><td class="max-w-[260px] truncate text-xs text-sf-muted">${t.embedUrl ? esc(t.embedUrl) : "No embed URL"}</td><td>${hasStream(t)?"Ready":"Missing"}</td><td><button onclick="editMovie('${t.id}')" class="admin-btn secondary mr-2 py-2">Edit</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger py-2">Delete</button></td></tr>`).join("")}</tbody></table></div>
+      <div id="title-editor" class="mt-5"></div>`;
+    }
+    function editMovie(id){
+      const t = title(id); adminTitleId=id;
+      document.getElementById("title-editor").innerHTML = `<div class="rounded-2xl border border-white/10 bg-white/[.03] p-5"><h4 class="mb-4 font-bold">Edit Movie</h4>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        ${field("Movie Title","ed-title",t.title)}${field("Genre","ed-genre",t.genre)}${field("Year","ed-year",t.year,"number")}
+        ${field("Maturity","ed-maturity",t.maturity)}${field("Duration","ed-duration",t.duration)}${field("Poster seed","ed-poster",t.poster)}${field("Banner seed","ed-banner",t.banner)}
+      </div><div class="mt-3 grid gap-3 lg:grid-cols-2">${field("Cast","ed-cast",t.cast)}${field("Streaming Embed URL","ed-embed",t.embedUrl||"")}</div>
+      <textarea id="ed-desc" class="admin-input mt-3" rows="3">${esc(t.desc)}</textarea>
+      <div class="mt-4 flex gap-2"><button onclick="saveMovieEditor()" class="admin-btn">Save Movie</button><button onclick="document.getElementById('title-editor').innerHTML=''" class="admin-btn ghost">Cancel</button></div></div>`;
+    }
+    function field(label,id,val,type="text"){ return `<label class="text-xs text-sf-muted">${label}<input id="${id}" type="${type}" value="${esc(val)}" class="admin-input mt-1"></label>`; }
+    function select(label,id,val,opts){ return `<label class="text-xs text-sf-muted">${label}<select id="${id}" class="admin-input mt-1">${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select></label>`; }
+    function saveMovieEditor(){
+      const t = title(adminTitleId); if(!t) return;
+      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:v("ed-genre"), year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:v("ed-poster"), banner:v("ed-banner"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed") });
+      delete t.seasons;
+      persist(); renderAdmin(); toast("Movie saved");
+    }
+    function v(id){ return document.getElementById(id).value.trim(); }
+    function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
+    function deleteTitle(id){ db.titles=db.titles.filter(t=>t.id!==id); db.rows.forEach(r=>r.ids=r.ids.filter(x=>x!==id)); db.list=db.list.filter(x=>x!==id); persist(); renderAdmin(); }
+    function renderAdminSeries(){
+      const series = db.titles.filter(t=>t.type==="series");
+      document.getElementById("admin-series").innerHTML = `<h3 class="mb-4 text-lg font-bold">Series, Seasons & Episodes</h3>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-center justify-between"><h4 class="font-bold">${esc(t.title)}</h4><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
+    }
+    function addSeason(id){ const t=title(id); t.seasons.push({n:t.seasons.length+1,name:`Season ${t.seasons.length+1}`,episodes:[]}); persist(); renderAdminSeries(); }
+    function addEpisode(id,si){ const eps=title(id).seasons[si].episodes; eps.push({n:eps.length+1,title:"New Episode",duration:"42m",desc:"Episode description.",embedUrl:""}); persist(); renderAdminSeries(); }
+    function removeEpisode(id,si,ei){ title(id).seasons[si].episodes.splice(ei,1); persist(); renderAdminSeries(); }
+    function renderAdminHomepage(){
+      document.getElementById("admin-homepage").innerHTML = `<h3 class="mb-4 text-lg font-bold">Homepage Rows</h3><div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><label class="text-xs text-sf-muted">Hero Title<select class="admin-input mt-1 max-w-md" onchange="db.settings.heroId=this.value;persist();renderHero()">${db.titles.map(t=>`<option value="${t.id}" ${t.id===db.settings.heroId?"selected":""}>${esc(t.title)}</option>`).join("")}</select></label></div>
+      ${db.rows.map((r,ri)=>`<div class="mb-3 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-3 flex gap-2"><input class="admin-input max-w-sm" value="${esc(r.title)}" onchange="db.rows[${ri}].title=this.value;persist()"><button onclick="db.rows.splice(${ri},1);persist();renderAdminHomepage()" class="admin-btn danger">Remove Row</button></div><div class="flex flex-wrap gap-2">${db.titles.map(t=>`<button onclick="toggleRowTitle(${ri},'${t.id}')" class="rounded-lg border ${r.ids.includes(t.id)?"border-sf-red bg-sf-red/20":"border-white/10 bg-white/5"} px-3 py-2 text-xs">${esc(t.title)}</button>`).join("")}</div></div>`).join("")}<button onclick="db.rows.push({title:'New Row',ids:[]});persist();renderAdminHomepage()" class="admin-btn">Add Row</button>`;
+    }
+    function toggleRowTitle(ri,id){ const row=db.rows[ri]; row.ids=row.ids.includes(id)?row.ids.filter(x=>x!==id):[...row.ids,id]; persist(); renderAdminHomepage(); }
+    function renderAdminMonetization(){
+      const m = db.monetization;
+      const adOptions = m.adCodes.map(a=>`<option value="${a.id}">${esc(a.name)} (${esc(a.type)})</option>`).join("");
+      const totalImpressions = Object.values(m.placements).reduce((n,p)=>n+(p.impressions||0),0);
+      const totalClicks = Object.values(m.placements).reduce((n,p)=>n+(p.clicks||0),0);
+      const topPlacement = Object.entries(m.placements).sort((a,b)=>(b[1].impressions||0)-(a[1].impressions||0))[0];
+      document.getElementById("admin-monetization").innerHTML = `
+        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div><h3 class="text-lg font-bold">Monetization</h3><p class="mt-1 text-sm text-sf-muted">OTT-style ad and sponsor control. Visitors only see enabled placements.</p></div>
+          <button onclick="addAdCode()" class="admin-btn">Add Ad Code</button>
+        </div>
 
-function openModal(id){var m=getMovie(id);if(!m)return;var hs=hasStream(m);var similar=SD.movies.filter(function(x){return x.genre===m.genre&&x.id!==id;}).slice(0,6);document.getElementById('modal-content').innerHTML='<div class="relative"><div class="relative h-[280px] sm:h-[380px] lg:h-[420px]"><img src="https://picsum.photos/seed/'+m.banner+'/1200/600.jpg" alt="'+esc(m.title)+'" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-[#16161f] via-black/50 to-transparent"></div><button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-black/70 transition-colors border border-white/5"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute bottom-6 left-6 right-6"><h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-5" style="text-shadow:0 4px 30px rgba(0,0,0,0.5);">'+m.title+'</h2><div class="flex items-center gap-3"><button onclick="'+(hs?'closeModal();playStream('+m.id+')':'showToast(\'No stream URL set\')')+'" class="play-btn-glow flex items-center gap-2 '+(hs?'bg-sf-red text-white':'bg-white/20 text-white/40 cursor-not-allowed')+' font-semibold text-sm px-7 py-3 rounded-xl transition-all shadow-xl '+(hs?'shadow-sf-red/20':'')+'"><i data-lucide="play" class="w-5 h-5 '+(hs?'fill-white':'')+'"></i> '+(hs?'Play':'Unavailable')+'</button><button onclick="showToast(\'Liked!\')" class="w-11 h-11 rounded-xl border-2 border-white/30 flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition-all"><i data-lucide="thumbs-up" class="w-5 h-5"></i></button></div></div></div><div class="bg-[#16161f] p-6 sm:p-8 rounded-b-2xl"><div class="flex flex-col sm:flex-row gap-6"><div class="flex-1"><div class="flex items-center gap-2.5 mb-4 text-sm flex-wrap"><span class="text-slate-300 font-light">'+m.year+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="maturity-badge text-slate-300 rounded">'+m.maturity+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="text-slate-300 font-light">'+m.duration+'</span><span class="w-1 h-1 bg-sf-muted rounded-full"></span><span class="border border-sf-muted/40 text-sf-muted px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded">HD</span>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Stream Ready</span>':'<span class="text-[10px] text-red-400/60 bg-red-500/5 border border-red-500/10 px-2 py-0.5 rounded-md">No Stream</span>')+'</div><p class="text-slate-400 text-sm font-light leading-[1.75] mb-4">'+m.desc+'</p>'+(hs?'<div class="flex items-center gap-2 text-[11px] text-sf-muted"><i data-lucide="link" class="w-3 h-3 flex-shrink-0"></i><span class="url-preview">'+esc(m.embedUrl)+'</span></div>':'')+'</div><div class="sm:w-52 space-y-3 text-sm border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6 pt-4 sm:pt-0"><div><span class="text-sf-muted text-xs">Cast</span><p class="text-slate-300 font-light mt-0.5">'+m.cast+'</p></div><div><span class="text-sf-muted text-xs">Genres</span><p class="text-slate-300 font-light mt-0.5">'+m.genre.charAt(0).toUpperCase()+m.genre.slice(1)+'</p></div></div></div>'+(similar.length>0?'<div class="mt-8 border-t border-white/5 pt-6"><h3 class="text-base font-semibold mb-4">More Like This</h3><div class="grid grid-cols-3 gap-2.5">'+similar.map(function(x){var xs=hasStream(x);return '<div class="rounded-xl overflow-hidden bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] hover:ring-1 hover:ring-white/10 transition-all duration-300" onclick="event.stopPropagation();openModal('+x.id+')"><div class="aspect-video relative"><img src="https://picsum.photos/seed/'+x.img+'/400/225.jpg" class="w-full h-full object-cover" loading="lazy">'+(xs?'<div class="absolute top-1.5 right-1.5 w-4 h-4 bg-sf-red/90 rounded flex items-center justify-center"><i data-lucide="play" class="w-2 h-2 text-white fill-white ml-px"></i></div>':'')+'</div><div class="p-2.5"><div class="flex items-center gap-1.5 mb-1"><span class="text-[9px] text-sf-muted">'+x.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+x.maturity+'</span></div><p class="text-[11px] font-medium line-clamp-1">'+x.title+'</p></div></div>';}).join('')+'</div></div>':'')+'</div></div>';document.getElementById('modal').classList.remove('hidden');document.body.style.overflow='hidden';lucide.createIcons();}
-function closeModal(){document.getElementById('modal').classList.add('hidden');checkOverflow();}
-function checkOverflow(){var m=document.getElementById('modal').classList.contains('hidden'),s=document.getElementById('stream-modal').classList.contains('hidden'),a=document.getElementById('admin-panel').classList.contains('hidden'),e=document.getElementById('movie-editor').classList.contains('hidden');if(m&&s&&a&&e)document.body.style.overflow='';}
+        <div class="mb-6 grid gap-3 md:grid-cols-4">
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Ad Impressions</p><b class="mt-2 block text-2xl">${totalImpressions}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Clicks</p><b class="mt-2 block text-2xl">${totalClicks}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Revenue Placeholder</p><b class="mt-2 block text-2xl">${esc(m.analytics.revenuePlaceholder)}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Most Viewed Placement</p><b class="mt-2 block text-base">${topPlacement ? esc(topPlacement[1].label) : "None"}</b></div>
+        </div>
 
-function openSearch(){document.getElementById('search-closed').classList.add('hidden');var o=document.getElementById('search-open');o.classList.remove('hidden');o.classList.add('flex');document.getElementById('search-input').focus();}
-function closeSearch(){document.getElementById('search-closed').classList.remove('hidden');var o=document.getElementById('search-open');o.classList.add('hidden');o.classList.remove('flex');document.getElementById('search-input').value='';document.getElementById('search-results').classList.add('hidden');}
-function handleSearch(q){var res=document.getElementById('search-results'),ct=document.getElementById('search-results-content');if(q.length<2){res.classList.add('hidden');return;}var ql=q.toLowerCase();var f=SD.movies.filter(function(m){return m.title.toLowerCase().indexOf(ql)!==-1||m.genre.toLowerCase().indexOf(ql)!==-1||m.cast.toLowerCase().indexOf(ql)!==-1;});ct.innerHTML=f.length===0?'<p class="text-sm text-sf-muted text-center py-6">No results for "'+esc(q)+'"</p>':f.map(function(m){var hs=hasStream(m);return '<div class="flex items-center gap-4 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors" onclick="closeSearch();openModal('+m.id+')"><div class="w-14 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-sf-card relative"><img src="https://picsum.photos/seed/'+m.img+'/160/240.jpg" class="w-full h-full object-cover" loading="lazy">'+(hs?'<div class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-sf-red/90 rounded flex items-center justify-center"><i data-lucide="play" class="w-1.5 h-1.5 text-white fill-white ml-px"></i></div>':'')+'</div><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">'+m.title+'</p><div class="flex items-center gap-2 mt-1"><span class="text-xs text-sf-muted">'+m.year+'</span><span class="maturity-badge text-[8px] text-sf-muted rounded">'+m.maturity+'</span>'+(hs?'<span class="flex items-center gap-1 text-[9px] text-green-400"><span class="w-1 h-1 bg-green-400 rounded-full"></span>Stream</span>':'')+'</div><p class="text-xs text-sf-muted mt-1 line-clamp-1">'+m.desc+'</p></div></div>';}).join('');res.classList.remove('hidden');}
-function filterGenre(btn,genre){document.querySelectorAll('.genre-chip').forEach(function(c){c.classList.remove('active');});btn.classList.add('active');var secs=document.querySelectorAll('#content-rows section');if(genre==='all'){secs.forEach(function(s){s.style.opacity='1';});}else{secs.forEach(function(s){var cards=s.querySelectorAll('.card-hover'),hit=false;cards.forEach(function(c){var on=c.getAttribute('onclick')||'',match=on.match(/openModal\((\d+)\)/);if(match){var mid=parseInt(match[1]),m=getMovie(mid);if(m&&m.genre===genre){c.style.opacity='1';c.style.display='';hit=true;}else{c.style.opacity='0';c.style.display='none';}}});s.style.opacity=hit?'1':'0.15';});}window.scrollTo({top:400,behavior:'smooth'});}
-function filterGenreByIndex(ci,genre){var chips=document.querySelectorAll('.genre-chip');if(chips[ci])filterGenre(chips[ci],genre);}
+        <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Ad Code Manager</h4><span class="text-xs text-sf-muted">Banner, video, native, popup, affiliate</span></div>
+          <div class="space-y-3">${m.adCodes.map((a,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 lg:grid-cols-[1fr_170px_90px_1.5fr_80px]">
+            <input class="admin-input" value="${esc(a.name)}" placeholder="Placement/ad name" onchange="db.monetization.adCodes[${i}].name=this.value;persist();renderAdminMonetization()">
+            <select class="admin-input" onchange="db.monetization.adCodes[${i}].type=this.value;persist();renderAdminMonetization()">${["Banner ads","Video ads","Native ads","Popup scripts","Affiliate banners"].map(type=>`<option ${a.type===type?"selected":""}>${type}</option>`).join("")}</select>
+            <label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${a.enabled?"checked":""} onchange="db.monetization.adCodes[${i}].enabled=this.checked;persist();renderAds()"><span class="track"></span></span></label>
+            <textarea class="admin-input min-h-[76px]" placeholder="Paste ad network script/code or affiliate HTML" onchange="db.monetization.adCodes[${i}].code=this.value;persist();renderAds()">${esc(a.code)}</textarea>
+            <button onclick="deleteAdCode('${a.id}')" class="admin-btn danger">Delete</button>
+          </div>`).join("")}</div>
+        </div>
 
-function showToast(msg){var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='animate-toast-in flex items-center gap-3 bg-sf-surface/95 border border-white/8 px-5 py-3.5 rounded-2xl shadow-2xl shadow-black/40 min-w-[240px] backdrop-blur-xl';t.innerHTML='<div class="w-7 h-7 bg-sf-red/15 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-sf-red"></i></div><span class="text-[13px] text-slate-300 font-light">'+msg+'</span>';c.appendChild(t);lucide.createIcons();setTimeout(function(){t.classList.remove('animate-toast-in');t.classList.add('animate-toast-out');setTimeout(function(){t.remove();},400);},2500);}
+        <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <h4 class="mb-4 font-bold">Ad Placement Controls</h4>
+          <div class="grid gap-3 lg:grid-cols-2">${Object.entries(m.placements).map(([key,p])=>`<div class="rounded-xl border border-white/10 bg-black/20 p-4">
+            <div class="mb-3 flex items-center justify-between gap-3"><div><b>${esc(p.label)}</b><p class="text-xs text-sf-muted">${key}</p></div><label class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.placements.${key}.enabled=this.checked;persist();renderAds();renderAdminMonetization()"><span class="track"></span></label></div>
+            <select class="admin-input" onchange="db.monetization.placements.${key}.adCodeId=this.value;persist();renderAds()">${m.adCodes.map(a=>`<option value="${a.id}" ${p.adCodeId===a.id?"selected":""}>${esc(a.name)}</option>`).join("")}</select>
+            <div class="mt-3 flex justify-between text-xs text-sf-muted"><span>${p.impressions||0} impressions</span><span>${p.clicks||0} clicks</span></div>
+          </div>`).join("")}</div>
+        </div>
 
-document.getElementById('mobile-menu-btn').addEventListener('click',function(){document.getElementById('mobile-menu').classList.remove('hidden');});
-function closeMobileMenu(){document.getElementById('mobile-menu').classList.add('hidden');}
-window.addEventListener('scroll',function(){var n=document.getElementById('navbar');if(window.scrollY>40)n.classList.add('nav-blur','bg-sf-dark/80','border-b','border-white/5');else n.classList.remove('nav-blur','bg-sf-dark/80','border-b','border-white/5');});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeStream();closeModal();closeSearch();closeMobileMenu();closeAdminLogin();closeMovieEditor();}if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();openSearch();}});
+        <div class="mb-6 grid gap-6 xl:grid-cols-2">
+          <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Campaign Manager</h4><button onclick="addCampaign()" class="admin-btn secondary">New Campaign</button></div>
+            <div class="space-y-3">${m.campaigns.map((c,i)=>`<div class="rounded-xl border border-white/10 bg-black/20 p-3">
+              <div class="grid gap-2 md:grid-cols-[1fr_140px_140px_80px]"><input class="admin-input" value="${esc(c.name)}" onchange="db.monetization.campaigns[${i}].name=this.value;persist()"><input type="date" class="admin-input" value="${esc(c.start)}" onchange="db.monetization.campaigns[${i}].start=this.value;persist()"><input type="date" class="admin-input" value="${esc(c.end)}" onchange="db.monetization.campaigns[${i}].end=this.value;persist()"><label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${c.active?"checked":""} onchange="db.monetization.campaigns[${i}].active=this.checked;persist();renderAds()"><span class="track"></span></span></label></div>
+              <div class="mt-3 flex flex-wrap gap-2">${Object.entries(m.placements).map(([key,p])=>`<button onclick="toggleCampaignPlacement(${i},'${key}')" class="rounded-lg border ${c.placementIds?.includes(key)?"border-sf-red bg-sf-red/20":"border-white/10 bg-white/5"} px-3 py-1.5 text-xs">${esc(p.label)}</button>`).join("")}</div>
+            </div>`).join("")}</div>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Promo / Sponsored Content</h4><button onclick="addPromo()" class="admin-btn secondary">New Promo</button></div>
+            <div class="space-y-3">${m.promos.map((p,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 md:grid-cols-2">
+              <input class="admin-input" value="${esc(p.name)}" placeholder="Promo name" onchange="db.monetization.promos[${i}].name=this.value;persist()">
+              <select class="admin-input" onchange="db.monetization.promos[${i}].type=this.value;persist()">${["Sponsored banner","Promotional popup","Featured sponsor section","Affiliate promotion block"].map(type=>`<option ${p.type===type?"selected":""}>${type}</option>`).join("")}</select>
+              <input class="admin-input" value="${esc(p.title)}" placeholder="Title" onchange="db.monetization.promos[${i}].title=this.value;persist()">
+              <input class="admin-input" value="${esc(p.cta)}" placeholder="CTA" onchange="db.monetization.promos[${i}].cta=this.value;persist()">
+              <input class="admin-input" value="${esc(p.url || "#")}" placeholder="Affiliate/sponsor URL" onchange="db.monetization.promos[${i}].url=this.value;persist();renderAds()">
+              <select class="admin-input" onchange="db.monetization.promos[${i}].placement=this.value;persist();renderAds()">${Object.entries(m.placements).map(([key,pl])=>`<option value="${key}" ${(p.placement||"hero")===key?"selected":""}>${esc(pl.label)}</option>`).join("")}</select>
+              <input class="admin-input md:col-span-2" value="${esc(p.text)}" placeholder="Promo text" onchange="db.monetization.promos[${i}].text=this.value;persist()">
+              <div class="flex items-center justify-between md:col-span-2"><label class="flex items-center gap-2 text-xs text-sf-muted">Enabled <span class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.promos[${i}].enabled=this.checked;persist()"><span class="track"></span></span></label><button onclick="db.monetization.promos.splice(${i},1);persist();renderAdminMonetization()" class="admin-btn danger">Delete</button></div>
+            </div>`).join("")}</div>
+          </div>
+        </div>
 
-function logoClick(e){e.preventDefault();logoClicks++;clearTimeout(logoTimer);logoTimer=setTimeout(function(){logoClicks=0;},1500);if(logoClicks>=5){logoClicks=0;document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-pass').value='';document.getElementById('login-error').classList.add('hidden');setTimeout(function(){document.getElementById('admin-pass').focus();},100);}}
-function closeAdminLogin(){document.getElementById('admin-login').classList.add('hidden');}
-function attemptAdminLogin(){if(document.getElementById('admin-pass').value===ADMIN_PASS){closeAdminLogin();openAdmin();}else{var err=document.getElementById('login-error');err.classList.remove('hidden');err.textContent='Incorrect password. Access denied.';document.getElementById('admin-pass').value='';document.getElementById('admin-pass').focus();}}
+        <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <h4 class="mb-4 font-bold">Video Ad Settings</h4>
+          <div class="grid gap-3 md:grid-cols-3">${["preroll","midroll","postroll"].map(k=>`<div class="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 p-4"><span class="capitalize">${k.replace("roll","-roll")} ads</span><label class="toggle"><input type="checkbox" ${m.videoAds[k]?"checked":""} onchange="db.monetization.videoAds.${k}=this.checked;persist()"><span class="track"></span></label></div>`).join("")}</div>
+          <p class="mt-3 text-xs text-sf-muted">These toggles prepare support for future pre-roll, mid-roll, and post-roll integrations.</p>
+        </div>`;
+    }
+    function addAdCode(){
+      db.monetization.adCodes.push({id:"ad-"+Date.now(),name:"New Ad Placement",type:"Banner ads",enabled:true,code:"<div class='ad-shell'>Paste ad code here</div>"});
+      persist(); renderAdminMonetization();
+    }
+    function deleteAdCode(id){
+      db.monetization.adCodes = db.monetization.adCodes.filter(a=>a.id!==id);
+      const fallback = db.monetization.adCodes[0]?.id || "";
+      Object.values(db.monetization.placements).forEach(p=>{ if(p.adCodeId===id) p.adCodeId=fallback; });
+      persist(); renderAdminMonetization(); renderAds();
+    }
+    function addCampaign(){
+      db.monetization.campaigns.push({id:"camp-"+Date.now(),name:"New Campaign",start:new Date().toISOString().slice(0,10),end:"",active:true,placementIds:[]});
+      persist(); renderAdminMonetization();
+    }
+    function toggleCampaignPlacement(i,key){
+      const c=db.monetization.campaigns[i]; c.placementIds=c.placementIds||[];
+      c.placementIds = c.placementIds.includes(key) ? c.placementIds.filter(x=>x!==key) : [...c.placementIds,key];
+      persist(); renderAdminMonetization(); renderAds();
+    }
+    function addPromo(){
+      db.monetization.promos.push({id:"promo-"+Date.now(),name:"New Sponsor Promo",type:"Sponsored banner",enabled:true,title:"Sponsor Title",text:"Promotion details",cta:"Open",url:"#",placement:"hero"});
+      persist(); renderAdminMonetization();
+    }
+    function renderAdminSettings(){
+      document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
+        <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Autoplay next episode</span><label class="toggle"><input type="checkbox" ${db.settings.autoplay?"checked":""} onchange="db.settings.autoplay=this.checked;document.getElementById('autoplay').checked=this.checked;persist()"><span class="track"></span></label></div>
+        <div class="flex items-center justify-between py-3"><span>Show continue watching strip</span><label class="toggle"><input type="checkbox" ${db.settings.showContinue?"checked":""} onchange="db.settings.showContinue=this.checked;persist();renderContinue()"><span class="track"></span></label></div>
+        <button onclick="db.progress={};persist();renderContinue();renderLibrary();toast('Continue watching cleared')" class="admin-btn danger mt-4">Clear Continue Watching</button>
+      </div>`;
+    }
 
-function openAdmin(){document.getElementById('admin-panel').classList.remove('hidden');document.body.style.overflow='hidden';populateAllAdminTabs();switchAdminTab('movies');lucide.createIcons();}
-function closeAdmin(){document.getElementById('admin-panel').classList.add('hidden');checkOverflow();renderAll();}
-function switchAdminTab(t){document.querySelectorAll('.admin-tab').forEach(function(b){b.classList.remove('active');b.style.background='transparent';b.style.color='#6b6b80';});var ab=document.querySelector('.admin-tab[data-tab="'+t+'"]');if(ab){ab.classList.add('active');ab.style.background='#1e1e2a';ab.style.color='#fff';}document.querySelectorAll('.admin-tab-content').forEach(function(c){c.classList.add('hidden');});var tab=document.getElementById('tab-'+t);if(tab)tab.classList.remove('hidden');}
-function populateAllAdminTabs(){renderMoviesTable();renderRowsEditor();renderHeroSelector();renderHeroBannerOverrides();renderTop10Editor();renderGenresEditor();populateLogoTab();populateThemeTab();populateHomepageTab();populateHeaderFooterTab();}
-
-function syncHex(picker,hexId){document.getElementById(hexId).value=picker.value;updateThemePreview();}
-function syncPick(hex,pickId){var v=hex.value;if(/^#[0-9a-f]{6}$/i.test(v))document.getElementById(pickId).value=v;updateThemePreview();}
-function updateThemePreview(){var t=ST.theme;var labels=['Accent','Background','Surface','Card','Border'];var keys=['accent','bg','surface','card','border'];document.getElementById('theme-preview').innerHTML=keys.map(function(k,i){return '<div class="flex flex-col items-center gap-2"><div class="w-16 h-16 rounded-xl border border-white/10" style="background:'+t[k]+';"></div><span class="text-[10px] text-sf-muted">'+labels[i]+'</span></div>';}).join('');}
-
-function renderMoviesTable(){var h='<thead><tr><th>ID</th><th>Title</th><th>Bunny Embed URL</th><th>Genre</th><th>Year</th><th>Stream</th><th>Actions</th></tr></thead><tbody>';SD.movies.forEach(function(m){var hs=hasStream(m);h+='<tr><td class="text-sf-muted">'+m.id+'</td><td class="font-medium max-w-[140px] truncate">'+m.title+'</td><td class="max-w-[220px]">'+(hs?'<span class="url-preview">'+esc(m.embedUrl)+'</span>':'<span class="text-[11px] text-sf-muted/40">\u2014</span>')+'</td><td><span class="text-xs px-2 py-0.5 rounded bg-white/5 text-sf-muted">'+m.genre+'</span></td><td class="text-sf-muted">'+m.year+'</td><td>'+(hs?'<span class="flex items-center gap-1 text-[10px] text-green-400"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Active</span>':'<span class="text-[10px] text-red-400/60">No URL</span>')+'</td><td class="flex gap-2"><button onclick="openMovieEditor('+m.id+')" class="admin-btn-secondary text-[11px] py-1 px-3">Edit</button><button onclick="deleteMovie('+m.id+')" class="admin-btn-danger text-[11px] py-1 px-3">Del</button></td></tr>';});h+='</tbody>';document.getElementById('movies-table').innerHTML=h;}
-function openMovieEditor(id){editingMovieId=id;document.getElementById('movie-editor').classList.remove('hidden');document.getElementById('embed-status').classList.add('hidden');document.getElementById('ed-embed').style.borderColor='#1e1e2a';if(id===-1){document.getElementById('editor-title').textContent='Add Movie';['ed-embed','ed-title','ed-duration','ed-desc','ed-cast','ed-img','ed-banner'].forEach(function(x){document.getElementById(x).value='';});document.getElementById('ed-genre').value='action';document.getElementById('ed-year').value='2024';document.getElementById('ed-maturity').value='R';}else{var m=getMovie(id);if(!m)return;document.getElementById('editor-title').textContent='Edit Movie';document.getElementById('ed-embed').value=m.embedUrl||'';document.getElementById('ed-title').value=m.title;document.getElementById('ed-genre').value=m.genre;document.getElementById('ed-year').value=m.year;document.getElementById('ed-duration').value=m.duration;document.getElementById('ed-maturity').value=m.maturity;document.getElementById('ed-desc').value=m.desc;document.getElementById('ed-cast').value=m.cast;document.getElementById('ed-img').value=m.img;document.getElementById('ed-banner').value=m.banner;if(m.embedUrl&&m.embedUrl.trim())document.getElementById('ed-embed').style.borderColor='rgba(34,197,94,0.4)';}lucide.createIcons();}
-function closeMovieEditor(){document.getElementById('movie-editor').classList.add('hidden');}
-function saveMovieEdits(){var t=document.getElementById('ed-title').value.trim();if(!t){showToast('Title is required');return;}var ev=document.getElementById('ed-embed').value.trim();var obj={title:t,embedUrl:ev,genre:document.getElementById('ed-genre').value,year:parseInt(document.getElementById('ed-year').value)||2024,duration:document.getElementById('ed-duration').value.trim()||'1h 30m',maturity:document.getElementById('ed-maturity').value,desc:document.getElementById('ed-desc').value.trim()||'No description.',cast:document.getElementById('ed-cast').value.trim()||'Unknown',img:document.getElementById('ed-img').value.trim()||('movie-'+Date.now()),banner:document.getElementById('ed-banner').value.trim()||('movie-'+Date.now())};if(editingMovieId===-1){obj.id=SD.movies.length>0?Math.max.apply(null,SD.movies.map(function(m){return m.id;}))+1:0;SD.movies.push(obj);showToast('Movie added'+(ev?' \u2014 stream ready':''));}else{var m=getMovie(editingMovieId);if(m)Object.assign(m,obj);showToast('Movie updated');}saveSiteData();closeMovieEditor();renderMoviesTable();lucide.createIcons();}
-function deleteMovie(id){SD.movies=SD.movies.filter(function(m){return m.id!==id;});SD.rows.forEach(function(r){r.ids=r.ids.filter(function(i){return i!==id;});});SD.heroIds=SD.heroIds.filter(function(i){return i!==id;});SD.top10Ids=SD.top10Ids.filter(function(i){return i!==id;});saveSiteData();renderMoviesTable();renderRowsEditor();renderHeroSelector();renderHeroBannerOverrides();renderTop10Editor();showToast('Movie deleted');}
-
-function renderRowsEditor(){var h='';SD.rows.forEach(function(r,ri){h+='<div class="admin-card"><div class="flex items-center justify-between mb-3 gap-3 flex-wrap"><input value="'+esc(r.title)+'" onchange="SD.rows['+ri+'].title=this.value" class="admin-input max-w-xs" placeholder="Row title"><button onclick="deleteRow('+ri+')" class="admin-btn-danger text-[11px] py-1 px-3">Remove</button></div><div class="flex flex-wrap gap-1.5">';r.ids.forEach(function(mid,mi){var m=getMovie(mid);h+='<span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5">'+(m?m.title:'#'+mid)+(m&&hasStream(m)?' <span class="text-green-400">\u2713</span>':'')+'<button onclick="removeFromRow('+ri+','+mi+')" class="text-sf-muted hover:text-red-400 transition-colors ml-1">&times;</button></span>';});h+='</div><div class="mt-3 pt-3 border-t border-white/5 flex gap-2 flex-wrap"><select id="row-add-'+ri+'" class="admin-input text-xs py-1.5 max-w-xs"><option value="">Add movie...</option>'+SD.movies.map(function(m){return '<option value="'+m.id+'">'+m.title+(hasStream(m)?' \u2713':'')+'</option>';}).join('')+'</select><button onclick="addToRow('+ri+')" class="admin-btn text-[11px] py-1.5 px-3">Add</button></div></div>';});h+='<button onclick="addNewRow()" class="admin-btn-secondary text-xs py-2 px-4 flex items-center gap-2 mt-4"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add New Row</button>';document.getElementById('rows-editor').innerHTML=h;lucide.createIcons();}
-function removeFromRow(ri,mi){SD.rows[ri].ids.splice(mi,1);saveSiteData();renderRowsEditor();}
-function addToRow(ri){var s=document.getElementById('row-add-'+ri);if(s&&s.value){SD.rows[ri].ids.push(parseInt(s.value));saveSiteData();renderRowsEditor();}}
-function deleteRow(i){SD.rows.splice(i,1);saveSiteData();renderRowsEditor();}
-function addNewRow(){SD.rows.push({title:'New Row',ids:[]});saveSiteData();renderRowsEditor();}
-
-function renderHeroSelector(){document.getElementById('hero-selector').innerHTML=SD.movies.map(function(m){var sel=SD.heroIds.indexOf(m.id)!==-1;return '<button onclick="toggleHeroMovie('+m.id+')" class="text-xs px-3 py-2 rounded-lg border transition-all '+(sel?'bg-sf-red/20 border-sf-red/40 text-white':'bg-white/3 border-white/5 text-sf-muted hover:border-white/20')+'">'+m.title+(hasStream(m)?' \u2713':'')+'</button>';}).join('');}
-function toggleHeroMovie(id){var i=SD.heroIds.indexOf(id);if(i===-1){if(SD.heroIds.length>=6){showToast('Max 6');return;}SD.heroIds.push(id);}else{SD.heroIds.splice(i,1);}saveSiteData();renderHeroSelector();renderHeroBannerOverrides();}
-function renderHeroBannerOverrides(){var h='';SD.heroIds.forEach(function(mid){var m=getMovie(mid);if(!m)return;var val=ST.hero.customBanners[mid]||'';h+='<div class="flex items-center gap-3"><span class="text-xs text-sf-muted w-32 truncate flex-shrink-0">'+m.title+'</span><input class="admin-input text-xs flex-1" value="'+esc(val)+'" placeholder="https://custom-banner.jpg" onchange="ST.hero.customBanners['+mid+']=this.value"><button onclick="delete ST.hero.customBanners['+mid+'];renderHeroBannerOverrides()" class="text-sf-muted hover:text-red-400 text-xs px-2 py-1">&times;</button></div>';});document.getElementById('hero-banner-overrides').innerHTML=h||'<p class="text-xs text-sf-muted/50">No hero movies selected</p>';}
-
-function renderTop10Editor(){var h='';SD.top10Ids.forEach(function(mid,i){var m=getMovie(mid);h+='<div class="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02]"><span class="text-sf-muted text-xs font-bold w-6 text-center">'+(i+1)+'</span><span class="flex-1 text-sm truncate">'+(m?m.title:'#'+mid)+(m&&hasStream(m)?' <span class="text-green-400 text-[10px]">\u2713</span>':'')+'</span><div class="flex gap-1 flex-shrink-0">'+(i>0?'<button onclick="moveTop10('+i+',-1)" class="text-sf-muted hover:text-white text-xs px-1.5 py-1 rounded hover:bg-white/5">\u2191</button>':'')+(i<SD.top10Ids.length-1?'<button onclick="moveTop10('+i+',1)" class="text-sf-muted hover:text-white text-xs px-1.5 py-1 rounded hover:bg-white/5">\u2193</button>':'')+'<button onclick="removeTop10('+i+')" class="text-sf-muted hover:text-red-400 text-xs px-1.5 py-1 rounded hover:bg-white/5">&times;</button></div></div>';});document.getElementById('top10-editor').innerHTML=h;document.getElementById('top10-add-select').innerHTML='<option value="">Select...</option>'+SD.movies.filter(function(m){return SD.top10Ids.indexOf(m.id)===-1;}).map(function(m){return '<option value="'+m.id+'">'+m.title+(hasStream(m)?' \u2713':'')+'</option>';}).join('');}
-function moveTop10(i,d){var j=i+d;if(j<0||j>=SD.top10Ids.length)return;var t=SD.top10Ids[i];SD.top10Ids[i]=SD.top10Ids[j];SD.top10Ids[j]=t;saveSiteData();renderTop10Editor();}
-function removeTop10(i){SD.top10Ids.splice(i,1);saveSiteData();renderTop10Editor();}
-function addToTop10(){var s=document.getElementById('top10-add-select');if(!s.value)return;if(SD.top10Ids.length>=10){showToast('Max 10');return;}SD.top10Ids.push(parseInt(s.value));saveSiteData();renderTop10Editor();}
-
-function renderGenresEditor(){document.getElementById('genres-editor').innerHTML=SD.genres.map(function(g,i){return '<div class="admin-card flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"><i data-lucide="'+g.icon+'" class="w-4 h-4 text-sf-muted"></i></div><input value="'+g.name+'" onchange="SD.genres['+i+'].name=this.value" class="admin-input text-sm"></div>';}).join('');lucide.createIcons();}
-
-function populateLogoTab(){document.getElementById('set-logo-text').value=ST.logo.text;document.getElementById('set-logo-accent').value=ST.logo.accent;document.getElementById('set-logo-icon').value=ST.logo.icon;document.getElementById('set-logo-image').value=ST.logo.imageUrl||'';updateLogoPreview();}
-function updateLogoPreview(){var p=document.getElementById('logo-preview');if(ST.logo.imageUrl){p.innerHTML='<img src="'+esc(ST.logo.imageUrl)+'" class="h-9 w-auto object-contain rounded-lg" alt="Preview">';}else{p.innerHTML='<div class="flex items-center gap-2.5"><div class="w-9 h-9 bg-sf-red rounded-xl flex items-center justify-center"><i data-lucide="'+ST.logo.icon+'" class="w-4 h-4 text-white fill-white ml-0.5"></i></div><span class="text-xl font-bold tracking-tight">'+esc(ST.logo.text)+'<span class="text-sf-red">'+esc(ST.logo.accent)+'</span></span></div>';lucide.createIcons();}}
-document.addEventListener('change',function(e){if(e.target.id==='set-logo-text'||e.target.id==='set-logo-accent'||e.target.id==='set-logo-icon'||e.target.id==='set-logo-image'){ST.logo.text=document.getElementById('set-logo-text').value;ST.logo.accent=document.getElementById('set-logo-accent').value;ST.logo.icon=document.getElementById('set-logo-icon').value;ST.logo.imageUrl=document.getElementById('set-logo-image').value;updateLogoPreview();}});
-document.addEventListener('input',function(e){if(e.target.id==='set-logo-text'||e.target.id==='set-logo-accent'||e.target.id==='set-logo-image'){ST.logo.text=document.getElementById('set-logo-text').value;ST.logo.accent=document.getElementById('set-logo-accent').value;ST.logo.imageUrl=document.getElementById('set-logo-image').value;updateLogoPreview();}});
-
-function populateThemeTab(){var t=ST.theme;document.getElementById('set-theme-accent').value=t.accent;document.getElementById('set-theme-accent-hex').value=t.accent;document.getElementById('set-theme-bg').value=t.bg;document.getElementById('set-theme-bg-hex').value=t.bg;document.getElementById('set-theme-surface').value=t.surface;document.getElementById('set-theme-surface-hex').value=t.surface;document.getElementById('set-theme-card').value=t.card;document.getElementById('set-theme-card-hex').value=t.card;document.getElementById('set-theme-border').value=t.border;document.getElementById('set-theme-border-hex').value=t.border;updateThemePreview();}
-document.addEventListener('input',function(e){if(e.target.id&&e.target.id.indexOf('set-theme-')===0){var map={'set-theme-accent':'accent','set-theme-accent-hex':'accent','set-theme-bg':'bg','set-theme-bg-hex':'bg','set-theme-surface':'surface','set-theme-surface-hex':'surface','set-theme-card':'card','set-theme-card-hex':'card','set-theme-border':'border','set-theme-border-hex':'border'};var key=map[e.target.id];if(key){var v=e.target.value;if(/^#[0-9a-f]{6}$/i.test(v)){ST.theme[key]=v;updateThemePreview();}}}});
-
-var presets={default:{accent:'#E50914',bg:'#0a0a0f',surface:'#12121a',card:'#16161f',border:'#1e1e2a'},ocean:{accent:'#0ea5e9',bg:'#060d1a',surface:'#0c1525',card:'#0f1a2e',border:'#162040'},forest:{accent:'#22c55e',bg:'#060f0a',surface:'#0c1810',card:'#0f1e14',border:'#162a1c'},purple:{accent:'#a855f7',bg:'#0c0a14',surface:'#14101e',card:'#1a1530',border:'#221c40'},gold:{accent:'#eab308',bg:'#0f0d06',surface:'#18140c',card:'#201a0f',border:'#2a2216'},midnight:{accent:'#6366f1',bg:'#050510',surface:'#0a0a1a',card:'#0e0e24',border:'#14143a'}};
-function applyPreset(name){var p=presets[name];if(!p)return;Object.assign(ST.theme,p);populateThemeTab();showToast('Applied '+name+' preset');}
-
-function populateHomepageTab(){document.getElementById('set-hp-genrefilter').checked=ST.homepage.showGenreFilter;document.getElementById('set-hp-top10').checked=ST.homepage.showTop10;document.getElementById('set-hp-genregrid').checked=ST.homepage.showGenreGrid;document.getElementById('set-hp-top10heading').value=ST.homepage.top10Heading||'';document.getElementById('set-hp-genreheading').value=ST.homepage.genreGridHeading||'';var h='';SD.rows.forEach(function(r,i){var hidden=ST.homepage.hiddenRows.indexOf(i)!==-1;h+='<div class="setting-row"><span class="setting-label">'+esc(r.title)+' <small>Row #'+(i+1)+'</small></span><label class="toggle"><input type="checkbox" '+(hidden?'':'checked')+' onchange="toggleRowVisibility('+i+',this.checked)"><span class="toggle-track"></span></label></div>';});document.getElementById('hp-rows-toggles').innerHTML=h;}
-function toggleRowVisibility(i,show){if(show){ST.homepage.hiddenRows=ST.homepage.hiddenRows.filter(function(x){return x!==i;});}else{if(ST.homepage.hiddenRows.indexOf(i)===-1)ST.homepage.hiddenRows.push(i);}}
-
-function populateHeaderFooterTab(){document.getElementById('set-hf-nav').checked=ST.header.showNav;document.getElementById('set-hf-search').checked=ST.header.showSearch;document.getElementById('set-hf-profile').checked=ST.header.showProfile;document.getElementById('set-hf-footer').checked=ST.footer.show;document.getElementById('set-hf-social').checked=ST.footer.showSocial;document.getElementById('set-hf-footerlinks').checked=ST.footer.showLinks;document.getElementById('set-hf-servicecode').checked=ST.footer.showServiceCode;document.getElementById('set-hf-copyright').value=ST.footer.copyright;var h='';ST.header.links.forEach(function(l,i){h+='<div class="nav-link-item"><label class="toggle" style="flex-shrink:0"><input type="checkbox" '+(l.active?'checked':'')+' onchange="ST.header.links['+i+'].active=this.checked"><span class="toggle-track"></span></label><input value="'+esc(l.text)+'" onchange="ST.header.links['+i+'].text=this.value" placeholder="Link text"><button onclick="ST.header.links.splice('+i+',1);populateHeaderFooterTab()" class="text-sf-muted hover:text-red-400 text-xs px-1">&times;</button></div>';});document.getElementById('hf-nav-links-editor').innerHTML=h;}
-function addNavLink(){ST.header.links.push({text:'New Link',active:false});populateHeaderFooterTab();}
-
-function gatherSettings(){ST.homepage.showGenreFilter=document.getElementById('set-hp-genrefilter').checked;ST.homepage.showTop10=document.getElementById('set-hp-top10').checked;ST.homepage.showGenreGrid=document.getElementById('set-hp-genregrid').checked;ST.homepage.top10Heading=document.getElementById('set-hp-top10heading').value;ST.homepage.genreGridHeading=document.getElementById('set-hp-genreheading').value;ST.header.showNav=document.getElementById('set-hf-nav').checked;ST.header.showSearch=document.getElementById('set-hf-search').checked;ST.header.showProfile=document.getElementById('set-hf-profile').checked;ST.footer.show=document.getElementById('set-hf-footer').checked;ST.footer.showSocial=document.getElementById('set-hf-social').checked;ST.footer.showLinks=document.getElementById('set-hf-footerlinks').checked;ST.footer.showServiceCode=document.getElementById('set-hf-servicecode').checked;ST.footer.copyright=document.getElementById('set-hf-copyright').value;}
-function saveAll(){gatherSettings();saveSettings();saveSiteData();showToast('All changes saved!');renderAll();setTimeout(closeAdmin,600);}
-function resetAllSettings(){if(confirm('Reset ALL settings and data to defaults?')){localStorage.removeItem('streamflix_data');localStorage.removeItem('streamflix_settings');SD=getDefaultData();ST=getDefaultSettings();saveSiteData();saveSettings();populateAllAdminTabs();showToast('Everything reset');lucide.createIcons();}}
-
-document.addEventListener('DOMContentLoaded',function(){loadSettings();loadSiteData();renderAll();startHeroAutoplay();switchAdminTab('movies');});
-</script>
+    document.addEventListener("DOMContentLoaded", boot);
+  </script>
 </body>
 </html>
