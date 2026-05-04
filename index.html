@@ -99,6 +99,7 @@
       <div id="ad-hero" class="ad-slot mb-6"></div>
       <div id="continue-strip" class="mb-10 hidden"></div>
       <div class="mb-7 flex gap-2 overflow-x-auto pb-2 row-scroll" id="chips"></div>
+      <div id="ad-sidebar" class="ad-slot mb-8"></div>
     </section>
     <section id="library" class="space-y-11"></section>
     <section class="mx-auto mt-12 max-w-[1920px] px-4 sm:px-6 lg:px-10">
@@ -186,6 +187,7 @@
           <button onclick="adminTab('series')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Series & Episodes</button>
           <button onclick="adminTab('homepage')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Homepage Rows</button>
           <button onclick="adminTab('monetization')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Monetization</button>
+          <button onclick="adminTab('backups')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Backups</button>
           <button onclick="adminTab('settings')" class="admin-tab mb-2 w-full rounded-xl px-4 py-3 text-left text-sm text-sf-muted">Playback Settings</button>
         </aside>
         <section class="flex-1 overflow-y-auto p-5">
@@ -193,6 +195,7 @@
           <div id="admin-series" class="admin-page hidden"></div>
           <div id="admin-homepage" class="admin-page hidden"></div>
           <div id="admin-monetization" class="admin-page hidden"></div>
+          <div id="admin-backups" class="admin-page hidden"></div>
           <div id="admin-settings" class="admin-page hidden"></div>
         </section>
       </div>
@@ -201,9 +204,10 @@
 
   <script>
     const STORAGE = "streamflix_upgraded_v1";
+    const BACKUP_STORAGE = "streamflix_backup_snapshots_v1";
     const ADMIN_PASSWORD = "Haran!stream2026!";
     const defaultData = {
-      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All" },
+      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All", autoBackup:true },
       list: [],
       progress: {},
       monetization: {
@@ -223,12 +227,19 @@
           episodeBetween:{ label:"Between episode lists", enabled:false, adCodeId:"ad-demo-banner", impressions:0, clicks:0 }
         },
         campaigns: [
-          { id:"camp-launch", name:"Launch Sponsor Campaign", start:"2026-05-01", end:"2026-06-30", active:true, placementIds:["hero","footer"] }
+          { id:"camp-launch", name:"Default Ad Campaign", active:true, placementIds:["hero","betweenRows","footer","watchBelow"] }
         ],
-        promos: [
-          { id:"promo-featured", name:"Featured Sponsor", type:"Sponsored banner", enabled:true, title:"Featured Sponsor", text:"Promote affiliate offers, sponsors, or OTT bundles here.", cta:"Learn More", url:"#", placement:"hero" }
+        affiliates: [
+          { id:"aff-demo", name:"Demo Affiliate Promo", enabled:true, title:"Home Cinema Deal", text:"Affiliate promotion block for streaming devices, VPNs, or media gear.", imageUrl:"https://picsum.photos/seed/affiliate-home-cinema/900/280.jpg", url:"#", placement:"hero" }
         ],
-        videoAds: { preroll:false, midroll:false, postroll:false },
+        affiliateItems: [
+          { id:"aff-remote", title:"Premium Streaming Remote", desc:"Backlit shortcut remote for your home theater setup.", image:"https://picsum.photos/seed/streaming-remote/500/700.jpg", url:"https://example.com", category:"Streaming Essentials", enabled:true },
+          { id:"aff-projector", title:"Mini 4K Projector", desc:"Compact projector for movie nights and binge sessions.", image:"https://picsum.photos/seed/mini-projector/500/700.jpg", url:"https://example.com", category:"Recommended Products", enabled:true },
+          { id:"aff-headphones", title:"Cinema Headphones", desc:"Low-latency wireless audio for private watching.", image:"https://picsum.photos/seed/cinema-headphones/500/700.jpg", url:"https://example.com", category:"Featured Deals", enabled:true }
+        ],
+        affiliateRows: [
+          { id:"aff-row-1", title:"Streaming Essentials", enabled:true, afterRow:0, itemIds:["aff-remote","aff-projector","aff-headphones"] }
+        ],
         analytics: { revenuePlaceholder:"$0.00" }
       },
       rows: [
@@ -282,6 +293,8 @@
     function title(id){ return db.titles.find(t => t.id === id); }
     function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
     function img(seed,w=700,h=1050){ return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${w}/${h}.jpg`; }
+    function posterSrc(t,w=700,h=1050){ return t.posterUrl || img(t.poster,w,h); }
+    function bannerSrc(t,w=1200,h=600){ return t.bannerUrl || img(t.banner,w,h); }
     function firstEpisode(t){ return t.type === "series" ? t.seasons?.[0]?.episodes?.[0] : t; }
     function progressKey(id,s=0,e=0){ return `${id}:${s}:${e}`; }
     function itemProgress(id){ const keys = Object.keys(db.progress).filter(k => k.startsWith(id + ":")); return keys.reduce((m,k)=>Math.max(m,db.progress[k]?.pct||0),0); }
@@ -291,8 +304,20 @@
       if(!db.monetization.adCodes) db.monetization.adCodes = structuredClone(defaultData.monetization.adCodes);
       if(!db.monetization.placements) db.monetization.placements = structuredClone(defaultData.monetization.placements);
       if(!db.monetization.campaigns) db.monetization.campaigns = [];
-      if(!db.monetization.promos) db.monetization.promos = [];
-      if(!db.monetization.videoAds) db.monetization.videoAds = { preroll:false, midroll:false, postroll:false };
+      if(!db.monetization.affiliates) db.monetization.affiliates = db.monetization.promos || structuredClone(defaultData.monetization.affiliates);
+      if(!db.monetization.affiliateItems) db.monetization.affiliateItems = structuredClone(defaultData.monetization.affiliateItems);
+      if(!db.monetization.affiliateRows) db.monetization.affiliateRows = structuredClone(defaultData.monetization.affiliateRows);
+      const cleanPlacements = {
+        hero:"Homepage banner",
+        betweenRows:"Between movie/series rows",
+        watchBelow:"Below video player",
+        footer:"Footer section",
+        popup:"Popup script"
+      };
+      Object.entries(cleanPlacements).forEach(([key,label]) => {
+        if(!db.monetization.placements[key]) db.monetization.placements[key] = { label, enabled:false, adCodeId:db.monetization.adCodes[0]?.id || "", impressions:0, clicks:0 };
+        db.monetization.placements[key].label = label;
+      });
       if(!db.monetization.analytics) db.monetization.analytics = { revenuePlaceholder:"$0.00" };
       persist();
     }
@@ -305,21 +330,22 @@
     }
     function adMarkup(key){
       const p = db.monetization.placements[key];
-      if(!p || !p.enabled || !campaignAllowsPlacement(key)) return "";
-      const code = adCode(p.adCodeId);
-      const promos = promoMarkup(key);
-      if(!code && !promos) return "";
-      p.impressions = (p.impressions || 0) + 1;
+      const canShowAd = p && p.enabled && campaignAllowsPlacement(key);
+      const code = canShowAd ? adCode(p.adCodeId) : null;
+      const affiliates = affiliateMarkup(key);
+      if(!code && !affiliates) return "";
+      if(p) p.impressions = (p.impressions || 0) + 1;
       persist();
-      return `<div onclick="trackAdClick('${key}')" class="ad-shell">${code ? code.code : ""}${promos}</div>`;
+      return `<div onclick="trackAdClick('${key}')" class="ad-shell">${code ? code.code : ""}${affiliates}</div>`;
     }
-    function promoMarkup(key){
-      const promos = (db.monetization.promos || []).filter(p => p.enabled && (p.placement || "hero") === key);
-      return promos.map(p => `<a href="${esc(p.url || "#")}" class="block w-full p-5 text-left text-white no-underline">
-        <span class="mb-2 inline-flex rounded-lg bg-sf-red px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">${esc(p.type)}</span>
+    function affiliateMarkup(key){
+      const affiliates = (db.monetization.affiliates || []).filter(p => p.enabled && (p.placement || "hero") === key);
+      return affiliates.map(p => `<a href="${esc(p.url || "#")}" class="block w-full text-left text-white no-underline">
+        ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.title)}" class="mb-3 max-h-40 w-full rounded-xl object-cover">` : ""}
+        <span class="mb-2 inline-flex rounded-lg bg-sf-red px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">Affiliate</span>
         <b class="block text-base">${esc(p.title)}</b>
         <span class="mt-1 block text-sm text-slate-300">${esc(p.text)}</span>
-        <span class="mt-3 inline-flex rounded-lg border border-white/15 px-3 py-2 text-xs font-bold">${esc(p.cta || "Open")}</span>
+        <span class="mt-3 inline-flex rounded-lg border border-white/15 px-3 py-2 text-xs font-bold">Open Offer</span>
       </a>`).join("");
     }
     function fillAd(id,key){
@@ -343,7 +369,6 @@
       fillAd("ad-hero","hero");
       fillAd("ad-footer","footer");
       fillAd("ad-watch-below","watchBelow");
-      fillAd("ad-episode","episode");
       document.querySelectorAll("[id^='ad-between-']").forEach(el => {
         const html = adMarkup("betweenRows");
         el.innerHTML = html;
@@ -357,6 +382,10 @@
         activateAdScripts(sticky);
         sticky.classList.toggle("active", !!html);
       }
+      let popup = document.getElementById("ad-popup-script");
+      if(!popup){ popup = document.createElement("div"); popup.id = "ad-popup-script"; popup.style.display = "none"; document.body.appendChild(popup); }
+      popup.innerHTML = adMarkup("popup");
+      activateAdScripts(popup);
     }
     function trackAdClick(key){
       const p = db.monetization.placements[key];
@@ -371,7 +400,7 @@
 
     function renderHero(){
       const h = title(db.settings.heroId) || db.titles[0], ep = firstEpisode(h);
-      document.getElementById("hero-bg").innerHTML = `<img src="${img(h.banner,1920,1080)}" class="h-full w-full object-cover opacity-80" alt="">`;
+      document.getElementById("hero-bg").innerHTML = `<img src="${bannerSrc(h,1920,1080)}" class="h-full w-full object-cover opacity-80" alt="">`;
       document.getElementById("hero-copy").innerHTML = `
         <div class="mb-5 flex flex-wrap items-center gap-3 text-xs text-sf-muted">
           <span class="rounded-lg bg-sf-red px-3 py-1.5 font-black uppercase tracking-[0.18em] text-white">StreamFlix Original</span>
@@ -418,16 +447,41 @@
           <div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">${esc(r.title)}</h2><span class="text-xs text-sf-muted">${items.length} titles</span></div>
           <div class="row-scroll flex gap-3 overflow-x-auto pb-5">${items.map(card).join("")}</div>
           ${i < rows.length - 1 ? `<div id="ad-between-${i}" class="ad-slot mt-3"></div>` : ""}
-        </section>`;
+        </section>${currentView === "home" ? affiliateRowsAfter(i) : ""}`;
       }).join("") || `<section class="mx-auto max-w-[1920px] px-4 text-sf-muted sm:px-6 lg:px-10">No titles match this view.</section>`;
       renderAds();
       lucide.createIcons();
+    }
+    function affiliateRowsAfter(rowIndex){
+      const rows = (db.monetization?.affiliateRows || []).filter(r => r.enabled && Number(r.afterRow) === rowIndex);
+      return rows.map(r => {
+        const items = (r.itemIds || []).map(affiliateItem).filter(x => x && x.enabled);
+        if(!items.length) return "";
+        return `<section class="mx-auto max-w-[1920px] px-4 sm:px-6 lg:px-10">
+          <div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">${esc(r.title)}</h2><span class="text-xs text-sf-muted">Affiliate</span></div>
+          <div class="row-scroll flex gap-3 overflow-x-auto pb-5">${items.map(affiliateCard).join("")}</div>
+        </section>`;
+      }).join("");
+    }
+    function affiliateItem(id){ return (db.monetization?.affiliateItems || []).find(x => x.id === id); }
+    function affiliateCard(a){
+      return `<a href="${esc(a.url || "#")}" target="_blank" rel="noopener sponsored" onclick="trackAffiliateClick('${a.id}')" class="card relative w-[150px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-sf-card text-white no-underline sm:w-[190px]">
+        <div class="relative aspect-[2/3]"><img src="${esc(a.image || img(a.id))}" alt="${esc(a.title)}" class="h-full w-full object-cover"><div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+          <div class="absolute right-2 top-2 rounded-md bg-sf-red px-2 py-1 text-[10px] font-black">AFFILIATE</div>
+          <span class="poster-overlay absolute bottom-3 left-3 rounded-xl bg-white px-3 py-2 text-xs font-black text-black">Open Deal</span>
+        </div>
+        <div class="p-3"><p class="line-1 text-sm font-bold">${esc(a.title)}</p><p class="line-2 mt-1 text-xs text-sf-muted">${esc(a.desc)}</p><p class="mt-2 text-[10px] uppercase tracking-wider text-sf-red">${esc(a.category)}</p></div>
+      </a>`;
+    }
+    function trackAffiliateClick(id){
+      const a = affiliateItem(id);
+      if(a){ a.clicks = (a.clicks || 0) + 1; persist(); }
     }
     function labelForView(){ return ({series:"TV Series",movies:"Movies",continue:"Continue Watching",list:"My List"})[currentView] || "Browse"; }
     function card(t){
       const pct = itemProgress(t.id), badge = t.type === "series" ? `${t.seasons.length} season${t.seasons.length>1?"s":""}` : t.duration;
       return `<article onclick="openDetails('${t.id}')" class="card relative w-[150px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-sf-card sm:w-[190px]">
-        <div class="relative aspect-[2/3]"><img src="${img(t.poster)}" alt="${esc(t.title)}" class="h-full w-full object-cover"><div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+        <div class="relative aspect-[2/3]"><img src="${posterSrc(t)}" alt="${esc(t.title)}" class="h-full w-full object-cover"><div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
           <div class="absolute right-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] font-bold">${t.type==="series"?"TV":"MOVIE"}</div>
           <button onclick="event.stopPropagation();play('${t.id}',0,0)" class="poster-overlay absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-black"><i data-lucide="play" class="ml-0.5 h-4 w-4 fill-black"></i></button>
         </div>
@@ -442,7 +496,7 @@
       wrap.classList.remove("hidden");
       wrap.innerHTML = `<div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">Continue Watching</h2><button onclick="setView('continue')" class="text-xs text-sf-red">View all</button></div>
       <div class="row-scroll flex gap-3 overflow-x-auto pb-2">${items.map(t=>`<button onclick="resume('${t.id}')" class="flex w-80 flex-shrink-0 gap-3 rounded-xl border border-white/10 bg-white/[.03] p-2 text-left hover:bg-white/[.06]">
-        <img src="${img(t.banner,220,124)}" class="h-20 w-32 rounded-lg object-cover" alt=""><span class="min-w-0 flex-1 py-1"><b class="line-1 text-sm">${esc(t.title)}</b><small class="mt-1 block text-sf-muted">${itemProgress(t.id)}% watched</small><span class="mt-3 block h-1 rounded bg-white/10"><span class="block h-full rounded bg-sf-red" style="width:${itemProgress(t.id)}%"></span></span></span>
+        <img src="${bannerSrc(t,220,124)}" class="h-20 w-32 rounded-lg object-cover" alt=""><span class="min-w-0 flex-1 py-1"><b class="line-1 text-sm">${esc(t.title)}</b><small class="mt-1 block text-sf-muted">${itemProgress(t.id)}% watched</small><span class="mt-3 block h-1 rounded bg-white/10"><span class="block h-full rounded bg-sf-red" style="width:${itemProgress(t.id)}%"></span></span></span>
       </button>`).join("")}</div>`;
     }
 
@@ -450,7 +504,7 @@
       const t = title(id); if(!t) return;
       const seasons = t.type === "series" ? renderEpisodes(t) : "";
       document.getElementById("details-content").innerHTML = `<div class="relative">
-        <div class="relative h-80"><img src="${img(t.banner,1200,600)}" class="h-full w-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-sf-card via-black/50 to-transparent"></div><button onclick="closeDetails()" class="absolute right-4 top-4 rounded-xl bg-black/60 p-2"><i data-lucide="x"></i></button>
+        <div class="relative h-80"><img src="${bannerSrc(t,1200,600)}" class="h-full w-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-sf-card via-black/50 to-transparent"></div><button onclick="closeDetails()" class="absolute right-4 top-4 rounded-xl bg-black/60 p-2"><i data-lucide="x"></i></button>
           <div class="absolute bottom-6 left-6 right-6"><div class="mb-3 flex gap-2 text-xs text-sf-muted"><span>${t.year}</span><span>${t.maturity}</span><span>${t.genre}</span><span>${t.duration}</span></div><h2 class="text-4xl font-black">${esc(t.title)}</h2></div>
         </div>
         <div class="p-6"><div class="grid gap-6 lg:grid-cols-[1fr_260px]"><div><div class="mb-4 flex gap-3"><button onclick="play('${t.id}',0,0)" class="admin-btn flex items-center gap-2"><i data-lucide="play" class="h-4 w-4 fill-white"></i>Play</button><button onclick="toggleList('${t.id}')" class="admin-btn secondary">${db.list.includes(t.id)?"Remove from List":"Add to List"}</button></div><p class="leading-7 text-slate-300">${esc(t.desc)}</p></div><div class="text-sm text-sf-muted"><p><b class="text-white">Cast:</b> ${esc(t.cast)}</p><p class="mt-3"><b class="text-white">Type:</b> ${t.type}</p></div></div>${seasons}</div>
@@ -535,7 +589,7 @@
     function closeAdmin(){ document.getElementById("admin-modal").classList.add("hidden"); document.body.style.overflow=""; renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); }
     function adminTab(name){ document.querySelectorAll(".admin-tab").forEach(b=>b.classList.remove("active")); event.target.classList.add("active"); document.querySelectorAll(".admin-page").forEach(p=>p.classList.add("hidden")); document.getElementById("admin-"+name).classList.remove("hidden"); }
     function saveAll(){ persist(); renderAds(); toast("Admin changes saved"); closeAdmin(); }
-    function renderAdmin(){ migrateMonetization(); renderAdminContent(); renderAdminSeries(); renderAdminHomepage(); renderAdminMonetization(); renderAdminSettings(); }
+    function renderAdmin(){ migrateMonetization(); renderAdminContent(); renderAdminSeries(); renderAdminHomepage(); renderAdminMonetization(); renderAdminBackups(); renderAdminSettings(); }
     function renderAdminContent(){
       const movies = db.titles.filter(t => t.type === "movie");
       document.getElementById("admin-content").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Movie Library</h3><p class="mt-1 text-sm text-sf-muted">Add, edit, delete movies and paste embed URLs for streaming.</p></div><button onclick="addMovie()" class="admin-btn">Add Movie</button></div>
@@ -548,7 +602,7 @@
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         ${field("Movie Title","ed-title",t.title)}${field("Genre","ed-genre",t.genre)}${field("Year","ed-year",t.year,"number")}
         ${field("Maturity","ed-maturity",t.maturity)}${field("Duration","ed-duration",t.duration)}${field("Poster seed","ed-poster",t.poster)}${field("Banner seed","ed-banner",t.banner)}
-      </div><div class="mt-3 grid gap-3 lg:grid-cols-2">${field("Cast","ed-cast",t.cast)}${field("Streaming Embed URL","ed-embed",t.embedUrl||"")}</div>
+      </div><div class="mt-3 grid gap-3 lg:grid-cols-2">${field("Movie poster image URL","ed-poster-url",t.posterUrl||"")}${field("Movie banner image URL","ed-banner-url",t.bannerUrl||"")}${field("Cast","ed-cast",t.cast)}${field("Streaming Embed URL","ed-embed",t.embedUrl||"")}</div>
       <textarea id="ed-desc" class="admin-input mt-3" rows="3">${esc(t.desc)}</textarea>
       <div class="mt-4 flex gap-2"><button onclick="saveMovieEditor()" class="admin-btn">Save Movie</button><button onclick="document.getElementById('title-editor').innerHTML=''" class="admin-btn ghost">Cancel</button></div></div>`;
     }
@@ -556,16 +610,23 @@
     function select(label,id,val,opts){ return `<label class="text-xs text-sf-muted">${label}<select id="${id}" class="admin-input mt-1">${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select></label>`; }
     function saveMovieEditor(){
       const t = title(adminTitleId); if(!t) return;
-      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:v("ed-genre"), year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:v("ed-poster"), banner:v("ed-banner"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed") });
+      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:v("ed-genre"), year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:v("ed-poster"), banner:v("ed-banner"), posterUrl:v("ed-poster-url"), bannerUrl:v("ed-banner-url"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed") });
       delete t.seasons;
       persist(); renderAdmin(); toast("Movie saved");
     }
     function v(id){ return document.getElementById(id).value.trim(); }
-    function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
-    function deleteTitle(id){ db.titles=db.titles.filter(t=>t.id!==id); db.rows.forEach(r=>r.ids=r.ids.filter(x=>x!==id)); db.list=db.list.filter(x=>x!==id); persist(); renderAdmin(); }
+    function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",posterUrl:"",bannerUrl:"",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
+    function deleteTitle(id){ maybeAutoBackup("Before title delete"); db.titles=db.titles.filter(t=>t.id!==id); db.rows.forEach(r=>r.ids=r.ids.filter(x=>x!==id)); db.list=db.list.filter(x=>x!==id); persist(); renderAdmin(); }
     function renderAdminSeries(){
       const series = db.titles.filter(t=>t.type==="series");
-      document.getElementById("admin-series").innerHTML = `<h3 class="mb-4 text-lg font-bold">Series, Seasons & Episodes</h3>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-center justify-between"><h4 class="font-bold">${esc(t.title)}</h4><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
+      document.getElementById("admin-series").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Series, Seasons & Episodes</h3><p class="mt-1 text-sm text-sf-muted">Add series, set banner image URLs, then build seasons and episodes.</p></div><button onclick="addSeries()" class="admin-btn">Add Series</button></div>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-start justify-between gap-3"><div class="flex-1"><input class="admin-input max-w-sm font-bold" value="${esc(t.title)}" onchange="title('${t.id}').title=this.value;persist();renderHero();renderLibrary()"><div class="mt-2 grid gap-2 lg:grid-cols-2"><input class="admin-input" value="${esc(t.bannerUrl||"")}" placeholder="Series banner image URL" onchange="title('${t.id}').bannerUrl=this.value;persist();renderHero();renderLibrary()"><input class="admin-input" value="${esc(t.posterUrl||"")}" placeholder="Series poster image URL optional" onchange="title('${t.id}').posterUrl=this.value;persist();renderLibrary()"></div><p class="mt-1 text-xs text-sf-muted">${esc(t.genre)} • ${t.year}</p></div><div class="flex gap-2"><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger">Delete Series</button></div></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
+    }
+    function addSeries(){
+      const id = "s-" + Date.now();
+      const newSeries = { id, type:"series", title:"New Series", genre:"Drama", year:2026, maturity:"TV-14", duration:"1 season", cast:"", poster:"new-series-poster", banner:"new-series-banner", posterUrl:"", bannerUrl:"", desc:"New series description.", seasons:[{ n:1, name:"Season 1", episodes:[] }] };
+      db.titles.push(newSeries);
+      db.rows[1]?.ids.push(id);
+      persist(); renderAdminSeries(); renderLibrary(); toast("Series added");
     }
     function addSeason(id){ const t=title(id); t.seasons.push({n:t.seasons.length+1,name:`Season ${t.seasons.length+1}`,episodes:[]}); persist(); renderAdminSeries(); }
     function addEpisode(id,si){ const eps=title(id).seasons[si].episodes; eps.push({n:eps.length+1,title:"New Episode",duration:"42m",desc:"Episode description.",embedUrl:""}); persist(); renderAdminSeries(); }
@@ -577,28 +638,27 @@
     function toggleRowTitle(ri,id){ const row=db.rows[ri]; row.ids=row.ids.includes(id)?row.ids.filter(x=>x!==id):[...row.ids,id]; persist(); renderAdminHomepage(); }
     function renderAdminMonetization(){
       const m = db.monetization;
-      const adOptions = m.adCodes.map(a=>`<option value="${a.id}">${esc(a.name)} (${esc(a.type)})</option>`).join("");
       const totalImpressions = Object.values(m.placements).reduce((n,p)=>n+(p.impressions||0),0);
       const totalClicks = Object.values(m.placements).reduce((n,p)=>n+(p.clicks||0),0);
       const topPlacement = Object.entries(m.placements).sort((a,b)=>(b[1].impressions||0)-(a[1].impressions||0))[0];
       document.getElementById("admin-monetization").innerHTML = `
         <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <div><h3 class="text-lg font-bold">Monetization</h3><p class="mt-1 text-sm text-sf-muted">OTT-style ad and sponsor control. Visitors only see enabled placements.</p></div>
-          <button onclick="addAdCode()" class="admin-btn">Add Ad Code</button>
+          <div><h3 class="text-lg font-bold">Monetization</h3><p class="mt-1 text-sm text-sf-muted">Clean control center for ad network ads and affiliate promotions.</p></div>
+          <div class="flex gap-2"><button onclick="addAdCode()" class="admin-btn">Add Ad Code</button><button onclick="addAffiliate()" class="admin-btn secondary">Add Affiliate</button></div>
         </div>
 
         <div class="mb-6 grid gap-3 md:grid-cols-4">
           <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Ad Impressions</p><b class="mt-2 block text-2xl">${totalImpressions}</b></div>
           <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Clicks</p><b class="mt-2 block text-2xl">${totalClicks}</b></div>
-          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Revenue Placeholder</p><b class="mt-2 block text-2xl">${esc(m.analytics.revenuePlaceholder)}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Active Campaigns</p><b class="mt-2 block text-2xl">${m.campaigns.filter(c=>c.active).length}</b></div>
           <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Most Viewed Placement</p><b class="mt-2 block text-base">${topPlacement ? esc(topPlacement[1].label) : "None"}</b></div>
         </div>
 
         <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
-          <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Ad Code Manager</h4><span class="text-xs text-sf-muted">Banner, video, native, popup, affiliate</span></div>
+          <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Ad Network Ads</h4><span class="text-xs text-sf-muted">Banner, native, display, optional popup scripts</span></div>
           <div class="space-y-3">${m.adCodes.map((a,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 lg:grid-cols-[1fr_170px_90px_1.5fr_80px]">
             <input class="admin-input" value="${esc(a.name)}" placeholder="Placement/ad name" onchange="db.monetization.adCodes[${i}].name=this.value;persist();renderAdminMonetization()">
-            <select class="admin-input" onchange="db.monetization.adCodes[${i}].type=this.value;persist();renderAdminMonetization()">${["Banner ads","Video ads","Native ads","Popup scripts","Affiliate banners"].map(type=>`<option ${a.type===type?"selected":""}>${type}</option>`).join("")}</select>
+            <select class="admin-input" onchange="db.monetization.adCodes[${i}].type=this.value;persist();renderAdminMonetization()">${["Banner ads","Native ads","Display ads","Popup scripts"].map(type=>`<option ${a.type===type?"selected":""}>${type}</option>`).join("")}</select>
             <label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${a.enabled?"checked":""} onchange="db.monetization.adCodes[${i}].enabled=this.checked;persist();renderAds()"><span class="track"></span></span></label>
             <textarea class="admin-input min-h-[76px]" placeholder="Paste ad network script/code or affiliate HTML" onchange="db.monetization.adCodes[${i}].code=this.value;persist();renderAds()">${esc(a.code)}</textarea>
             <button onclick="deleteAdCode('${a.id}')" class="admin-btn danger">Delete</button>
@@ -606,41 +666,34 @@
         </div>
 
         <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
-          <h4 class="mb-4 font-bold">Ad Placement Controls</h4>
-          <div class="grid gap-3 lg:grid-cols-2">${Object.entries(m.placements).map(([key,p])=>`<div class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <h4 class="mb-4 font-bold">Placement Manager</h4>
+          <div class="grid gap-3 lg:grid-cols-2">${["hero","betweenRows","watchBelow","footer"].map(key=>{ const p=m.placements[key]; return `<div class="rounded-xl border border-white/10 bg-black/20 p-4">
             <div class="mb-3 flex items-center justify-between gap-3"><div><b>${esc(p.label)}</b><p class="text-xs text-sf-muted">${key}</p></div><label class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.placements.${key}.enabled=this.checked;persist();renderAds();renderAdminMonetization()"><span class="track"></span></label></div>
             <select class="admin-input" onchange="db.monetization.placements.${key}.adCodeId=this.value;persist();renderAds()">${m.adCodes.map(a=>`<option value="${a.id}" ${p.adCodeId===a.id?"selected":""}>${esc(a.name)}</option>`).join("")}</select>
             <div class="mt-3 flex justify-between text-xs text-sf-muted"><span>${p.impressions||0} impressions</span><span>${p.clicks||0} clicks</span></div>
-          </div>`).join("")}</div>
+          </div>`}).join("")}</div>
         </div>
 
         <div class="mb-6 grid gap-6 xl:grid-cols-2">
           <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
-            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Campaign Manager</h4><button onclick="addCampaign()" class="admin-btn secondary">New Campaign</button></div>
+            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Campaign On/Off Controls</h4><button onclick="addCampaign()" class="admin-btn secondary">New Campaign</button></div>
             <div class="space-y-3">${m.campaigns.map((c,i)=>`<div class="rounded-xl border border-white/10 bg-black/20 p-3">
-              <div class="grid gap-2 md:grid-cols-[1fr_140px_140px_80px]"><input class="admin-input" value="${esc(c.name)}" onchange="db.monetization.campaigns[${i}].name=this.value;persist()"><input type="date" class="admin-input" value="${esc(c.start)}" onchange="db.monetization.campaigns[${i}].start=this.value;persist()"><input type="date" class="admin-input" value="${esc(c.end)}" onchange="db.monetization.campaigns[${i}].end=this.value;persist()"><label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${c.active?"checked":""} onchange="db.monetization.campaigns[${i}].active=this.checked;persist();renderAds()"><span class="track"></span></span></label></div>
-              <div class="mt-3 flex flex-wrap gap-2">${Object.entries(m.placements).map(([key,p])=>`<button onclick="toggleCampaignPlacement(${i},'${key}')" class="rounded-lg border ${c.placementIds?.includes(key)?"border-sf-red bg-sf-red/20":"border-white/10 bg-white/5"} px-3 py-1.5 text-xs">${esc(p.label)}</button>`).join("")}</div>
+              <div class="grid gap-2 md:grid-cols-[1fr_90px]"><input class="admin-input" value="${esc(c.name)}" onchange="db.monetization.campaigns[${i}].name=this.value;persist()"><label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${c.active?"checked":""} onchange="db.monetization.campaigns[${i}].active=this.checked;persist();renderAds()"><span class="track"></span></span></label></div>
+              <div class="mt-3 flex flex-wrap gap-2">${["hero","betweenRows","watchBelow","footer"].map(key=>`<button onclick="toggleCampaignPlacement(${i},'${key}')" class="rounded-lg border ${c.placementIds?.includes(key)?"border-sf-red bg-sf-red/20":"border-white/10 bg-white/5"} px-3 py-1.5 text-xs">${esc(m.placements[key].label)}</button>`).join("")}</div>
             </div>`).join("")}</div>
           </div>
           <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
-            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Promo / Sponsored Content</h4><button onclick="addPromo()" class="admin-btn secondary">New Promo</button></div>
-            <div class="space-y-3">${m.promos.map((p,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 md:grid-cols-2">
-              <input class="admin-input" value="${esc(p.name)}" placeholder="Promo name" onchange="db.monetization.promos[${i}].name=this.value;persist()">
-              <select class="admin-input" onchange="db.monetization.promos[${i}].type=this.value;persist()">${["Sponsored banner","Promotional popup","Featured sponsor section","Affiliate promotion block"].map(type=>`<option ${p.type===type?"selected":""}>${type}</option>`).join("")}</select>
-              <input class="admin-input" value="${esc(p.title)}" placeholder="Title" onchange="db.monetization.promos[${i}].title=this.value;persist()">
-              <input class="admin-input" value="${esc(p.cta)}" placeholder="CTA" onchange="db.monetization.promos[${i}].cta=this.value;persist()">
-              <input class="admin-input" value="${esc(p.url || "#")}" placeholder="Affiliate/sponsor URL" onchange="db.monetization.promos[${i}].url=this.value;persist();renderAds()">
-              <select class="admin-input" onchange="db.monetization.promos[${i}].placement=this.value;persist();renderAds()">${Object.entries(m.placements).map(([key,pl])=>`<option value="${key}" ${(p.placement||"hero")===key?"selected":""}>${esc(pl.label)}</option>`).join("")}</select>
-              <input class="admin-input md:col-span-2" value="${esc(p.text)}" placeholder="Promo text" onchange="db.monetization.promos[${i}].text=this.value;persist()">
-              <div class="flex items-center justify-between md:col-span-2"><label class="flex items-center gap-2 text-xs text-sf-muted">Enabled <span class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.promos[${i}].enabled=this.checked;persist()"><span class="track"></span></span></label><button onclick="db.monetization.promos.splice(${i},1);persist();renderAdminMonetization()" class="admin-btn danger">Delete</button></div>
+            <div class="mb-4 flex items-center justify-between"><h4 class="font-bold">Affiliate Promotions</h4><button onclick="addAffiliate()" class="admin-btn secondary">New Affiliate</button></div>
+            <div class="space-y-3">${(m.affiliates||[]).map((p,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 md:grid-cols-2">
+              <input class="admin-input" value="${esc(p.name)}" placeholder="Promotion name" onchange="db.monetization.affiliates[${i}].name=this.value;persist()">
+              <select class="admin-input" onchange="db.monetization.affiliates[${i}].placement=this.value;persist();renderAds()">${["hero","sidebar","watchBelow"].map(key=>`<option value="${key}" ${(p.placement||"hero")===key?"selected":""}>${key==="hero"?"Homepage promo section":key==="sidebar"?"Sidebar/banner area":"Below player recommendations"}</option>`).join("")}</select>
+              <input class="admin-input" value="${esc(p.title)}" placeholder="Promo title" onchange="db.monetization.affiliates[${i}].title=this.value;persist();renderAds()">
+              <input class="admin-input" value="${esc(p.url || "#")}" placeholder="Affiliate URL" onchange="db.monetization.affiliates[${i}].url=this.value;persist();renderAds()">
+              <input class="admin-input md:col-span-2" value="${esc(p.imageUrl || "")}" placeholder="Affiliate banner image URL" onchange="db.monetization.affiliates[${i}].imageUrl=this.value;persist();renderAds()">
+              <input class="admin-input md:col-span-2" value="${esc(p.text)}" placeholder="Promo description" onchange="db.monetization.affiliates[${i}].text=this.value;persist();renderAds()">
+              <div class="flex items-center justify-between md:col-span-2"><label class="flex items-center gap-2 text-xs text-sf-muted">Enabled <span class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.affiliates[${i}].enabled=this.checked;persist();renderAds()"><span class="track"></span></span></label><button onclick="db.monetization.affiliates.splice(${i},1);persist();renderAdminMonetization();renderAds()" class="admin-btn danger">Delete</button></div>
             </div>`).join("")}</div>
           </div>
-        </div>
-
-        <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
-          <h4 class="mb-4 font-bold">Video Ad Settings</h4>
-          <div class="grid gap-3 md:grid-cols-3">${["preroll","midroll","postroll"].map(k=>`<div class="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 p-4"><span class="capitalize">${k.replace("roll","-roll")} ads</span><label class="toggle"><input type="checkbox" ${m.videoAds[k]?"checked":""} onchange="db.monetization.videoAds.${k}=this.checked;persist()"><span class="track"></span></label></div>`).join("")}</div>
-          <p class="mt-3 text-xs text-sf-muted">These toggles prepare support for future pre-roll, mid-roll, and post-roll integrations.</p>
         </div>`;
     }
     function addAdCode(){
@@ -648,13 +701,14 @@
       persist(); renderAdminMonetization();
     }
     function deleteAdCode(id){
+      maybeAutoBackup("Before ad code delete");
       db.monetization.adCodes = db.monetization.adCodes.filter(a=>a.id!==id);
       const fallback = db.monetization.adCodes[0]?.id || "";
       Object.values(db.monetization.placements).forEach(p=>{ if(p.adCodeId===id) p.adCodeId=fallback; });
       persist(); renderAdminMonetization(); renderAds();
     }
     function addCampaign(){
-      db.monetization.campaigns.push({id:"camp-"+Date.now(),name:"New Campaign",start:new Date().toISOString().slice(0,10),end:"",active:true,placementIds:[]});
+      db.monetization.campaigns.push({id:"camp-"+Date.now(),name:"New Campaign",active:true,placementIds:["hero"]});
       persist(); renderAdminMonetization();
     }
     function toggleCampaignPlacement(i,key){
@@ -662,9 +716,215 @@
       c.placementIds = c.placementIds.includes(key) ? c.placementIds.filter(x=>x!==key) : [...c.placementIds,key];
       persist(); renderAdminMonetization(); renderAds();
     }
-    function addPromo(){
-      db.monetization.promos.push({id:"promo-"+Date.now(),name:"New Sponsor Promo",type:"Sponsored banner",enabled:true,title:"Sponsor Title",text:"Promotion details",cta:"Open",url:"#",placement:"hero"});
+    function addAffiliate(){
+      db.monetization.affiliates.push({id:"aff-"+Date.now(),name:"New Affiliate Promotion",enabled:true,title:"Affiliate Offer",text:"Promotion details",imageUrl:"",url:"#",placement:"hero"});
       persist(); renderAdminMonetization();
+    }
+    function renderAdminMonetization(){
+      migrateMonetization();
+      const m = db.monetization;
+      const placementKeys = ["hero","betweenRows","watchBelow","footer","popup"];
+      const totalImpressions = placementKeys.reduce((n,key)=>n+(m.placements[key]?.impressions||0),0);
+      const adClicks = placementKeys.reduce((n,key)=>n+(m.placements[key]?.clicks||0),0);
+      const affiliateClicks = (m.affiliateItems || []).reduce((n,a)=>n+(a.clicks||0),0);
+      const activeAffiliates = (m.affiliateItems || []).filter(a=>a.enabled).length;
+      document.getElementById("admin-monetization").innerHTML = `
+        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div><h3 class="text-lg font-bold">Monetization</h3><p class="mt-1 text-sm text-sf-muted">Manage ad network placements and affiliate rows that blend into the OTT homepage.</p></div>
+          <div class="flex flex-wrap gap-2"><button onclick="addAdCode()" class="admin-btn">Add Ad Code</button><button onclick="addAffiliateItem()" class="admin-btn secondary">Add Affiliate Item</button><button onclick="addAffiliateRow()" class="admin-btn ghost">Add Affiliate Row</button></div>
+        </div>
+
+        <div class="mb-6 grid gap-3 md:grid-cols-4">
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Ad Impressions</p><b class="mt-2 block text-2xl">${totalImpressions}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Ad Clicks</p><b class="mt-2 block text-2xl">${adClicks}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Affiliate Clicks</p><b class="mt-2 block text-2xl">${affiliateClicks}</b></div>
+          <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Active Affiliate Items</p><b class="mt-2 block text-2xl">${activeAffiliates}</b></div>
+        </div>
+
+        <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <div class="mb-4 flex items-center justify-between"><div><h4 class="font-bold">Ad Network Management</h4><p class="mt-1 text-xs text-sf-muted">Paste banner/native/display ad code or optional popup scripts.</p></div></div>
+          <div class="space-y-3">${m.adCodes.map((a,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 lg:grid-cols-[1fr_170px_90px_1.5fr_80px]">
+            <input class="admin-input" value="${esc(a.name)}" placeholder="Ad code name" onchange="db.monetization.adCodes[${i}].name=this.value;persist();renderAdminMonetization()">
+            <select class="admin-input" onchange="db.monetization.adCodes[${i}].type=this.value;persist();renderAdminMonetization()">${["Banner ads","Native/display ads","Popup scripts"].map(type=>`<option ${a.type===type?"selected":""}>${type}</option>`).join("")}</select>
+            <label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${a.enabled?"checked":""} onchange="db.monetization.adCodes[${i}].enabled=this.checked;persist();renderAds()"><span class="track"></span></span></label>
+            <textarea class="admin-input min-h-[76px]" placeholder="Paste ad network script/code here" onchange="db.monetization.adCodes[${i}].code=this.value;persist();renderAds()">${esc(a.code)}</textarea>
+            <button onclick="deleteAdCode('${a.id}')" class="admin-btn danger">Delete</button>
+          </div>`).join("")}</div>
+        </div>
+
+        <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <h4 class="mb-4 font-bold">Ad Placement Areas</h4>
+          <div class="grid gap-3 lg:grid-cols-2">${placementKeys.map(key=>{ const p=m.placements[key]; return `<div class="rounded-xl border border-white/10 bg-black/20 p-4">
+            <div class="mb-3 flex items-center justify-between gap-3"><div><b>${esc(p.label)}</b><p class="text-xs text-sf-muted">${key}</p></div><label class="toggle"><input type="checkbox" ${p.enabled?"checked":""} onchange="db.monetization.placements.${key}.enabled=this.checked;persist();renderAds();renderAdminMonetization()"><span class="track"></span></label></div>
+            <select class="admin-input" onchange="db.monetization.placements.${key}.adCodeId=this.value;persist();renderAds()">${m.adCodes.map(a=>`<option value="${a.id}" ${p.adCodeId===a.id?"selected":""}>${esc(a.name)}</option>`).join("")}</select>
+            <div class="mt-3 flex justify-between text-xs text-sf-muted"><span>${p.impressions||0} impressions</span><span>${p.clicks||0} clicks</span></div>
+          </div>`}).join("")}</div>
+        </div>
+
+        <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <div class="mb-4 flex items-center justify-between"><div><h4 class="font-bold">Affiliate Content Manager</h4><p class="mt-1 text-xs text-sf-muted">Cards open affiliate URLs in a new tab and visually match movie cards.</p></div><button onclick="addAffiliateItem()" class="admin-btn secondary">Add Affiliate Item</button></div>
+          <div class="space-y-3">${(m.affiliateItems||[]).map((a,i)=>`<div class="grid gap-2 rounded-xl border border-white/10 bg-black/20 p-3 lg:grid-cols-[1fr_1fr_1fr_90px]">
+            <input class="admin-input" value="${esc(a.title)}" placeholder="Item title" onchange="db.monetization.affiliateItems[${i}].title=this.value;persist();renderLibrary()">
+            <input class="admin-input" value="${esc(a.category)}" placeholder="Category" onchange="db.monetization.affiliateItems[${i}].category=this.value;persist();renderLibrary()">
+            <input class="admin-input" value="${esc(a.url)}" placeholder="Destination URL" onchange="db.monetization.affiliateItems[${i}].url=this.value;persist()">
+            <label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${a.enabled?"checked":""} onchange="db.monetization.affiliateItems[${i}].enabled=this.checked;persist();renderLibrary();renderAdminMonetization()"><span class="track"></span></span></label>
+            <input class="admin-input lg:col-span-2" value="${esc(a.image)}" placeholder="Affiliate image URL" onchange="db.monetization.affiliateItems[${i}].image=this.value;persist();renderLibrary()">
+            <input class="admin-input" value="${esc(a.desc)}" placeholder="Description" onchange="db.monetization.affiliateItems[${i}].desc=this.value;persist();renderLibrary()">
+            <button onclick="deleteAffiliateItem('${a.id}')" class="admin-btn danger">Delete</button>
+          </div>`).join("")}</div>
+        </div>
+
+        <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <div class="mb-4 flex items-center justify-between"><div><h4 class="font-bold">Homepage Affiliate Sections</h4><p class="mt-1 text-xs text-sf-muted">Add rows anywhere on the homepage, reorder them, and mix them between movie/series rows.</p></div><button onclick="addAffiliateRow()" class="admin-btn secondary">Add Affiliate Row</button></div>
+          <div class="space-y-3">${(m.affiliateRows||[]).map((r,i)=>`<div class="rounded-xl border border-white/10 bg-black/20 p-4">
+            <div class="mb-3 grid gap-2 lg:grid-cols-[1fr_180px_90px_130px]">
+              <input class="admin-input" value="${esc(r.title)}" placeholder="Section title" onchange="db.monetization.affiliateRows[${i}].title=this.value;persist();renderLibrary()">
+              <select class="admin-input" onchange="db.monetization.affiliateRows[${i}].afterRow=Number(this.value);persist();renderLibrary();renderAdminMonetization()">${db.rows.map((row,ri)=>`<option value="${ri}" ${Number(r.afterRow)===ri?"selected":""}>After ${esc(row.title)}</option>`).join("")}</select>
+              <label class="flex items-center justify-center gap-2 text-xs text-sf-muted">On <span class="toggle"><input type="checkbox" ${r.enabled?"checked":""} onchange="db.monetization.affiliateRows[${i}].enabled=this.checked;persist();renderLibrary();renderAdminMonetization()"><span class="track"></span></span></label>
+              <div class="flex gap-1"><button onclick="moveAffiliateRow(${i},-1)" class="admin-btn ghost flex-1">Up</button><button onclick="moveAffiliateRow(${i},1)" class="admin-btn ghost flex-1">Down</button></div>
+            </div>
+            <div class="flex flex-wrap gap-2">${(m.affiliateItems||[]).map(a=>`<button onclick="toggleAffiliateRowItem(${i},'${a.id}')" class="rounded-lg border ${(r.itemIds||[]).includes(a.id)?"border-sf-red bg-sf-red/20":"border-white/10 bg-white/5"} px-3 py-2 text-xs">${esc(a.title)}</button>`).join("")}</div>
+            <button onclick="db.monetization.affiliateRows.splice(${i},1);persist();renderLibrary();renderAdminMonetization()" class="admin-btn danger mt-3">Delete Section</button>
+          </div>`).join("")}</div>
+        </div>`;
+    }
+    function addAffiliateItem(){
+      db.monetization.affiliateItems.push({id:"aff-"+Date.now(),title:"New Affiliate Item",desc:"Affiliate description",image:"https://picsum.photos/seed/affiliate-"+Date.now()+"/500/700.jpg",url:"https://example.com",category:"Recommended Products",enabled:true});
+      persist(); renderLibrary(); renderAdminMonetization();
+    }
+    function deleteAffiliateItem(id){
+      maybeAutoBackup("Before affiliate item delete");
+      db.monetization.affiliateItems = db.monetization.affiliateItems.filter(a=>a.id!==id);
+      (db.monetization.affiliateRows||[]).forEach(r=>r.itemIds=(r.itemIds||[]).filter(x=>x!==id));
+      persist(); renderLibrary(); renderAdminMonetization();
+    }
+    function addAffiliateRow(){
+      db.monetization.affiliateRows.push({id:"aff-row-"+Date.now(),title:"Recommended Products",enabled:true,afterRow:0,itemIds:(db.monetization.affiliateItems||[]).slice(0,4).map(a=>a.id)});
+      persist(); renderLibrary(); renderAdminMonetization();
+    }
+    function toggleAffiliateRowItem(i,id){
+      const r=db.monetization.affiliateRows[i]; r.itemIds=r.itemIds||[];
+      r.itemIds = r.itemIds.includes(id) ? r.itemIds.filter(x=>x!==id) : [...r.itemIds,id];
+      persist(); renderLibrary(); renderAdminMonetization();
+    }
+    function moveAffiliateRow(i,d){
+      const rows=db.monetization.affiliateRows, j=i+d;
+      if(j<0 || j>=rows.length) return;
+      const temp=rows[i]; rows[i]=rows[j]; rows[j]=temp;
+      persist(); renderLibrary(); renderAdminMonetization();
+    }
+    function createBackupPackage(){
+      const movies = db.titles.filter(t=>t.type==="movie");
+      const series = db.titles.filter(t=>t.type==="series");
+      return {
+        meta:{ app:"StreamFlix", version:1, exportedAt:new Date().toISOString(), storageKey:STORAGE },
+        files:{
+          "movies.json":movies,
+          "series.json":series,
+          "settings.json":db.settings,
+          "homepage-layout.json":db.rows,
+          "affiliate-promotions.json":{ affiliateItems:db.monetization?.affiliateItems||[], affiliateRows:db.monetization?.affiliateRows||[], affiliates:db.monetization?.affiliates||[] },
+          "appearance-settings.json":{ heroId:db.settings.heroId, activeGenre:db.settings.activeGenre },
+          "monetization-settings.json":db.monetization||{}
+        },
+        data:db
+      };
+    }
+    function downloadJson(filename,obj){
+      const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),500);
+    }
+    function exportFullBackup(){
+      const pkg = createBackupPackage();
+      downloadJson(`streamflix-full-backup-${new Date().toISOString().slice(0,10)}.json`, pkg);
+      saveSnapshot("Manual export");
+      toast("Backup exported");
+      renderAdminBackups();
+    }
+    function backupSnapshots(){
+      try { return JSON.parse(localStorage.getItem(BACKUP_STORAGE)) || []; } catch { return []; }
+    }
+    function saveSnapshot(label="Auto snapshot"){
+      const snapshots = backupSnapshots();
+      snapshots.unshift({ id:"snap-"+Date.now(), label, createdAt:new Date().toISOString(), package:createBackupPackage() });
+      localStorage.setItem(BACKUP_STORAGE, JSON.stringify(snapshots.slice(0,8)));
+    }
+    function maybeAutoBackup(reason="Auto backup"){
+      if(db.settings.autoBackup) saveSnapshot(reason);
+    }
+    function restoreFromPackage(pkg){
+      const restored = pkg?.data || pkg;
+      if(!restored || !Array.isArray(restored.titles)){
+        toast("Invalid backup file");
+        return;
+      }
+      if(!confirm("Restore this backup? Current website data will be replaced.")) return;
+      maybeAutoBackup("Before restore");
+      db = restored;
+      persist();
+      migrateMonetization();
+      renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); renderAdmin();
+      toast("Backup restored");
+    }
+    function handleBackupUpload(input){
+      const file = input.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { restoreFromPackage(JSON.parse(reader.result)); }
+        catch { toast("Could not read backup JSON"); }
+        input.value = "";
+      };
+      reader.readAsText(file);
+    }
+    function restoreSnapshot(id){
+      const snap = backupSnapshots().find(s=>s.id===id);
+      if(snap) restoreFromPackage(snap.package);
+    }
+    function deleteSnapshot(id){
+      localStorage.setItem(BACKUP_STORAGE, JSON.stringify(backupSnapshots().filter(s=>s.id!==id)));
+      renderAdminBackups();
+    }
+    function renderAdminBackups(){
+      const snaps = backupSnapshots();
+      const pkg = createBackupPackage();
+      document.getElementById("admin-backups").innerHTML = `<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div><h3 class="text-lg font-bold">Backups</h3><p class="mt-1 text-sm text-sf-muted">Export and restore all JSON data: movies, series, settings, layout, affiliate promotions, appearance, and monetization.</p></div>
+        <button onclick="exportFullBackup()" class="admin-btn">Export Full Backup</button>
+      </div>
+      <div class="mb-6 grid gap-3 md:grid-cols-4">
+        <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Movies</p><b class="mt-2 block text-2xl">${pkg.files["movies.json"].length}</b></div>
+        <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Series</p><b class="mt-2 block text-2xl">${pkg.files["series.json"].length}</b></div>
+        <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Homepage Rows</p><b class="mt-2 block text-2xl">${pkg.files["homepage-layout.json"].length}</b></div>
+        <div class="rounded-2xl border border-white/10 bg-white/[.04] p-4"><p class="text-xs text-sf-muted">Local Snapshots</p><b class="mt-2 block text-2xl">${snaps.length}</b></div>
+      </div>
+      <div class="mb-6 grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <h4 class="mb-3 font-bold">Export Backup</h4>
+          <p class="mb-4 text-sm text-sf-muted">Downloads a JSON backup package containing virtual files for movies.json, series.json, settings.json, homepage-layout.json, affiliate/promotions data, appearance settings, and monetization settings.</p>
+          <button onclick="exportFullBackup()" class="admin-btn">Export Full Backup</button>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+          <h4 class="mb-3 font-bold">Restore Backup</h4>
+          <p class="mb-4 text-sm text-sf-muted">Upload a previous StreamFlix backup JSON. You will be asked to confirm before data is replaced.</p>
+          <input type="file" accept="application/json,.json" class="admin-input" onchange="handleBackupUpload(this)">
+        </div>
+      </div>
+      <div class="mb-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+        <div class="flex items-center justify-between gap-4"><div><h4 class="font-bold">Automatic Backup Snapshots</h4><p class="mt-1 text-sm text-sf-muted">Keeps latest local snapshots before restore and after manual exports.</p></div><label class="toggle"><input type="checkbox" ${db.settings.autoBackup?"checked":""} onchange="db.settings.autoBackup=this.checked;persist();renderAdminBackups()"><span class="track"></span></label></div>
+        <button onclick="saveSnapshot('Manual snapshot');renderAdminBackups();toast('Snapshot saved')" class="admin-btn secondary mt-4">Save Snapshot Now</button>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+        <h4 class="mb-4 font-bold">Latest Local Backups</h4>
+        <div class="space-y-2">${snaps.length ? snaps.map(s=>`<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 p-3"><div><b>${esc(s.label)}</b><p class="text-xs text-sf-muted">${new Date(s.createdAt).toLocaleString()}</p></div><div class="flex gap-2"><button onclick="downloadJson('streamflix-snapshot-${s.createdAt.slice(0,10)}.json', backupSnapshots().find(x=>x.id==='${s.id}').package)" class="admin-btn ghost">Download</button><button onclick="restoreSnapshot('${s.id}')" class="admin-btn secondary">Restore</button><button onclick="deleteSnapshot('${s.id}')" class="admin-btn danger">Delete</button></div></div>`).join("") : `<p class="text-sm text-sf-muted">No local snapshots yet.</p>`}</div>
+      </div>`;
     }
     function renderAdminSettings(){
       document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
