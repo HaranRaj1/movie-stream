@@ -302,6 +302,15 @@
     function progressKey(id,s=0,e=0){ return `${id}:${s}:${e}`; }
     function itemProgress(id){ const keys = Object.keys(db.progress).filter(k => k.startsWith(id + ":")); return keys.reduce((m,k)=>Math.max(m,db.progress[k]?.pct||0),0); }
     function hasStream(t){ const ep = firstEpisode(t); return !!(ep && ep.embedUrl && ep.embedUrl.trim()); }
+    function genreList(t){ return Array.isArray(t.genres) && t.genres.length ? t.genres : (t.genre ? [t.genre] : []); }
+    function genreText(t){ return genreList(t).join(", "); }
+    function parseGenres(value){ return String(value || "").split(",").map(g=>g.trim()).filter(Boolean); }
+    function setTitleGenres(id,value){
+      const t = title(id); if(!t) return;
+      t.genres = parseGenres(value);
+      t.genre = t.genres[0] || "";
+      persist(); renderHero(); renderChips(); renderLibrary();
+    }
     function migrateMonetization(){
       if(!db.settings.skip) db.settings.skip = structuredClone(defaultData.settings.skip);
       if(!db.settings.skip.movies) db.settings.skip.movies = structuredClone(defaultData.settings.skip.movies);
