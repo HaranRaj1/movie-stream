@@ -144,6 +144,10 @@
       <div class="relative flex-1 bg-black">
         <div id="player-loader" class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black"><div class="spinner"></div><p class="text-sm text-sf-muted">Loading stream...</p></div>
         <iframe id="player-frame" class="absolute inset-0 h-full w-full border-0" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>
+        <div class="absolute bottom-20 right-5 z-20 flex flex-col gap-2 sm:flex-row">
+          <button id="skip-intro-btn" onclick="skipIntro()" class="hidden rounded-xl border border-white/15 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-xl hover:bg-sf-red">Skip Intro</button>
+          <button id="skip-outro-btn" onclick="skipOutro()" class="hidden rounded-xl border border-white/15 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-xl hover:bg-sf-red">Skip Outro</button>
+        </div>
         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-5">
           <div class="mb-2 flex items-center justify-between text-xs text-sf-muted"><span id="progress-label">0% watched</span><span>Demo progress is saved automatically</span></div>
           <div class="h-1.5 overflow-hidden rounded-full bg-white/15"><div id="watch-progress" class="h-full rounded-full bg-sf-red" style="width:0%"></div></div>
@@ -206,7 +210,7 @@
     const BACKUP_STORAGE = "streamflix_backup_snapshots_v1";
     const ADMIN_PASSWORD = "Haran!stream2026!";
     const defaultData = {
-      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All", autoBackup:true },
+      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All", autoBackup:true, skip:{ movies:{ intro:true, outro:true, introEnd:12, outroStart:88 }, series:{ intro:true, outro:true, introEnd:10, outroStart:90 } } },
       list: [],
       progress: {},
       monetization: {
@@ -299,6 +303,9 @@
     function itemProgress(id){ const keys = Object.keys(db.progress).filter(k => k.startsWith(id + ":")); return keys.reduce((m,k)=>Math.max(m,db.progress[k]?.pct||0),0); }
     function hasStream(t){ const ep = firstEpisode(t); return !!(ep && ep.embedUrl && ep.embedUrl.trim()); }
     function migrateMonetization(){
+      if(!db.settings.skip) db.settings.skip = structuredClone(defaultData.settings.skip);
+      if(!db.settings.skip.movies) db.settings.skip.movies = structuredClone(defaultData.settings.skip.movies);
+      if(!db.settings.skip.series) db.settings.skip.series = structuredClone(defaultData.settings.skip.series);
       if(!db.monetization) db.monetization = structuredClone(defaultData.monetization);
       if(!db.monetization.adCodes) db.monetization.adCodes = structuredClone(defaultData.monetization.adCodes);
       if(!db.monetization.placements) db.monetization.placements = structuredClone(defaultData.monetization.placements);
@@ -526,23 +533,56 @@
       currentTitleId=id; currentSeason=s; currentEpisode=e;
       document.getElementById("player-title").textContent = t.title;
       document.getElementById("player-subtitle").textContent = t.type==="series" ? `S${s+1}:E${e+1} ${ep.title}` : `${t.year} • ${t.duration}`;
+      document.getElementById("autoplay").checked = db.settings.autoplay;
       document.getElementById("player-modal").classList.remove("hidden"); document.body.style.overflow="hidden";
       document.getElementById("player-loader").style.display="flex"; document.getElementById("player-frame").src="";
       setTimeout(()=>{ document.getElementById("player-frame").src=ep.embedUrl; setTimeout(()=>document.getElementById("player-loader").style.display="none",1800); },250);
       startProgress(); renderAds(); lucide.createIcons();
     }
-    function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
+    function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); hideSkipButtons(); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
     function startProgress(){
       clearInterval(progressTimer);
       const key = progressKey(currentTitleId,currentSeason,currentEpisode);
       if(!db.progress[key]) db.progress[key] = { pct:0, updated:Date.now() };
       updateProgressUI(db.progress[key].pct);
       progressTimer=setInterval(()=>{
-        const p = db.progress[key]; p.pct = Math.min(100, (p.pct||0)+5); p.updated=Date.now(); persist(); updateProgressUI(p.pct);
+        const p = db.progress[key]; p.pct = Math.min(100, (p.pct||0)+5); p.updated=Date.now(); persist(); updateProgressUI(p.pct); updateSkipButtons(p.pct);
         if(p.pct>=100){ clearInterval(progressTimer); if(document.getElementById("autoplay").checked) setTimeout(nextEpisode,900); }
       },1800);
     }
-    function updateProgressUI(p){ document.getElementById("watch-progress").style.width=p+"%"; document.getElementById("progress-label").textContent=p+"% watched"; }
+    function updateProgressUI(p){ document.getElementById("watch-progress").style.width=p+"%"; document.getElementById("progress-label").textContent=p+"% watched"; updateSkipButtons(p); }
+    function skipConfig(){
+      const t = title(currentTitleId);
+      if(!t) return null;
+      return db.settings.skip?.[t.type === "series" ? "series" : "movies"];
+    }
+    function currentProgressRecord(){
+      const key = progressKey(currentTitleId,currentSeason,currentEpisode);
+      if(!db.progress[key]) db.progress[key] = { pct:0, updated:Date.now() };
+      return db.progress[key];
+    }
+    function hideSkipButtons(){
+      document.getElementById("skip-intro-btn")?.classList.add("hidden");
+      document.getElementById("skip-outro-btn")?.classList.add("hidden");
+    }
+    function updateSkipButtons(pct){
+      const cfg = skipConfig();
+      const intro = document.getElementById("skip-intro-btn"), outro = document.getElementById("skip-outro-btn");
+      if(!cfg || !intro || !outro){ return; }
+      intro.classList.toggle("hidden", !(cfg.intro && pct < Number(cfg.introEnd || 0)));
+      outro.classList.toggle("hidden", !(cfg.outro && pct >= Number(cfg.outroStart || 100) && pct < 100));
+    }
+    function skipIntro(){
+      const cfg = skipConfig(); if(!cfg) return;
+      const p = currentProgressRecord();
+      p.pct = Math.max(p.pct || 0, Number(cfg.introEnd || 0));
+      p.updated = Date.now(); persist(); updateProgressUI(p.pct); toast("Intro skipped");
+    }
+    function skipOutro(){
+      const p = currentProgressRecord();
+      p.pct = 100; p.updated = Date.now(); persist(); updateProgressUI(p.pct); hideSkipButtons();
+      if(document.getElementById("autoplay").checked) nextEpisode(); else toast("Outro skipped");
+    }
     function nextEpisode(){
       const t=title(currentTitleId); if(!t || t.type!=="series"){ closePlayer(); return; }
       let s=currentSeason,e=currentEpisode+1;
@@ -926,9 +966,27 @@
       </div>`;
     }
     function renderAdminSettings(){
-      document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
+      const sm = db.settings.skip.movies, ss = db.settings.skip.series;
+      document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-3xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
         <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Autoplay next episode</span><label class="toggle"><input type="checkbox" ${db.settings.autoplay?"checked":""} onchange="db.settings.autoplay=this.checked;document.getElementById('autoplay').checked=this.checked;persist()"><span class="track"></span></label></div>
-        <div class="flex items-center justify-between py-3"><span>Show continue watching strip</span><label class="toggle"><input type="checkbox" ${db.settings.showContinue?"checked":""} onchange="db.settings.showContinue=this.checked;persist();renderContinue()"><span class="track"></span></label></div>
+        <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Show continue watching strip</span><label class="toggle"><input type="checkbox" ${db.settings.showContinue?"checked":""} onchange="db.settings.showContinue=this.checked;persist();renderContinue()"><span class="track"></span></label></div>
+        <div class="mt-5 grid gap-4 lg:grid-cols-2">
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <h4 class="mb-3 font-bold">Movie Skip Controls</h4>
+            <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Skip intro button</span><label class="toggle"><input type="checkbox" ${sm.intro?"checked":""} onchange="db.settings.skip.movies.intro=this.checked;persist()"><span class="track"></span></label></div>
+            <label class="mt-3 block text-xs text-sf-muted">Intro ends at watched %<input type="number" min="0" max="50" value="${sm.introEnd}" class="admin-input mt-1" onchange="db.settings.skip.movies.introEnd=Number(this.value);persist()"></label>
+            <div class="mt-3 flex items-center justify-between border-b border-white/5 py-3"><span>Skip outro button</span><label class="toggle"><input type="checkbox" ${sm.outro?"checked":""} onchange="db.settings.skip.movies.outro=this.checked;persist()"><span class="track"></span></label></div>
+            <label class="mt-3 block text-xs text-sf-muted">Outro starts at watched %<input type="number" min="50" max="99" value="${sm.outroStart}" class="admin-input mt-1" onchange="db.settings.skip.movies.outroStart=Number(this.value);persist()"></label>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <h4 class="mb-3 font-bold">Series Skip Controls</h4>
+            <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Skip intro button</span><label class="toggle"><input type="checkbox" ${ss.intro?"checked":""} onchange="db.settings.skip.series.intro=this.checked;persist()"><span class="track"></span></label></div>
+            <label class="mt-3 block text-xs text-sf-muted">Intro ends at watched %<input type="number" min="0" max="50" value="${ss.introEnd}" class="admin-input mt-1" onchange="db.settings.skip.series.introEnd=Number(this.value);persist()"></label>
+            <div class="mt-3 flex items-center justify-between border-b border-white/5 py-3"><span>Skip outro button</span><label class="toggle"><input type="checkbox" ${ss.outro?"checked":""} onchange="db.settings.skip.series.outro=this.checked;persist()"><span class="track"></span></label></div>
+            <label class="mt-3 block text-xs text-sf-muted">Outro starts at watched %<input type="number" min="50" max="99" value="${ss.outroStart}" class="admin-input mt-1" onchange="db.settings.skip.series.outroStart=Number(this.value);persist()"></label>
+          </div>
+        </div>
+        <p class="mt-4 text-xs text-sf-muted">These controls use the site's saved watch progress percentage. Embedded third-party iframes cannot be directly seeked, so the buttons update StreamFlix progress and continue/autoplay behavior.</p>
         <button onclick="db.progress={};persist();renderContinue();renderLibrary();toast('Continue watching cleared')" class="admin-btn danger mt-4">Clear Continue Watching</button>
       </div>`;
     }
