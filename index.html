@@ -419,7 +419,7 @@
       document.getElementById("hero-copy").innerHTML = `
         <div class="mb-5 flex flex-wrap items-center gap-3 text-xs text-sf-muted">
           <span class="rounded-lg bg-sf-red px-3 py-1.5 font-black uppercase tracking-[0.18em] text-white">StreamFlix Original</span>
-          <span>${h.year}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${h.genre}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${h.type === "series" ? h.duration : h.maturity}</span>
+          <span>${h.year}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${esc(genreText(h))}</span><span class="h-1 w-1 rounded-full bg-sf-muted"></span><span>${h.type === "series" ? h.duration : h.maturity}</span>
         </div>
         <h1 class="mb-5 text-5xl font-black leading-[.9] tracking-tight sm:text-7xl lg:text-8xl">${esc(h.title)}</h1>
         <p class="mb-7 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">${esc(h.desc)}</p>
@@ -431,8 +431,8 @@
     }
 
     function renderChips(){
-      const genres = ["All","Series","Movies",...Array.from(new Set(db.titles.map(t=>t.genre)))];
-      document.getElementById("chips").innerHTML = genres.map(g=>`<button onclick="setGenre('${g}')" class="chip ${db.settings.activeGenre===g?"active":""} whitespace-nowrap rounded-xl border border-white/10 px-5 py-2 text-sm text-sf-muted">${g}</button>`).join("");
+      const genres = ["All","Series","Movies",...Array.from(new Set(db.titles.flatMap(genreList))).filter(Boolean).sort()];
+      document.getElementById("chips").innerHTML = genres.map(g=>`<button onclick='setGenre(${JSON.stringify(g)})' class="chip ${db.settings.activeGenre===g?"active":""} whitespace-nowrap rounded-xl border border-white/10 px-5 py-2 text-sm text-sf-muted">${esc(g)}</button>`).join("");
     }
     function setGenre(g){ db.settings.activeGenre=g; persist(); renderChips(); renderLibrary(); }
     function setView(v){ currentView=v; renderLibrary(); renderContinue(); scrollTo({top:620,behavior:"smooth"}); }
@@ -447,8 +447,8 @@
       const g = db.settings.activeGenre;
       if(g==="Series") list = list.filter(t=>t.type==="series");
       else if(g==="Movies") list = list.filter(t=>t.type==="movie");
-      else if(g!=="All") list = list.filter(t=>t.genre===g);
-      if(q) list = list.filter(t => [t.title,t.genre,t.cast,t.desc].join(" ").toLowerCase().includes(q));
+      else if(g!=="All") list = list.filter(t=>genreList(t).includes(g));
+      if(q) list = list.filter(t => [t.title,genreText(t),t.cast,t.desc].join(" ").toLowerCase().includes(q));
       return list;
     }
 
