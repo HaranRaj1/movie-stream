@@ -554,7 +554,8 @@
     function skipConfig(){
       const t = title(currentTitleId);
       if(!t) return null;
-      return db.settings.skip?.[t.type === "series" ? "series" : "movies"];
+      const defaults = db.settings.skip?.[t.type === "series" ? "series" : "movies"] || {};
+      return Object.assign({}, defaults, t.skip || {});
     }
     function currentProgressRecord(){
       const key = progressKey(currentTitleId,currentSeason,currentEpisode);
