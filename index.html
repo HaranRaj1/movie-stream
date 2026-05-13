@@ -144,14 +144,6 @@
       <div class="relative flex-1 bg-black">
         <div id="player-loader" class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black"><div class="spinner"></div><p class="text-sm text-sf-muted">Loading stream...</p></div>
         <iframe id="player-frame" class="absolute inset-0 h-full w-full border-0" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>
-        <div class="absolute bottom-20 right-5 z-20 flex flex-col gap-2 sm:flex-row">
-          <button id="skip-intro-btn" onclick="skipIntro()" class="hidden rounded-xl border border-white/15 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-xl hover:bg-sf-red">Skip Intro</button>
-          <button id="skip-outro-btn" onclick="skipOutro()" class="hidden rounded-xl border border-white/15 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-xl hover:bg-sf-red">Skip Outro</button>
-        </div>
-        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-5">
-          <div class="mb-2 flex items-center justify-between text-xs text-sf-muted"><span id="progress-label">0% watched</span><span>Demo progress is saved automatically</span></div>
-          <div class="h-1.5 overflow-hidden rounded-full bg-white/15"><div id="watch-progress" class="h-full rounded-full bg-sf-red" style="width:0%"></div></div>
-        </div>
       </div>
       <div id="ad-watch-below" class="ad-slot m-4"></div>
     </div>
@@ -210,7 +202,7 @@
     const BACKUP_STORAGE = "streamflix_backup_snapshots_v1";
     const ADMIN_PASSWORD = "Haran!stream2026!";
     const defaultData = {
-      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All", autoBackup:true, skip:{ movies:{ intro:true, outro:true, introEnd:12, outroStart:88 }, series:{ intro:true, outro:true, introEnd:10, outroStart:90 } } },
+      settings: { autoplay:true, showContinue:true, heroId:"s-arcane-frontier", activeGenre:"All", autoBackup:true },
       list: [],
       progress: {},
       monetization: {
@@ -332,9 +324,6 @@
       persist(); renderHero(); renderChips(); renderLibrary();
     }
     function migrateMonetization(){
-      if(!db.settings.skip) db.settings.skip = structuredClone(defaultData.settings.skip);
-      if(!db.settings.skip.movies) db.settings.skip.movies = structuredClone(defaultData.settings.skip.movies);
-      if(!db.settings.skip.series) db.settings.skip.series = structuredClone(defaultData.settings.skip.series);
       if(!db.monetization) db.monetization = structuredClone(defaultData.monetization);
       if(!db.monetization.adCodes) db.monetization.adCodes = structuredClone(defaultData.monetization.adCodes);
       if(!db.monetization.placements) db.monetization.placements = structuredClone(defaultData.monetization.placements);
@@ -519,13 +508,13 @@
     }
     function labelForView(){ return ({series:"TV Series",movies:"Movies",continue:"Continue Watching",list:"My List"})[currentView] || "Browse"; }
     function card(t){
-      const pct = itemProgress(t.id), badge = t.type === "series" ? `${t.seasons.length} season${t.seasons.length>1?"s":""}` : t.duration;
+      const badge = t.type === "series" ? `${t.seasons.length} season${t.seasons.length>1?"s":""}` : t.duration;
       return `<article onclick="openDetails('${t.id}')" class="card relative w-[150px] flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-sf-card sm:w-[190px]">
         <div class="relative aspect-[2/3]"><img src="${posterSrc(t)}" alt="${esc(t.title)}" class="h-full w-full object-cover"><div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
           <div class="absolute right-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] font-bold">${t.type==="series"?"TV":"MOVIE"}</div>
           <button onclick="event.stopPropagation();play('${t.id}',0,0)" class="poster-overlay absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-black"><i data-lucide="play" class="ml-0.5 h-4 w-4 fill-black"></i></button>
         </div>
-        <div class="p-3"><p class="line-1 text-sm font-bold">${esc(t.title)}</p><p class="mt-1 text-xs text-sf-muted">${t.year} • ${esc(badge)}</p>${pct?`<div class="mt-3 h-1 rounded bg-white/10"><div class="h-full rounded bg-sf-red" style="width:${pct}%"></div></div>`:""}</div>
+        <div class="p-3"><p class="line-1 text-sm font-bold">${esc(t.title)}</p><p class="mt-1 text-xs text-sf-muted">${t.year} • ${esc(badge)}</p></div>
       </article>`;
     }
 
@@ -536,7 +525,7 @@
       wrap.classList.remove("hidden");
       wrap.innerHTML = `<div class="mb-5 flex items-center justify-between"><h2 class="text-xl font-bold">Continue Watching</h2><button onclick="setView('continue')" class="text-xs text-sf-red">View all</button></div>
       <div class="row-scroll flex gap-3 overflow-x-auto pb-2">${items.map(t=>`<button onclick="resume('${t.id}')" class="flex w-80 flex-shrink-0 gap-3 rounded-xl border border-white/10 bg-white/[.03] p-2 text-left hover:bg-white/[.06]">
-        <img src="${bannerSrc(t,220,124)}" class="h-20 w-32 rounded-lg object-cover" alt=""><span class="min-w-0 flex-1 py-1"><b class="line-1 text-sm">${esc(t.title)}</b><small class="mt-1 block text-sf-muted">${itemProgress(t.id)}% watched</small><span class="mt-3 block h-1 rounded bg-white/10"><span class="block h-full rounded bg-sf-red" style="width:${itemProgress(t.id)}%"></span></span></span>
+        <img src="${bannerSrc(t,220,124)}" class="h-20 w-32 rounded-lg object-cover" alt=""><span class="min-w-0 flex-1 py-1"><b class="line-1 text-sm">${esc(t.title)}</b><small class="mt-1 block text-sf-muted">${t.type === "series" ? "Resume episode" : "Resume movie"}</small></span>
       </button>`).join("")}</div>`;
     }
 
@@ -573,7 +562,7 @@
       setTimeout(()=>{ document.getElementById("player-frame").src=ep.embedUrl; setTimeout(()=>document.getElementById("player-loader").style.display="none",1800); },250);
       startProgress(); renderAds(); refreshIcons();
     }
-    function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); hideSkipButtons(); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
+    function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
     function parseDurationMinutes(value, fallback){
       const text = String(value || "").toLowerCase();
       if(text.includes("episode")) return fallback;
@@ -600,48 +589,14 @@
         const t = title(currentTitleId);
         const p = db.progress[key];
         p.pct = Math.min(100, (p.pct||0) + step);
-        p.updated=Date.now(); persist(); updateProgressUI(p.pct); updateSkipButtons(p.pct);
+        p.updated=Date.now(); persist(); updateProgressUI(p.pct);
         if(p.pct>=100){
           clearInterval(progressTimer);
           if(t?.type === "series" && document.getElementById("autoplay").checked) setTimeout(nextEpisode,900);
         }
       },tickMs);
     }
-    function updateProgressUI(p){ const pct = Math.max(0, Math.min(100, Number(p)||0)); document.getElementById("watch-progress").style.width=pct+"%"; document.getElementById("progress-label").textContent=Math.round(pct)+"% watched"; updateSkipButtons(pct); }
-    function skipConfig(){
-      const t = title(currentTitleId);
-      if(!t) return null;
-      const defaults = db.settings.skip?.[t.type === "series" ? "series" : "movies"] || {};
-      return Object.assign({}, defaults, t.skip || {});
-    }
-    function currentProgressRecord(){
-      const key = progressKey(currentTitleId,currentSeason,currentEpisode);
-      if(!db.progress[key]) db.progress[key] = { pct:0, updated:Date.now() };
-      return db.progress[key];
-    }
-    function hideSkipButtons(){
-      document.getElementById("skip-intro-btn")?.classList.add("hidden");
-      document.getElementById("skip-outro-btn")?.classList.add("hidden");
-    }
-    function updateSkipButtons(pct){
-      const cfg = skipConfig();
-      const intro = document.getElementById("skip-intro-btn"), outro = document.getElementById("skip-outro-btn");
-      if(!cfg || !intro || !outro){ return; }
-      intro.classList.toggle("hidden", !(cfg.intro && pct < Number(cfg.introEnd || 0)));
-      outro.classList.toggle("hidden", !(cfg.outro && pct >= Number(cfg.outroStart || 100) && pct < 100));
-    }
-    function skipIntro(){
-      const cfg = skipConfig(); if(!cfg) return;
-      const p = currentProgressRecord();
-      p.pct = Math.max(p.pct || 0, Number(cfg.introEnd || 0));
-      p.updated = Date.now(); persist(); updateProgressUI(p.pct); toast("Intro skipped");
-    }
-    function skipOutro(){
-      const p = currentProgressRecord();
-      p.pct = 100; p.updated = Date.now(); persist(); updateProgressUI(p.pct); hideSkipButtons();
-      const t = title(currentTitleId);
-      if(t?.type === "series" && document.getElementById("autoplay").checked) nextEpisode(); else toast("Outro skipped");
-    }
+    function updateProgressUI(p){}
     function nextEpisode(){
       const t=title(currentTitleId); if(!t || t.type!=="series"){ toast("No next episode"); return; }
       let s=currentSeason,e=currentEpisode+1;
@@ -701,11 +656,6 @@
         ${field("Movie Title","ed-title",t.title)}${field("Genres (comma separated)","ed-genre",genreText(t))}${field("Year","ed-year",t.year,"number")}
         ${field("Maturity","ed-maturity",t.maturity)}${field("Duration","ed-duration",t.duration)}${field("Movie poster image URL","ed-poster-url",t.posterUrl||"")}${field("Movie banner image URL","ed-banner-url",t.bannerUrl||"")}
       </div><div class="mt-3 grid gap-3 lg:grid-cols-2">${field("Cast","ed-cast",t.cast)}${field("Streaming Embed URL","ed-embed",t.embedUrl||"")}</div>
-      <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4"><h5 class="mb-3 font-bold">Custom Skip Timings</h5><div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        ${field("Intro ends at %","ed-skip-intro-end",t.skip?.introEnd ?? "","number")}${field("Outro starts at %","ed-skip-outro-start",t.skip?.outroStart ?? "","number")}
-        <label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Skip intro <span class="toggle"><input id="ed-skip-intro" type="checkbox" ${t.skip?.intro ?? true ? "checked" : ""}><span class="track"></span></span></label>
-        <label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Skip outro <span class="toggle"><input id="ed-skip-outro" type="checkbox" ${t.skip?.outro ?? true ? "checked" : ""}><span class="track"></span></span></label>
-      </div><p class="mt-2 text-xs text-sf-muted">Leave percentage boxes empty to use global movie defaults.</p></div>
       <textarea id="ed-desc" class="admin-input mt-3" rows="3">${esc(t.desc)}</textarea>
       <div class="mt-4 flex gap-2"><button onclick="saveMovieEditor()" class="admin-btn">Save Movie</button><button onclick="document.getElementById('title-editor').innerHTML=''" class="admin-btn ghost">Cancel</button></div></div>`;
     }
@@ -714,27 +664,16 @@
     function saveMovieEditor(){
       const t = title(adminTitleId); if(!t) return;
       const gs = parseGenres(v("ed-genre"));
-      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:gs[0]||"", genres:gs, year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:t.poster||("movie-"+Date.now()), banner:t.banner||("movie-banner-"+Date.now()), posterUrl:v("ed-poster-url"), bannerUrl:v("ed-banner-url"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed"), skip:gatherSkipEditor("ed") });
+      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:gs[0]||"", genres:gs, year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:t.poster||("movie-"+Date.now()), banner:t.banner||("movie-banner-"+Date.now()), posterUrl:v("ed-poster-url"), bannerUrl:v("ed-banner-url"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed") });
       delete t.seasons;
       persist(); renderAdmin(); toast("Movie saved");
-    }
-    function gatherSkipEditor(prefix){
-      const introEnd = document.getElementById(prefix+"-skip-intro-end")?.value;
-      const outroStart = document.getElementById(prefix+"-skip-outro-start")?.value;
-      const skip = {
-        intro: !!document.getElementById(prefix+"-skip-intro")?.checked,
-        outro: !!document.getElementById(prefix+"-skip-outro")?.checked
-      };
-      if(introEnd !== "") skip.introEnd = Number(introEnd);
-      if(outroStart !== "") skip.outroStart = Number(outroStart);
-      return skip;
     }
     function v(id){ return document.getElementById(id).value.trim(); }
     function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",genres:["Drama"],year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",posterUrl:"",bannerUrl:"",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
     function deleteTitle(id){ maybeAutoBackup("Before title delete"); db.titles=db.titles.filter(t=>t.id!==id); db.rows.forEach(r=>r.ids=r.ids.filter(x=>x!==id)); db.list=db.list.filter(x=>x!==id); persist(); renderAdmin(); }
     function renderAdminSeries(){
       const series = db.titles.filter(t=>t.type==="series");
-      document.getElementById("admin-series").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Series, Seasons & Episodes</h3><p class="mt-1 text-sm text-sf-muted">Add series, paste banner/poster image URLs, then build seasons and episodes.</p></div><button onclick="addSeries()" class="admin-btn">Add Series</button></div>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-start justify-between gap-3"><div class="flex-1"><input class="admin-input max-w-sm font-bold" value="${esc(t.title)}" onchange="title('${t.id}').title=this.value;persist();renderHero();renderLibrary()"><div class="mt-3 grid gap-3 lg:grid-cols-2"><label class="text-xs text-sf-muted">Series banner image URL<input type="url" class="admin-input mt-1" value="${esc(t.bannerUrl||"")}" placeholder="https://example.com/series-banner.jpg" onchange="title('${t.id}').bannerUrl=this.value;persist();renderHero();renderLibrary()"></label><label class="text-xs text-sf-muted">Series poster image URL<input type="url" class="admin-input mt-1" value="${esc(t.posterUrl||"")}" placeholder="https://example.com/series-poster.jpg" onchange="title('${t.id}').posterUrl=this.value;persist();renderLibrary()"></label></div><div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-3"><div class="mb-2 text-xs font-bold text-white">Custom Skip Timings</div><div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"><input id="series-${t.id}-skip-intro-end" class="admin-input" type="number" placeholder="Intro end %" value="${t.skip?.introEnd ?? ""}"><input id="series-${t.id}-skip-outro-start" class="admin-input" type="number" placeholder="Outro start %" value="${t.skip?.outroStart ?? ""}"><label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Intro <span class="toggle"><input id="series-${t.id}-skip-intro" type="checkbox" ${t.skip?.intro ?? true ? "checked" : ""}><span class="track"></span></span></label><label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Outro <span class="toggle"><input id="series-${t.id}-skip-outro" type="checkbox" ${t.skip?.outro ?? true ? "checked" : ""}><span class="track"></span></span></label><button onclick="saveSeriesSkip('${t.id}')" class="admin-btn secondary">Save Skip</button></div><p class="mt-2 text-xs text-sf-muted">Leave percentage boxes empty to use global series defaults.</p></div><p class="mt-2 text-xs text-sf-muted">${esc(t.genre)} • ${t.year}</p></div><div class="flex gap-2"><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger">Delete Series</button></div></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
+      document.getElementById("admin-series").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Series, Seasons & Episodes</h3><p class="mt-1 text-sm text-sf-muted">Add series, paste banner/poster image URLs, then build seasons and episodes.</p></div><button onclick="addSeries()" class="admin-btn">Add Series</button></div>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-start justify-between gap-3"><div class="flex-1"><input class="admin-input max-w-sm font-bold" value="${esc(t.title)}" onchange="title('${t.id}').title=this.value;persist();renderHero();renderLibrary()"><div class="mt-3 grid gap-3 lg:grid-cols-2"><label class="text-xs text-sf-muted">Series banner image URL<input type="url" class="admin-input mt-1" value="${esc(t.bannerUrl||"")}" placeholder="https://example.com/series-banner.jpg" onchange="title('${t.id}').bannerUrl=this.value;persist();renderHero();renderLibrary()"></label><label class="text-xs text-sf-muted">Series poster image URL<input type="url" class="admin-input mt-1" value="${esc(t.posterUrl||"")}" placeholder="https://example.com/series-poster.jpg" onchange="title('${t.id}').posterUrl=this.value;persist();renderLibrary()"></label></div><p class="mt-2 text-xs text-sf-muted">${esc(t.genre)} • ${t.year}</p></div><div class="flex gap-2"><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger">Delete Series</button></div></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
       document.getElementById("admin-series").innerHTML += `<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><h4 class="mb-3 font-bold">Series Multi-Genre Manager</h4><p class="mb-3 text-sm text-sf-muted">Use commas to place one series in multiple genres.</p><div class="grid gap-3 lg:grid-cols-2">${series.map(t=>`<label class="text-xs text-sf-muted">${esc(t.title)}<input class="admin-input mt-1" value="${esc(genreText(t))}" placeholder="Drama, Thriller, Sci-Fi" onchange="setTitleGenres('${t.id}',this.value)"></label>`).join("")}</div></div>`;
     }
     function addSeries(){
@@ -743,18 +682,6 @@
       db.titles.push(newSeries);
       db.rows[1]?.ids.push(id);
       persist(); renderAdminSeries(); renderLibrary(); toast("Series added");
-    }
-    function saveSeriesSkip(id){
-      const t = title(id); if(!t) return;
-      const introEnd = document.getElementById(`series-${id}-skip-intro-end`)?.value;
-      const outroStart = document.getElementById(`series-${id}-skip-outro-start`)?.value;
-      t.skip = {
-        intro: !!document.getElementById(`series-${id}-skip-intro`)?.checked,
-        outro: !!document.getElementById(`series-${id}-skip-outro`)?.checked
-      };
-      if(introEnd !== "") t.skip.introEnd = Number(introEnd);
-      if(outroStart !== "") t.skip.outroStart = Number(outroStart);
-      persist(); toast("Series skip timings saved");
     }
     function addSeason(id){ const t=title(id); t.seasons.push({n:t.seasons.length+1,name:`Season ${t.seasons.length+1}`,episodes:[]}); persist(); renderAdminSeries(); }
     function addEpisode(id,si){ const eps=title(id).seasons[si].episodes; eps.push({n:eps.length+1,title:"New Episode",duration:"42m",desc:"Episode description.",embedUrl:""}); persist(); renderAdminSeries(); }
@@ -1055,27 +982,9 @@
       </div>`;
     }
     function renderAdminSettings(){
-      const sm = db.settings.skip.movies, ss = db.settings.skip.series;
-      document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-3xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
+      document.getElementById("admin-settings").innerHTML = `<h3 class="mb-4 text-lg font-bold">Playback Settings</h3><div class="max-w-xl rounded-2xl border border-white/10 bg-white/[.03] p-5">
         <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Autoplay next episode</span><label class="toggle"><input type="checkbox" ${db.settings.autoplay?"checked":""} onchange="db.settings.autoplay=this.checked;document.getElementById('autoplay').checked=this.checked;persist()"><span class="track"></span></label></div>
-        <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Show continue watching strip</span><label class="toggle"><input type="checkbox" ${db.settings.showContinue?"checked":""} onchange="db.settings.showContinue=this.checked;persist();renderContinue()"><span class="track"></span></label></div>
-        <div class="mt-5 grid gap-4 lg:grid-cols-2">
-          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <h4 class="mb-3 font-bold">Movie Skip Controls</h4>
-            <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Skip intro button</span><label class="toggle"><input type="checkbox" ${sm.intro?"checked":""} onchange="db.settings.skip.movies.intro=this.checked;persist()"><span class="track"></span></label></div>
-            <label class="mt-3 block text-xs text-sf-muted">Intro ends at watched %<input type="number" min="0" max="50" value="${sm.introEnd}" class="admin-input mt-1" onchange="db.settings.skip.movies.introEnd=Number(this.value);persist()"></label>
-            <div class="mt-3 flex items-center justify-between border-b border-white/5 py-3"><span>Skip outro button</span><label class="toggle"><input type="checkbox" ${sm.outro?"checked":""} onchange="db.settings.skip.movies.outro=this.checked;persist()"><span class="track"></span></label></div>
-            <label class="mt-3 block text-xs text-sf-muted">Outro starts at watched %<input type="number" min="50" max="99" value="${sm.outroStart}" class="admin-input mt-1" onchange="db.settings.skip.movies.outroStart=Number(this.value);persist()"></label>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <h4 class="mb-3 font-bold">Series Skip Controls</h4>
-            <div class="flex items-center justify-between border-b border-white/5 py-3"><span>Skip intro button</span><label class="toggle"><input type="checkbox" ${ss.intro?"checked":""} onchange="db.settings.skip.series.intro=this.checked;persist()"><span class="track"></span></label></div>
-            <label class="mt-3 block text-xs text-sf-muted">Intro ends at watched %<input type="number" min="0" max="50" value="${ss.introEnd}" class="admin-input mt-1" onchange="db.settings.skip.series.introEnd=Number(this.value);persist()"></label>
-            <div class="mt-3 flex items-center justify-between border-b border-white/5 py-3"><span>Skip outro button</span><label class="toggle"><input type="checkbox" ${ss.outro?"checked":""} onchange="db.settings.skip.series.outro=this.checked;persist()"><span class="track"></span></label></div>
-            <label class="mt-3 block text-xs text-sf-muted">Outro starts at watched %<input type="number" min="50" max="99" value="${ss.outroStart}" class="admin-input mt-1" onchange="db.settings.skip.series.outroStart=Number(this.value);persist()"></label>
-          </div>
-        </div>
-        <p class="mt-4 text-xs text-sf-muted">These controls use the site's saved watch progress percentage. Embedded third-party iframes cannot be directly seeked, so the buttons update StreamFlix progress and continue/autoplay behavior.</p>
+        <div class="flex items-center justify-between py-3"><span>Show continue watching strip</span><label class="toggle"><input type="checkbox" ${db.settings.showContinue?"checked":""} onchange="db.settings.showContinue=this.checked;persist();renderContinue()"><span class="track"></span></label></div>
         <button onclick="db.progress={};persist();renderContinue();renderLibrary();toast('Continue watching cleared')" class="admin-btn danger mt-4">Clear Continue Watching</button>
       </div>`;
     }
