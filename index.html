@@ -291,8 +291,28 @@
     let db = load();
     let currentView = "home", currentTitleId = null, currentSeason = 0, currentEpisode = 0, progressTimer = null, adminTitleId = null;
 
-    function load(){ try { return JSON.parse(localStorage.getItem(STORAGE)) || structuredClone(defaultData); } catch { return structuredClone(defaultData); } }
+    function load(){
+      try { return normalizeDb(JSON.parse(localStorage.getItem(STORAGE)) || structuredClone(defaultData)); }
+      catch { return structuredClone(defaultData); }
+    }
+    function normalizeDb(data){
+      const fresh = structuredClone(defaultData);
+      if(!data || typeof data !== "object") return fresh;
+      data.settings = Object.assign({}, fresh.settings, data.settings || {});
+      data.list = Array.isArray(data.list) ? data.list : [];
+      data.progress = data.progress && typeof data.progress === "object" ? data.progress : {};
+      data.titles = Array.isArray(data.titles) && data.titles.length ? data.titles : fresh.titles;
+      data.rows = Array.isArray(data.rows) && data.rows.length ? data.rows : fresh.rows;
+      data.titles.forEach(t => {
+        if(t.type === "series" && !Array.isArray(t.seasons)) t.seasons = [{ n:1, name:"Season 1", episodes:[] }];
+        if(t.type === "series") t.seasons.forEach(s => { if(!Array.isArray(s.episodes)) s.episodes = []; });
+        if(!Array.isArray(t.genres) || !t.genres.length) t.genres = t.genre ? [t.genre] : [];
+        t.genre = t.genres[0] || t.genre || "Drama";
+      });
+      return data;
+    }
     function persist(){ localStorage.setItem(STORAGE, JSON.stringify(db)); }
+    function refreshIcons(){ if(window.lucide && lucide.createIcons) lucide.createIcons(); }
     function title(id){ return db.titles.find(t => t.id === id); }
     function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
     function img(seed,w=700,h=1050){ return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${w}/${h}.jpg`; }
@@ -408,7 +428,12 @@
     }
 
     function boot(){
-      migrateMonetization(); renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); renderAdmin(); lucide.createIcons();
+      try {
+        migrateMonetization(); renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); refreshIcons();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("hero-copy").innerHTML = `<h1 class="mb-4 text-4xl font-black">StreamFlix</h1><p class="text-slate-300">The site data could not load. Open Admin after refreshing, or restore a backup.</p>`;
+      }
       window.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("nav-glass",scrollY>20));
       document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDetails(); closePlayer(); closeAdmin(); closeAdminLogin(); } });
     }
@@ -465,7 +490,7 @@
         </section>${currentView === "home" ? affiliateRowsAfter(i) : ""}`;
       }).join("") || `<section class="mx-auto max-w-[1920px] px-4 text-sf-muted sm:px-6 lg:px-10">No titles match this view.</section>`;
       renderAds();
-      lucide.createIcons();
+      refreshIcons();
     }
     function affiliateRowsAfter(rowIndex){
       const rows = (db.monetization?.affiliateRows || []).filter(r => r.enabled && Number(r.afterRow) === rowIndex);
@@ -520,11 +545,11 @@
       const seasons = t.type === "series" ? renderEpisodes(t) : "";
       document.getElementById("details-content").innerHTML = `<div class="relative">
         <div class="relative h-80"><img src="${bannerSrc(t,1200,600)}" class="h-full w-full object-cover" alt=""><div class="absolute inset-0 bg-gradient-to-t from-sf-card via-black/50 to-transparent"></div><button onclick="closeDetails()" class="absolute right-4 top-4 rounded-xl bg-black/60 p-2"><i data-lucide="x"></i></button>
-          <div class="absolute bottom-6 left-6 right-6"><div class="mb-3 flex gap-2 text-xs text-sf-muted"><span>${t.year}</span><span>${t.maturity}</span><span>${t.genre}</span><span>${t.duration}</span></div><h2 class="text-4xl font-black">${esc(t.title)}</h2></div>
+          <div class="absolute bottom-6 left-6 right-6"><div class="mb-3 flex gap-2 text-xs text-sf-muted"><span>${t.year}</span><span>${t.maturity}</span><span>${esc(genreText(t))}</span><span>${t.duration}</span></div><h2 class="text-4xl font-black">${esc(t.title)}</h2></div>
         </div>
         <div class="p-6"><div class="grid gap-6 lg:grid-cols-[1fr_260px]"><div><div class="mb-4 flex gap-3"><button onclick="play('${t.id}',0,0)" class="admin-btn flex items-center gap-2"><i data-lucide="play" class="h-4 w-4 fill-white"></i>Play</button><button onclick="toggleList('${t.id}')" class="admin-btn secondary">${db.list.includes(t.id)?"Remove from List":"Add to List"}</button></div><p class="leading-7 text-slate-300">${esc(t.desc)}</p></div><div class="text-sm text-sf-muted"><p><b class="text-white">Cast:</b> ${esc(t.cast)}</p><p class="mt-3"><b class="text-white">Type:</b> ${t.type}</p></div></div>${seasons}</div>
       </div>`;
-      document.getElementById("details-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAds(); lucide.createIcons();
+      document.getElementById("details-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAds(); refreshIcons();
     }
     function closeDetails(){ document.getElementById("details-modal").classList.add("hidden"); document.body.style.overflow=""; }
     function renderEpisodes(t){
@@ -546,20 +571,43 @@
       document.getElementById("player-modal").classList.remove("hidden"); document.body.style.overflow="hidden";
       document.getElementById("player-loader").style.display="flex"; document.getElementById("player-frame").src="";
       setTimeout(()=>{ document.getElementById("player-frame").src=ep.embedUrl; setTimeout(()=>document.getElementById("player-loader").style.display="none",1800); },250);
-      startProgress(); renderAds(); lucide.createIcons();
+      startProgress(); renderAds(); refreshIcons();
     }
     function closePlayer(){ document.getElementById("player-modal").classList.add("hidden"); document.getElementById("player-frame").src=""; clearInterval(progressTimer); hideSkipButtons(); document.body.style.overflow=""; renderContinue(); renderLibrary(); renderAds(); }
+    function parseDurationMinutes(value, fallback){
+      const text = String(value || "").toLowerCase();
+      if(text.includes("episode")) return fallback;
+      const hours = text.match(/(\d+(?:\.\d+)?)\s*h/);
+      const mins = text.match(/(\d+(?:\.\d+)?)\s*m/);
+      const total = (hours ? Number(hours[1]) * 60 : 0) + (mins ? Number(mins[1]) : 0);
+      return total > 0 ? total : fallback;
+    }
+    function playbackDurationMinutes(){
+      const t = title(currentTitleId);
+      if(!t) return 120;
+      const ep = t.type === "series" ? t.seasons?.[currentSeason]?.episodes?.[currentEpisode] : t;
+      return parseDurationMinutes(ep?.duration || t.duration, t.type === "series" ? 45 : 120);
+    }
     function startProgress(){
       clearInterval(progressTimer);
       const key = progressKey(currentTitleId,currentSeason,currentEpisode);
       if(!db.progress[key]) db.progress[key] = { pct:0, updated:Date.now() };
+      if((db.progress[key].pct || 0) >= 99.5) db.progress[key].pct = 0;
       updateProgressUI(db.progress[key].pct);
+      const tickMs = 5000;
+      const step = (tickMs / (playbackDurationMinutes() * 60 * 1000)) * 100;
       progressTimer=setInterval(()=>{
-        const p = db.progress[key]; p.pct = Math.min(100, (p.pct||0)+5); p.updated=Date.now(); persist(); updateProgressUI(p.pct); updateSkipButtons(p.pct);
-        if(p.pct>=100){ clearInterval(progressTimer); if(document.getElementById("autoplay").checked) setTimeout(nextEpisode,900); }
-      },1800);
+        const t = title(currentTitleId);
+        const p = db.progress[key];
+        p.pct = Math.min(100, (p.pct||0) + step);
+        p.updated=Date.now(); persist(); updateProgressUI(p.pct); updateSkipButtons(p.pct);
+        if(p.pct>=100){
+          clearInterval(progressTimer);
+          if(t?.type === "series" && document.getElementById("autoplay").checked) setTimeout(nextEpisode,900);
+        }
+      },tickMs);
     }
-    function updateProgressUI(p){ document.getElementById("watch-progress").style.width=p+"%"; document.getElementById("progress-label").textContent=p+"% watched"; updateSkipButtons(p); }
+    function updateProgressUI(p){ const pct = Math.max(0, Math.min(100, Number(p)||0)); document.getElementById("watch-progress").style.width=pct+"%"; document.getElementById("progress-label").textContent=Math.round(pct)+"% watched"; updateSkipButtons(pct); }
     function skipConfig(){
       const t = title(currentTitleId);
       if(!t) return null;
@@ -591,13 +639,14 @@
     function skipOutro(){
       const p = currentProgressRecord();
       p.pct = 100; p.updated = Date.now(); persist(); updateProgressUI(p.pct); hideSkipButtons();
-      if(document.getElementById("autoplay").checked) nextEpisode(); else toast("Outro skipped");
+      const t = title(currentTitleId);
+      if(t?.type === "series" && document.getElementById("autoplay").checked) nextEpisode(); else toast("Outro skipped");
     }
     function nextEpisode(){
-      const t=title(currentTitleId); if(!t || t.type!=="series"){ closePlayer(); return; }
+      const t=title(currentTitleId); if(!t || t.type!=="series"){ toast("No next episode"); return; }
       let s=currentSeason,e=currentEpisode+1;
       if(e >= (t.seasons[s]?.episodes.length||0)){ s++; e=0; }
-      if(!t.seasons[s]?.episodes[e]){ toast("Series complete"); closePlayer(); return; }
+      if(!t.seasons[s]?.episodes[e]){ toast("Series complete"); return; }
       play(t.id,s,e);
     }
     function resume(id){
@@ -615,7 +664,7 @@
       document.getElementById("admin-password").value="";
       document.body.style.overflow="hidden";
       setTimeout(()=>document.getElementById("admin-password").focus(),80);
-      lucide.createIcons();
+      refreshIcons();
     }
     function closeAdminLogin(){
       document.getElementById("admin-login-modal").classList.add("hidden");
@@ -634,7 +683,7 @@
       document.getElementById("admin-password").value = "";
       document.getElementById("admin-password").focus();
     }
-    function openAdmin(){ document.getElementById("admin-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAdmin(); lucide.createIcons(); }
+    function openAdmin(){ document.getElementById("admin-modal").classList.remove("hidden"); document.body.style.overflow="hidden"; renderAdmin(); refreshIcons(); }
     function closeAdmin(){ document.getElementById("admin-modal").classList.add("hidden"); document.body.style.overflow=""; renderHero(); renderChips(); renderLibrary(); renderContinue(); renderAds(); }
     function adminTab(name){ document.querySelectorAll(".admin-tab").forEach(b=>b.classList.remove("active")); event.target.classList.add("active"); document.querySelectorAll(".admin-page").forEach(p=>p.classList.add("hidden")); document.getElementById("admin-"+name).classList.remove("hidden"); }
     function saveAll(){ persist(); renderAds(); toast("Admin changes saved"); closeAdmin(); }
@@ -642,14 +691,14 @@
     function renderAdminContent(){
       const movies = db.titles.filter(t => t.type === "movie");
       document.getElementById("admin-content").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Movie Library</h3><p class="mt-1 text-sm text-sf-muted">Add, edit, delete movies and paste embed URLs for streaming.</p></div><button onclick="addMovie()" class="admin-btn">Add Movie</button></div>
-      <div class="overflow-x-auto rounded-2xl border border-white/10"><table class="w-full text-left text-sm"><thead class="bg-white/[.03] text-xs uppercase tracking-wider text-sf-muted"><tr><th class="p-3">Movie</th><th>Genre</th><th>Year</th><th>Duration</th><th>Embed URL</th><th>Stream</th><th>Actions</th></tr></thead><tbody>${movies.map(t=>`<tr class="border-t border-white/5"><td class="p-3 font-semibold">${esc(t.title)}</td><td>${t.genre}</td><td>${t.year}</td><td>${t.duration}</td><td class="max-w-[260px] truncate text-xs text-sf-muted">${t.embedUrl ? esc(t.embedUrl) : "No embed URL"}</td><td>${hasStream(t)?"Ready":"Missing"}</td><td><button onclick="editMovie('${t.id}')" class="admin-btn secondary mr-2 py-2">Edit</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger py-2">Delete</button></td></tr>`).join("")}</tbody></table></div>
+      <div class="overflow-x-auto rounded-2xl border border-white/10"><table class="w-full text-left text-sm"><thead class="bg-white/[.03] text-xs uppercase tracking-wider text-sf-muted"><tr><th class="p-3">Movie</th><th>Genres</th><th>Year</th><th>Duration</th><th>Embed URL</th><th>Stream</th><th>Actions</th></tr></thead><tbody>${movies.map(t=>`<tr class="border-t border-white/5"><td class="p-3 font-semibold">${esc(t.title)}</td><td>${esc(genreText(t))}</td><td>${t.year}</td><td>${t.duration}</td><td class="max-w-[260px] truncate text-xs text-sf-muted">${t.embedUrl ? esc(t.embedUrl) : "No embed URL"}</td><td>${hasStream(t)?"Ready":"Missing"}</td><td><button onclick="editMovie('${t.id}')" class="admin-btn secondary mr-2 py-2">Edit</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger py-2">Delete</button></td></tr>`).join("")}</tbody></table></div>
       <div id="title-editor" class="mt-5"></div>`;
     }
     function editMovie(id){
       const t = title(id); adminTitleId=id;
       document.getElementById("title-editor").innerHTML = `<div class="rounded-2xl border border-white/10 bg-white/[.03] p-5"><h4 class="mb-4 font-bold">Edit Movie</h4>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        ${field("Movie Title","ed-title",t.title)}${field("Genre","ed-genre",t.genre)}${field("Year","ed-year",t.year,"number")}
+        ${field("Movie Title","ed-title",t.title)}${field("Genres (comma separated)","ed-genre",genreText(t))}${field("Year","ed-year",t.year,"number")}
         ${field("Maturity","ed-maturity",t.maturity)}${field("Duration","ed-duration",t.duration)}${field("Movie poster image URL","ed-poster-url",t.posterUrl||"")}${field("Movie banner image URL","ed-banner-url",t.bannerUrl||"")}
       </div><div class="mt-3 grid gap-3 lg:grid-cols-2">${field("Cast","ed-cast",t.cast)}${field("Streaming Embed URL","ed-embed",t.embedUrl||"")}</div>
       <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4"><h5 class="mb-3 font-bold">Custom Skip Timings</h5><div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -664,7 +713,8 @@
     function select(label,id,val,opts){ return `<label class="text-xs text-sf-muted">${label}<select id="${id}" class="admin-input mt-1">${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select></label>`; }
     function saveMovieEditor(){
       const t = title(adminTitleId); if(!t) return;
-      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:v("ed-genre"), year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:t.poster||("movie-"+Date.now()), banner:t.banner||("movie-banner-"+Date.now()), posterUrl:v("ed-poster-url"), bannerUrl:v("ed-banner-url"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed"), skip:gatherSkipEditor("ed") });
+      const gs = parseGenres(v("ed-genre"));
+      Object.assign(t,{ type:"movie", title:v("ed-title"), genre:gs[0]||"", genres:gs, year:Number(v("ed-year"))||2026, maturity:v("ed-maturity"), duration:v("ed-duration"), poster:t.poster||("movie-"+Date.now()), banner:t.banner||("movie-banner-"+Date.now()), posterUrl:v("ed-poster-url"), bannerUrl:v("ed-banner-url"), cast:v("ed-cast"), desc:v("ed-desc"), embedUrl:v("ed-embed"), skip:gatherSkipEditor("ed") });
       delete t.seasons;
       persist(); renderAdmin(); toast("Movie saved");
     }
@@ -680,15 +730,16 @@
       return skip;
     }
     function v(id){ return document.getElementById(id).value.trim(); }
-    function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",posterUrl:"",bannerUrl:"",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
+    function addMovie(){ const id="m-"+Date.now(); db.titles.push({id,type:"movie",title:"New Movie",genre:"Drama",genres:["Drama"],year:2026,maturity:"TV-14",duration:"1h 30m",cast:"",poster:"new-movie",banner:"new-movie-banner",posterUrl:"",bannerUrl:"",desc:"New movie description.",embedUrl:""}); persist(); renderAdminContent(); editMovie(id); }
     function deleteTitle(id){ maybeAutoBackup("Before title delete"); db.titles=db.titles.filter(t=>t.id!==id); db.rows.forEach(r=>r.ids=r.ids.filter(x=>x!==id)); db.list=db.list.filter(x=>x!==id); persist(); renderAdmin(); }
     function renderAdminSeries(){
       const series = db.titles.filter(t=>t.type==="series");
       document.getElementById("admin-series").innerHTML = `<div class="mb-4 flex items-center justify-between gap-4"><div><h3 class="text-lg font-bold">Series, Seasons & Episodes</h3><p class="mt-1 text-sm text-sf-muted">Add series, paste banner/poster image URLs, then build seasons and episodes.</p></div><button onclick="addSeries()" class="admin-btn">Add Series</button></div>${series.map(t=>`<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><div class="mb-4 flex items-start justify-between gap-3"><div class="flex-1"><input class="admin-input max-w-sm font-bold" value="${esc(t.title)}" onchange="title('${t.id}').title=this.value;persist();renderHero();renderLibrary()"><div class="mt-3 grid gap-3 lg:grid-cols-2"><label class="text-xs text-sf-muted">Series banner image URL<input type="url" class="admin-input mt-1" value="${esc(t.bannerUrl||"")}" placeholder="https://example.com/series-banner.jpg" onchange="title('${t.id}').bannerUrl=this.value;persist();renderHero();renderLibrary()"></label><label class="text-xs text-sf-muted">Series poster image URL<input type="url" class="admin-input mt-1" value="${esc(t.posterUrl||"")}" placeholder="https://example.com/series-poster.jpg" onchange="title('${t.id}').posterUrl=this.value;persist();renderLibrary()"></label></div><div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-3"><div class="mb-2 text-xs font-bold text-white">Custom Skip Timings</div><div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"><input id="series-${t.id}-skip-intro-end" class="admin-input" type="number" placeholder="Intro end %" value="${t.skip?.introEnd ?? ""}"><input id="series-${t.id}-skip-outro-start" class="admin-input" type="number" placeholder="Outro start %" value="${t.skip?.outroStart ?? ""}"><label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Intro <span class="toggle"><input id="series-${t.id}-skip-intro" type="checkbox" ${t.skip?.intro ?? true ? "checked" : ""}><span class="track"></span></span></label><label class="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-xs text-sf-muted">Outro <span class="toggle"><input id="series-${t.id}-skip-outro" type="checkbox" ${t.skip?.outro ?? true ? "checked" : ""}><span class="track"></span></span></label><button onclick="saveSeriesSkip('${t.id}')" class="admin-btn secondary">Save Skip</button></div><p class="mt-2 text-xs text-sf-muted">Leave percentage boxes empty to use global series defaults.</p></div><p class="mt-2 text-xs text-sf-muted">${esc(t.genre)} • ${t.year}</p></div><div class="flex gap-2"><button onclick="addSeason('${t.id}')" class="admin-btn secondary">Add Season</button><button onclick="deleteTitle('${t.id}')" class="admin-btn danger">Delete Series</button></div></div>${t.seasons.map((s,si)=>`<div class="mb-3 rounded-xl border border-white/10 p-3"><div class="mb-3 flex items-center gap-2"><input class="admin-input max-w-xs" value="${esc(s.name)}" onchange="title('${t.id}').seasons[${si}].name=this.value;persist()"><button onclick="addEpisode('${t.id}',${si})" class="admin-btn secondary">Add Episode</button></div><div class="space-y-2">${s.episodes.map((e,ei)=>`<div class="grid gap-2 rounded-lg bg-black/20 p-2 lg:grid-cols-[60px_1fr_90px_1.4fr_1.5fr_70px]"><input class="admin-input" value="${e.n}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].n=Number(this.value);persist()"><input class="admin-input" value="${esc(e.title)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].title=this.value;persist()"><input class="admin-input" value="${esc(e.duration)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].duration=this.value;persist()"><input class="admin-input" value="${esc(e.desc)}" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].desc=this.value;persist()"><input class="admin-input" value="${esc(e.embedUrl)}" placeholder="Embed URL" onchange="title('${t.id}').seasons[${si}].episodes[${ei}].embedUrl=this.value;persist()"><button onclick="removeEpisode('${t.id}',${si},${ei})" class="admin-btn danger">Del</button></div>`).join("")}</div></div>`).join("")}</div>`).join("")}`;
+      document.getElementById("admin-series").innerHTML += `<div class="mb-4 rounded-2xl border border-white/10 bg-white/[.03] p-5"><h4 class="mb-3 font-bold">Series Multi-Genre Manager</h4><p class="mb-3 text-sm text-sf-muted">Use commas to place one series in multiple genres.</p><div class="grid gap-3 lg:grid-cols-2">${series.map(t=>`<label class="text-xs text-sf-muted">${esc(t.title)}<input class="admin-input mt-1" value="${esc(genreText(t))}" placeholder="Drama, Thriller, Sci-Fi" onchange="setTitleGenres('${t.id}',this.value)"></label>`).join("")}</div></div>`;
     }
     function addSeries(){
       const id = "s-" + Date.now();
-      const newSeries = { id, type:"series", title:"New Series", genre:"Drama", year:2026, maturity:"TV-14", duration:"1 season", cast:"", poster:"series-fallback-poster", banner:"series-fallback-banner", posterUrl:"", bannerUrl:"", desc:"New series description.", seasons:[{ n:1, name:"Season 1", episodes:[] }] };
+      const newSeries = { id, type:"series", title:"New Series", genre:"Drama", genres:["Drama"], year:2026, maturity:"TV-14", duration:"1 season", cast:"", poster:"series-fallback-poster", banner:"series-fallback-banner", posterUrl:"", bannerUrl:"", desc:"New series description.", seasons:[{ n:1, name:"Season 1", episodes:[] }] };
       db.titles.push(newSeries);
       db.rows[1]?.ids.push(id);
       persist(); renderAdminSeries(); renderLibrary(); toast("Series added");
